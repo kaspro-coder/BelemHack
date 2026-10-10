@@ -56,6 +56,12 @@ def susde():
             "exit_in_window": r["fund_exit_t0"] / 1e6, "exit_after": r["fund_exit_after"] / 1e6,
             "fund_stuck": r["fund_unsold_after"] > 0,
         } for r in depeg],
+        "events_prudent": [{
+            "severity": r["depeg_bps"] / 1e4, "liquidated": r["liquidated"], "skipped": r["skipped"],
+            "seized_pt": r["seized_pt"] / 1e18, "debt_at_risk": r["debt_at_risk"] / 1e6,
+            "underwater": r["underwater"] / 1e6, "exit_after": r["fund_exit_after"] / 1e6,
+            "fund_stuck": r["fund_unsold"] > 0,
+        } for r in load("usde_depeg_prudent")],
         "short_dip": load("short_dip"),
         "feed_failure": load("feed_failure"),
         "pt_panic": load("pt_panic"),
@@ -86,6 +92,16 @@ def reusd():
                       "oracle_low": min(r["oracle_price"] for r in rounds) / 1e36,
                       "oracle_start": rounds[0]["oracle_price"] / 1e36,
                       "fund_exit": rounds[-1]["fund_exit"] / 1e6, "apy_after": _apy(rounds[-1]["ln_implied_rate"])})
+    prudent = []
+    for bps, rounds in groupby(load("reusd_writedown_prudent"), key=lambda r: r["cut_bps"]):
+        rounds = list(rounds)
+        last = rounds[-1]
+        prudent.append({"severity": bps / 1e4, "liquidated": sum(r["liquidated"] for r in rounds),
+                        "skipped": last["skipped"], "seized_pt": sum(r["seized_pt"] for r in rounds) / 1e6,
+                        "debt_at_risk": last["debt_at_risk"] / 1e6, "underwater": last["underwater"] / 1e6,
+                        "exit_after": last["fund_exit"] / 1e6,
+                        # PT left unsold, or a few thousand dollars out of ~$980k: either way not an exit
+                        "fund_stuck": last["fund_unsold"] > 0 or last["fund_exit"] < 100_000})
     stuck = [e for e in events if e["fund_stuck"]]
     return {
         "name": "PT-reUSD", "expiry": "2026-12-10",
@@ -103,6 +119,7 @@ def reusd():
         "borrowers": meta["borrowers_usdc"] + meta["borrowers_usdt"],
         "events": events,
         "pt_panic": panic,
+        "events_prudent": prudent,
         "proxy": True,
     }
 
@@ -154,8 +171,12 @@ def decide(pos, probs, risk_free):
     verdict = verdicts.pop() if len(verdicts) == 1 else "UNCLEAR"
     stuck_from = pos["stuck_from"]
     p_stuck = {k: probs[stuck_from][k] for k in ("lo", "p", "hi")} if stuck_from in probs else None
+    prudent = [e["severity"] for e in pos.get("events_prudent", []) if e["fund_stuck"]]
+    pos["stuck_from_prudent"] = min(prudent) if prudent else None
+    p_stuck_prudent = ({k: probs[pos["stuck_from_prudent"]][k] for k in ("lo", "p", "hi")}
+                       if pos["stuck_from_prudent"] in probs else None)
     return {"verdict": verdict, "at": at, "exit_cost": exit_cost, "carry": carry, "risk_free": risk_free,
-            "p_stuck": p_stuck}
+            "p_stuck": p_stuck, "p_stuck_prudent": p_stuck_prudent}
 
 
 def run():

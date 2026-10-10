@@ -1,0 +1,7 @@
+{"depeg_bps":100,"switched":true,"liquidated":1,"skipped":0,"seized_pt":1636191892531793048334447,"debt_at_risk":0,"underwater":0,"fund_exit_after":975495712032,"fund_unsold":0}
+{"depeg_bps":200,"switched":true,"liquidated":1,"skipped":0,"seized_pt":1636191892531793048334447,"debt_at_risk":0,"underwater":0,"fund_exit_after":965642219991,"fund_unsold":0}
+{"depeg_bps":300,"switched":true,"liquidated":3,"skipped":0,"seized_pt":1701301696877412941212575,"debt_at_risk":0,"underwater":0,"fund_exit_after":955110875225,"fund_unsold":0}
+{"depeg_bps":400,"switched":true,"liquidated":3,"skipped":0,"seized_pt":1701301696877412941212575,"debt_at_risk":0,"underwater":0,"fund_exit_after":945264371356,"fund_unsold":0}
+{"depeg_bps":500,"switched":true,"liquidated":4,"skipped":0,"seized_pt":1907816858870046353467584,"debt_at_risk":1439372100086,"underwater":0,"fund_exit_after":774019139623,"fund_unsold":173828125000000000000000}
+{"depeg_bps":1000,"switched":true,"liquidated":8,"skipped":0,"seized_pt":2547990693327970692551471,"debt_at_risk":4688218719290,"underwater":56929402305,"fund_exit_after":164477855333,"fund_unsold":814453125000000000000000}
+{"depeg_bps":2000,"switched":true,"liquidated":9,"skipped":1,"seized_pt":2359794240774027365986491,"debt_at_risk":5098101556879,"underwater":647424061295,"fund_exit_after":294079819551,"fund_unsold":626953125000000000000000}

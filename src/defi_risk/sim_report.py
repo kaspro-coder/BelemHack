@@ -28,6 +28,14 @@ def main():
             ps = d["p_stuck"]
             print(f"  LIQUIDITY: the position becomes unsellable from a {pos['stuck_from']:.0%} move; "
                   f"chance before expiry {ps['p']:.2%} (range {ps['lo']:.2%} to {ps['hi']:.2%})")
+        if d.get("p_stuck_prudent"):
+            pp = d["p_stuck_prudent"]
+            print(f"             with flash-loan liquidators (stop when the pool is full): from a "
+                  f"{pos['stuck_from_prudent']:.0%} move, chance {pp['p']:.2%} (range {pp['lo']:.2%} to {pp['hi']:.2%})")
+        if pos.get("events_prudent"):
+            worst = max(pos["events_prudent"], key=lambda e: e["severity"])
+            print(f"  LENDERS (flash-loan liquidators): at {worst['severity']:.0%}, ${worst['debt_at_risk']:,.0f} of debt left unhealthy, "
+                  f"${worst['underwater']:,.0f} not covered by collateral")
         print(f"  ACTION: watch {pos['trigger']}.")
         print(f"          Exit window once it fires: {pos['window']}.")
 

@@ -143,6 +143,59 @@ abstract contract ScenarioBase is Test {
         }
     }
 
+    struct Prudent {
+        uint256 count; // liquidations executed (full or partial)
+        uint256 seizedPt;
+        uint256 syOut;
+        uint256 skipped; // unhealthy borrowers left alone because the pool could not take their PT
+        uint256 debtAtRisk; // debt of borrowers still unhealthy afterwards (loan units)
+        uint256 underwater; // part of that debt not covered by collateral at the oracle price
+    }
+
+    /// Flash-loan style liquidators: they only liquidate what they can sell in the pool in the
+    /// same transaction. Each borrower is tried at 100%, 50%, 25%, 12.5% of the collateral; a try
+    /// whose PT cannot be fully sold is reverted. What is left unhealthy stays with the lenders.
+    function liquidatePrudent() internal returns (Prudent memory P) {
+        for (uint256 m; m < marketIds.length; m++) {
+            bytes32 id = marketIds[m];
+            MarketParams memory p = paramsOf[id];
+            MORPHO.accrueInterest(p);
+            address[] storage bs = borrowersOf[id];
+            for (uint256 i; i < bs.length; i++) {
+                if (healthFactor(id, bs[i]) >= WAD) continue;
+                if (!_tryPrudent(id, p, bs[i], P)) P.skipped++;
+            }
+            for (uint256 i; i < bs.length; i++) {
+                if (healthFactor(id, bs[i]) >= WAD) continue;
+                uint256 debt = borrowAssets(id, bs[i]);
+                uint256 value = collateralOf(id, bs[i]) * oraclePrice(id) / 1e36;
+                P.debtAtRisk += debt;
+                if (debt > value) P.underwater += debt - value;
+            }
+        }
+    }
+
+    function _tryPrudent(bytes32 id, MarketParams memory p, address b, Prudent memory P) private returns (bool) {
+        (,, uint128 coll) = MORPHO.position(id, b);
+        for (uint256 div = 1; div <= 8; div *= 2) {
+            uint256 snap = vm.snapshotState();
+            uint256 ptBefore = PT.balanceOf(LIQUIDATOR);
+            vm.prank(LIQUIDATOR);
+            try MORPHO.liquidate(p, b, coll / div, 0, "") {
+                uint256 seized = PT.balanceOf(LIQUIDATOR) - ptBefore;
+                Sale memory s = sellPt(LIQUIDATOR, seized);
+                if (s.unsoldPt == 0) {
+                    P.count++;
+                    P.seizedPt += seized;
+                    P.syOut += s.syOut;
+                    return true;
+                }
+            } catch {}
+            vm.revertToState(snap);
+        }
+        return false;
+    }
+
     // ---------- Pendle ----------
 
     struct Sale {

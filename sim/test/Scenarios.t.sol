@@ -118,6 +118,27 @@ contract Scenarios is ScenarioBase {
         }
     }
 
+    /// Same depegs, flash-loan liquidators that stop when the pool is full.
+    function test_usdeDepeg_prudent() public {
+        _open("usde_depeg_prudent");
+        uint256[7] memory depegs = [uint256(100), 200, 300, 400, 500, 1000, 2000];
+        for (uint256 i; i < depegs.length; i++) {
+            uint256 snap = vm.snapshotState();
+            setUsdePrice(1e8 * (10_000 - depegs[i]) / 10_000);
+            bool switched = challengeAndSwitch();
+            Prudent memory P = liquidatePrudent();
+            (uint256 exitAfter, uint256 fundUnsold) = exitValue(FUND_PT);
+            _row(string.concat(
+                "{", _kv("depeg_bps", depegs[i]), ",", _kb("switched", switched), ",", _kv("liquidated", P.count), ",",
+                _kv("skipped", P.skipped), ",", _kv("seized_pt", P.seizedPt), ",", _kv("debt_at_risk", P.debtAtRisk), ",",
+                _kv("underwater", P.underwater), ",", _kv("fund_exit_after", exitAfter), ",", _kv("fund_unsold", fundUnsold), "}"
+            ));
+            vm.revertToState(snap);
+            vm.clearMockedCalls();
+            vm.warp(T0);
+        }
+    }
+
     /// Bybit-like dip: USDe at -4%, then recovers. Does it last long enough to switch the oracle?
     function test_shortDip() public {
         _open("short_dip");

@@ -105,6 +105,32 @@ contract ReUsdCascade is ScenarioBase {
         }
     }
 
+    /// Same write-downs, flash-loan liquidators: they stop when the pool is full. Measures the
+    /// debt left unhealthy with the lenders instead of PT stuck with liquidators.
+    function test_reusd_writedown_prudent() public {
+        _open("reusd_writedown_prudent");
+        uint256[7] memory cuts = [uint256(100), 200, 300, 500, 700, 1000, 2000];
+        for (uint256 i; i < cuts.length; i++) {
+            uint256 snap = vm.snapshotState();
+            _writeDown(cuts[i]);
+            for (uint256 r = 1; r <= MAX_ROUNDS; r++) {
+                vm.warp(vm.getBlockTimestamp() + TWAP_WAIT);
+                Prudent memory P = liquidatePrudent();
+                (uint256 fundSy, uint256 fundUnsold) = exitSy(_fundPt());
+                _row(string.concat(
+                    "{", _kv("cut_bps", cuts[i]), ",", _kv("round", r), ",", _kv("oracle_price", oraclePrice(USDC_MARKET)), ",",
+                    _kv("liquidated", P.count), ",", _kv("skipped", P.skipped), ",", _kv("seized_pt", P.seizedPt), ",",
+                    _kv("debt_at_risk", P.debtAtRisk), ",", _kv("underwater", P.underwater), ",",
+                    _kv("fund_exit", _assetValue(fundSy)), ",", _kv("fund_unsold", fundUnsold), "}"
+                ));
+                if (P.count == 0) break;
+            }
+            vm.revertToState(snap);
+            vm.clearMockedCalls();
+            vm.warp(T0);
+        }
+    }
+
     function _noLiq() internal view returns (Liquidations memory L) {
         L.badDebtByMarket = new uint256[](marketIds.length);
     }

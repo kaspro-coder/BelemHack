@@ -117,6 +117,9 @@ pre { background: var(--bg); border-radius: 8px; padding: 10px 12px; font-size: 
     <h2>Scenario results</h2>
     <p class="lead" id="slead"></p>
     <table id="events"></table>
+    <h3>Same events with flash-loan liquidators</h3>
+    <p class="lead" style="margin-bottom:8px">They only liquidate what the pool can absorb in the same transaction, partially if needed. What they leave stays as unhealthy debt with the lenders.</p>
+    <table id="prudent"></table>
   </section>
 
   <section class="card" id="extra"></section>
@@ -186,6 +189,7 @@ function renderPosition() {
   $("liq").innerHTML = p.stuck_from != null && d.p_stuck
     ? `<b>Liquidity risk.</b> From a ${pct(p.stuck_from, 0)} move in the ${p.driver.split(" (")[0]}, the cascade saturates the pool and the fund's PT becomes unsellable before maturity. Chance before expiry: <b>${pct(d.p_stuck.p, 2)}</b> (range ${pct(d.p_stuck.lo, 2)} to ${pct(d.p_stuck.hi, 2)}).`
     : "No severity tested made the position unsellable.";
+  if (d.p_stuck_prudent) $("liq").innerHTML += ` If liquidators only take what they can sell at once (flash loans), it takes a ${pct(p.stuck_from_prudent, 0)} move: chance ${pct(d.p_stuck_prudent.p, 2)}.`;
   $("trigger").textContent = `Watch ${p.trigger}. Once it fires, the fund has ${p.window} to exit before liquidations reach the pool.` +
     (p.window_hours < 1 ? " That is too short for a human: the exit has to be automated." : "");
   renderCascade(p); renderExit(p); renderEvents(p); renderExtra(p);
@@ -226,6 +230,9 @@ function renderEvents(p) {
   let h = "<tr><th>Severity</th><th>Liquidated</th><th>PT seized</th><th>PT stuck</th><th>Bad debt</th><th>Fund exit in window</th><th>Fund exit after</th></tr>";
   p.events.forEach(e => h += `<tr class="${e.fund_stuck ? "bad" : ""}"><td>${sev(e.severity)}</td><td>${e.liquidated}</td><td>${num(e.seized_pt)}</td><td>${num(e.stuck_pt)}</td><td>${usd(e.bad_debt)}</td><td>${usd(e.exit_in_window)}</td><td>${e.fund_stuck ? "stuck" : usd(e.exit_after)}</td></tr>`);
   $("events").innerHTML = h;
+  let q = "<tr><th>Severity</th><th>Liquidated</th><th>Left alone</th><th>PT seized</th><th>Debt left unhealthy</th><th>Not covered</th><th>Fund exit after</th></tr>";
+  (p.events_prudent || []).forEach(e => q += `<tr class="${e.fund_stuck ? "bad" : ""}"><td>${sev(e.severity)}</td><td>${e.liquidated}</td><td>${e.skipped}</td><td>${num(e.seized_pt)}</td><td>${usd(e.debt_at_risk)}</td><td>${usd(e.underwater)}</td><td>${e.fund_stuck ? "stuck" : usd(e.exit_after)}</td></tr>`);
+  $("prudent").innerHTML = q;
 }
 function renderExtra(p) {
   let h = "";
@@ -321,7 +328,7 @@ function renderLive() {
 
 function renderLimits() {
   $("limits").innerHTML = [
-    "Liquidators are assumed to liquidate and sell at once into the Pendle pool. A real liquidator that cannot sell would stop: the stuck PT would then show up as bad debt for the lenders rather than as unsold collateral. The risk moves, it does not vanish.",
+    "Liquidator behaviour is bracketed by two runs: liquidators who seize everything and dump it, and flash-loan liquidators who stop when the pool is full. Real behaviour sits in between.",
     "Only liquidators sell. Other holders panicking at the same time are not simulated, so exit values inside the window are optimistic.",
     "The pool is simulated without Pendle's off-chain limit orders (they cannot exist on a fork). Live quotes use them and look cheaper; in a crisis market makers can pull them.",
     "Probabilities come from 17 non-fiat stablecoins above $100M (2 persistent depegs of 3%+). For PT-reUSD the same cohort is a proxy for an issuer write-down. Size is measured today, so survivors are over-represented.",
