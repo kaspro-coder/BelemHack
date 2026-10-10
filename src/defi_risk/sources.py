@@ -7,6 +7,20 @@ LLAMA = "https://api.llama.fi"
 MORPHO = "https://blue-api.morpho.org/graphql"
 
 
+def rpc_url():
+    """Ethereum RPC: ETH_RPC_URL from the project's .env if set, else a public node."""
+    import os
+    from pathlib import Path
+    if os.environ.get("ETH_RPC_URL"):
+        return os.environ["ETH_RPC_URL"]
+    env = Path(__file__).resolve().parents[2] / ".env"
+    if env.exists():
+        for line in env.read_text().splitlines():
+            if line.startswith("ETH_RPC_URL="):
+                return line.split("=", 1)[1].strip()
+    return "https://ethereum-rpc.publicnode.com"
+
+
 def _request(url, body=None):
     data = json.dumps(body).encode() if body is not None else None
     headers = {"Content-Type": "application/json", "User-Agent": "defi-risk/0.1"}
@@ -25,6 +39,26 @@ def pendle_market_data(market, chain_id=1):
 
 def llama_protocol(slug):
     return _request(f"{LLAMA}/protocol/{slug}")
+
+
+def pendle_market_info(market, chain_id=1):
+    return _request(f"{PENDLE}/core/v1/{chain_id}/markets/{market}")
+
+
+_LLAMA_PROTOCOLS = None
+
+
+def llama_slug(name):
+    """DefiLlama slug for a protocol name as Pendle writes it ("Sky Protocol", "re.xyz"), or None."""
+    global _LLAMA_PROTOCOLS
+    if _LLAMA_PROTOCOLS is None:
+        _LLAMA_PROTOCOLS = _request(f"{LLAMA}/protocols")
+    norm = lambda s: "".join(c for c in s.lower() if c.isalnum()).replace("protocol", "")
+    target = norm(name)
+    exact = [p for p in _LLAMA_PROTOCOLS if norm(p["name"]) == target]
+    prefix = [p for p in _LLAMA_PROTOCOLS if norm(p["name"]).startswith(target)]
+    hits = sorted(exact or prefix, key=lambda p: -(p.get("tvl") or 0))
+    return hits[0]["slug"] if hits else None
 
 
 def llama_hacks():
@@ -56,8 +90,8 @@ def eth_funding_annualized():
 def morpho_markets_by_collateral(token_address, chain_id=1):
     query = (
         '{ markets(first: 50, where: { collateralAssetAddress_in: ["%s"], chainId_in: [%d] }) '
-        "{ items { marketId lltv loanAsset { symbol } collateralAsset { symbol } "
-        "oracle { address type } "
+        "{ items { marketId lltv loanAsset { symbol address decimals } collateralAsset { symbol decimals } "
+        "oracle { address type } supplyingVaults { address name } "
         "state { supplyAssetsUsd borrowAssetsUsd collateralAssetsUsd utilization } } } }"
     ) % (token_address, chain_id)
     return _request(MORPHO, {"query": query})["data"]["markets"]["items"]
