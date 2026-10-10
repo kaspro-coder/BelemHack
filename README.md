@@ -18,6 +18,9 @@ and turns the measured impact into a **stay / exit / unclear** verdict with an a
 Book of 1M PT in each pocket: **8.5%** chance at least one pocket becomes unsellable before expiry (range 4.4% to 14.9%),
 with one contagion path where two pockets that share no issuer fall together.
 
+Ecosystem scan (every PT with $1M+ on Morpho): 9 PTs, $248M of collateral, 13 lending oracles of which 3 ignore
+the PT market entirely; Smokehouse USDT is the only vault lending to two of them; APYX issues the asset behind two PTs.
+
 Other results replayed on the fork:
 - **The exit is a queue, not a price**: inside the window the fund gets ~fair value as long as less than ~1.5M
   (PT-sUSDe), ~4M (PT-reUSD) or ~2M (PT-sUSDS) PT were sold ahead of it; past that, part of it is stuck.
@@ -51,6 +54,7 @@ src/defi_risk/
   cohort.py, venues.py    measured base rates (stablecoin depegs, exchange hacks)
   simulation.py           decision layer fed by the fork results
   sim_report.py           text report;  dashboard.py: exports dashboard/data.json
+  ecosystem.py            scan of every Pendle PT used as Morpho collateral, shared dependencies ranked
   portfolio.py            book view: which event hits which pocket, with contagion
   watch.py                live signals from mainnet (oracle deviation, issuer share price, vault, whales)
 dashboard/index.html      the demo page

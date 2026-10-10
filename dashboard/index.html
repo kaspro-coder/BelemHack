@@ -142,6 +142,13 @@ pre { background: var(--bg); border-radius: 8px; padding: 10px 12px; font-size: 
     <table id="shared"></table>
   </section>
 
+  <section class="card" id="eco" style="display:none">
+    <h2>Ecosystem scan: every Pendle PT used as Morpho collateral</h2>
+    <p class="lead" id="ecolead"></p>
+    <div class="nums" id="econums"></div>
+    <table id="ecotable" style="margin-top:12px"></table>
+  </section>
+
   <section class="card">
     <h2>Contagion between tokens that share nothing directly</h2>
     <p class="lead" id="clead"></p>
@@ -354,6 +361,20 @@ function renderBook() {
   $("booknote").innerHTML = k ? `* Contagion, assuming Smokehouse USDT's depositors run after its loss: on the fork the run locks ${usd(k.locked)} in PT-sUSDS/USDT and lifts its borrow rate from ${pct(k.rate_before, 1)} to ${pct(k.rate_after, 1)}; a forced sale of ${num(k.saturating_dump_pt)} PT-sUSDS saturates its pool. Two pockets that share no issuer fall together. Shared protocols (Pendle, Morpho, Ethereum) would hit all three at once; they are mapped, not priced.` : "";
 }
 
+function renderEco() {
+  fetch("ecosystem.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(e => {
+    if (!e) return;
+    $("eco").style.display = "";
+    const total = e.mapped.reduce((a, m) => a + m.morpho_collateral_usd, 0), o = e.oracle_market_sensitivity;
+    $("ecolead").textContent = `Same automatic discovery on ${e.mapped.length} PTs with at least $1M on Morpho (${e.nodes} nodes, ${e.edges} edges, ${e.failed.length} failures): ${e.mapped.map(m => m.position.split(" ")[0]).join(", ")}. Chains, protocols and Pendle's order book are left out of the table: everything shares them.`;
+    const n = (v, l) => `<div class="num"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+    $("econums").innerHTML = n(usd(total), "PT collateral on Morpho, mapped") + n(o.ignores_market, `lending oracles that ignore the PT market (linear discount)`) +
+      n(o.follows_market, "read a market-type feed (heuristic: any non-linear feed; some have floors)") + n(e.contagion_paths.length, "vaults lending to two or more of these PTs");
+    $("ecotable").innerHTML = "<tr><th>Shared dependency</th><th>Kind</th><th>PTs exposed</th><th>Collateral behind</th></tr>" +
+      e.shared.map(x => `<tr><td>${x.node}</td><td>${x.kind}</td><td>${x.positions}: ${x.names.join(", ")}</td><td>${usd(x.collateral_behind_usd)}</td></tr>`).join("");
+  }).catch(() => {});
+}
+
 function renderLimits() {
   $("limits").innerHTML = [
     "Liquidator behaviour is bracketed by two runs: liquidators who seize everything and dump it, and flash-loan liquidators who stop when the pool is full. Real behaviour sits in between.",
@@ -372,7 +393,7 @@ fetch("data.json").then(r => r.json()).then(d => {
   $("blk").textContent = d.fork_block;
   $("tabs").innerHTML = d.positions.map((p, i) => `<button class="tab" data-i="${i}">${p.name}</button>`).join("");
   document.querySelectorAll(".tab").forEach(t => t.onclick = () => { cur = +t.dataset.i; renderPosition(); });
-  renderBook(); renderPosition(); renderGraph(); renderContagion(); renderLimits(); renderLive(); setInterval(renderLive, 60000);
+  renderBook(); renderPosition(); renderGraph(); renderContagion(); renderLimits(); renderLive(); renderEco(); setInterval(renderLive, 60000);
 }).catch(e => { document.body.insertAdjacentHTML("afterbegin", "<p style='padding:16px'>Could not load data.json. Run python -m defi_risk.dashboard, then serve this folder.</p>"); console.error(e); });
 </script>
 </body>

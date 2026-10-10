@@ -1,0 +1,146 @@
+{
+ "mapped": [
+  {
+   "position": "PT-reUSD (2026-12-10)",
+   "morpho_collateral_usd": 146579781.36477008
+  },
+  {
+   "position": "PT-USD3 (2026-12-17)",
+   "morpho_collateral_usd": 31278096.174779903
+  },
+  {
+   "position": "PT-sUSDS (2026-11-26)",
+   "morpho_collateral_usd": 23816533.970348205
+  },
+  {
+   "position": "PT-apyUSD (2026-11-05)",
+   "morpho_collateral_usd": 15969460.484969115
+  },
+  {
+   "position": "PT-USDat (2027-01-14)",
+   "morpho_collateral_usd": 15233313.637536041
+  },
+  {
+   "position": "PT-sUSDe (2026-11-26)",
+   "morpho_collateral_usd": 7927516.7722504595
+  },
+  {
+   "position": "PT-apxUSD (2026-11-05)",
+   "morpho_collateral_usd": 3588499.8375923894
+  },
+  {
+   "position": "PT-trUSD (2026-11-26)",
+   "morpho_collateral_usd": 2157180.3883736916
+  },
+  {
+   "position": "PT-fxSAVE (2026-10-29)",
+   "morpho_collateral_usd": 1246644.3580802486
+  }
+ ],
+ "failed": [],
+ "nodes": 99,
+ "edges": 171,
+ "shared": [
+  {
+   "node": "USDC",
+   "kind": "stablecoin",
+   "positions": 9,
+   "collateral_behind_usd": 247797017.3114463,
+   "names": [
+    "PT-USD3",
+    "PT-USDat",
+    "PT-apxUSD",
+    "PT-apyUSD",
+    "PT-fxSAVE",
+    "PT-reUSD",
+    "PT-sUSDS",
+    "PT-sUSDe",
+    "PT-trUSD"
+   ]
+  },
+  {
+   "node": "USDT",
+   "kind": "stablecoin",
+   "positions": 3,
+   "collateral_behind_usd": 185629620.82922345,
+   "names": [
+    "PT-USDat",
+    "PT-reUSD",
+    "PT-sUSDS"
+   ]
+  },
+  {
+   "node": "Smokehouse USDT",
+   "kind": "vault",
+   "positions": 2,
+   "collateral_behind_usd": 170396307.1916874,
+   "names": [
+    "PT-reUSD",
+    "PT-sUSDS"
+   ]
+  },
+  {
+   "node": "apxUSD",
+   "kind": "stablecoin",
+   "positions": 2,
+   "collateral_behind_usd": 19557960.115483373,
+   "names": [
+    "PT-apxUSD",
+    "PT-apyUSD"
+   ]
+  },
+  {
+   "node": "APXUSD / USD Exchange Rate",
+   "kind": "price_feed",
+   "positions": 2,
+   "collateral_behind_usd": 19557960.115483373,
+   "names": [
+    "PT-apxUSD",
+    "PT-apyUSD"
+   ]
+  },
+  {
+   "node": "APYX",
+   "kind": "issuer",
+   "positions": 2,
+   "collateral_behind_usd": 19557960.115483373,
+   "names": [
+    "PT-apxUSD",
+    "PT-apyUSD"
+   ]
+  }
+ ],
+ "oracle_patterns": {
+  "MorphoChainlinkOracleV2": 10,
+  "MetaOracleDeviationTimelock (primary/backup)": 3
+ },
+ "oracle_market_sensitivity": {
+  "follows_market": 10,
+  "ignores_market": 3,
+  "unknown": 0
+ },
+ "contagion_paths": [
+  {
+   "vault": "Smokehouse USDT",
+   "total_assets_usd": 21619494.1655796,
+   "legs": [
+    {
+     "market_id": "0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca",
+     "position": "PT-reUSD (2026-12-10)",
+     "market": "Morpho PT-reUSD-10DEC2026/USDT",
+     "usd": 4324145.073824399,
+     "share_of_vault": 0.20001138975346017,
+     "share_of_market_supply": 0.38150064901817415
+    },
+    {
+     "market_id": "0x0367161b7cb23dfd03747dd3815d1c445b0437b648a6d50346249c6e7b92ff1b",
+     "position": "PT-sUSDS (2026-11-26)",
+     "market": "Morpho PT-sUSDS-26NOV2026/USDT",
+     "usd": 4256982.7886988735,
+     "share_of_vault": 0.19690482839679094,
+     "share_of_market_supply": 0.8257404523412171
+    }
+   ]
+  }
+ ]
+}
