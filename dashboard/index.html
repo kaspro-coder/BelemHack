@@ -101,6 +101,7 @@ pre { background: var(--bg); border-radius: 8px; padding: 10px 12px; font-size: 
         <div class="nums" id="nums"></div>
         <table id="range" style="margin-top:12px"></table>
         <div class="callout exit" id="liq"></div>
+        <div class="callout unclear" id="queue"></div>
         <div class="callout action" style="grid-template-columns:1fr"><div><b>Action.</b> <span id="trigger"></span></div></div>
       </div>
     </div>
@@ -198,6 +199,10 @@ function renderPosition() {
     ? `<b>Liquidity risk.</b> From a ${pct(p.stuck_from, 0)} move in the ${p.driver.split(" (")[0]}, the cascade saturates the pool and the fund's PT becomes unsellable before maturity. Chance before expiry: <b>${pct(d.p_stuck.p, 2)}</b> (range ${pct(d.p_stuck.lo, 2)} to ${pct(d.p_stuck.hi, 2)}).`
     : "No severity tested made the position unsellable.";
   if (d.p_stuck_prudent) $("liq").innerHTML += ` If liquidators only take what they can sell at once (flash loans), it takes a ${pct(p.stuck_from_prudent, 0)} move: chance ${pct(d.p_stuck_prudent.p, 2)}.`;
+  const c = p.crowd;
+  $("queue").innerHTML = c ? `<b>The exit is a queue.</b> After a ${sev(c.severity)} move, the fund still gets ~fair value with up to <b>${num(c.room_pt)} PT</b> sold ahead of it; from ${num(c.blocked_from_pt)} PT ahead, part of it is stuck. ` +
+    c.rows.map(r => `${num(r.crowd_pt)} ahead: ${r.fund_unsold > 0 ? usd(r.fund_exit) + " (" + num(r.fund_unsold) + " PT stuck)" : usd(r.fund_exit)}`).join(" · ") +
+    `. Keep the position small against that room, and be early.` : "";
   $("trigger").textContent = `Watch ${p.trigger}. Once it fires, the fund has ${p.window} to exit before liquidations reach the pool.` +
     (p.window_hours < 1 ? " That is too short for a human: the exit has to be automated." : "");
   renderCascade(p); renderExit(p); renderEvents(p); renderExtra(p);
@@ -352,7 +357,7 @@ function renderBook() {
 function renderLimits() {
   $("limits").innerHTML = [
     "Liquidator behaviour is bracketed by two runs: liquidators who seize everything and dump it, and flash-loan liquidators who stop when the pool is full. Real behaviour sits in between.",
-    "Only liquidators sell. Other holders panicking at the same time are not simulated, so exit values inside the window are optimistic.",
+    "Other sellers are modelled as a queue of PT sold ahead of the fund inside the window, not as a full behavioural model of every holder.",
     "The pool is simulated without Pendle's off-chain limit orders (they cannot exist on a fork). Live quotes use them and look cheaper; in a crisis market makers can pull them.",
     "Probabilities come from 17 non-fiat stablecoins above $100M (2 persistent depegs of 3%+). For PT-reUSD the same cohort is a proxy for an issuer write-down. Size is measured today, so survivors are over-represented.",
     "Borrower lists come from Morpho's API at generation time and the fork is pinned a few hours earlier: a borrower who opened in between is missing.",

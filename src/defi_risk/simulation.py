@@ -174,6 +174,17 @@ def susds():
     }
 
 
+def crowd(name, pt_unit):
+    """Fund exit inside the window when `crowd_pt` PT from others reach the pool first."""
+    rows = [{"crowd_pt": r["crowd_pt"] / pt_unit, "severity": r["severity_bps"] / 1e4,
+             "fund_exit": r["fund_exit"] / 1e6, "fund_unsold": r["fund_unsold"] / pt_unit} for r in load(name)]
+    first = min(r["severity"] for r in rows)
+    rows = [r for r in rows if r["severity"] == first]
+    room = max((r["crowd_pt"] for r in rows if r["fund_unsold"] == 0), default=0.0)
+    blocked = min((r["crowd_pt"] for r in rows if r["fund_unsold"] > 0), default=None)
+    return {"severity": first, "rows": rows, "room_pt": room, "blocked_from_pt": blocked}
+
+
 def probabilities(days):
     """P(persistent depeg >= d within the holding window) per severity, with 90% ranges."""
     prices = cohort.load_prices()
@@ -215,7 +226,10 @@ def decide(pos, probs, risk_free):
 def run():
     rf = sources.risk_free_rate()
     out = []
+    crowds = {"PT-sUSDe": crowd("crowd_exit", 1e18), "PT-reUSD": crowd("reusd_crowd_exit", 1e6),
+              "PT-sUSDS": crowd("susds_crowd_exit", 1e18)}
     for pos in (susde(), reusd(), susds()):
+        pos["crowd"] = crowds[pos["name"]]
         probs = probabilities(round(pos["days"]))
         pos["probabilities"] = {d: {k: v[k] for k in ("p", "lo", "hi", "episodes", "coins")} for d, v in probs.items()}
         pos["decision"] = decide(pos, probs, rf)

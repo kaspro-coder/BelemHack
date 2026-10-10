@@ -131,6 +131,19 @@ contract ReUsdCascade is ScenarioBase {
         }
     }
 
+    /// Inside the 15-minute window after a 1% write-down, others sell before the fund.
+    function test_reusd_crowdedExit() public {
+        _open("reusd_crowd_exit");
+        _writeDown(100);
+        uint256[6] memory crowd = [uint256(0), 1_000_000, 2_000_000, 3_000_000, 4_000_000, 6_000_000];
+        for (uint256 j; j < crowd.length; j++) {
+            (uint256 syOut, uint256 unsold) = exitAfterCrowd(crowd[j] * ptUnit, _fundPt());
+            _row(string.concat("{", _kv("severity_bps", 100), ",", _kv("crowd_pt", crowd[j] * ptUnit), ",",
+                _kv("fund_exit", _assetValue(syOut)), ",", _kv("fund_unsold", unsold), "}"));
+        }
+        vm.clearMockedCalls();
+    }
+
     function _noLiq() internal view returns (Liquidations memory L) {
         L.badDebtByMarket = new uint256[](marketIds.length);
     }

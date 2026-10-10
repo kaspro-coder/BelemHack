@@ -245,6 +245,20 @@ abstract contract ScenarioBase is Test {
         vm.revertToState(snap);
     }
 
+    /// What the fund gets if `crowdPt` PT from other holders hit the pool first. Reverted afterwards.
+    function exitAfterCrowd(uint256 crowdPt, uint256 fundPt) internal returns (uint256 syOut, uint256 unsold) {
+        uint256 snap = vm.snapshotState();
+        if (crowdPt > 0) {
+            deal(address(PT), address(0xC20D), crowdPt);
+            sellPt(address(0xC20D), crowdPt);
+        }
+        deal(address(PT), FUND, fundPt);
+        Sale memory s = sellPt(FUND, fundPt);
+        syOut = s.syOut;
+        unsold = s.unsoldPt;
+        vm.revertToState(snap);
+    }
+
     // ---------- output ----------
 
     string out; // rows go straight to disk so state reverts cannot erase them

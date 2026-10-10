@@ -19,6 +19,9 @@ Book of 1M PT in each pocket: **8.5%** chance at least one pocket becomes unsell
 with one contagion path where two pockets that share no issuer fall together.
 
 Other results replayed on the fork:
+- **The exit is a queue, not a price**: inside the window the fund gets ~fair value as long as less than ~1.5M
+  (PT-sUSDe), ~4M (PT-reUSD) or ~2M (PT-sUSDS) PT were sold ahead of it; past that, part of it is stuck.
+  Position size has to be judged against that room.
 - A USDe dip shorter than 16 h liquidates nobody; at 24 h it liquidates 3 borrowers.
 - A crash of the PT-sUSDe market liquidates nobody (the oracle ignores the market): lenders carry it silently.
 - A Chainlink USDe/USD feed stuck at $0.80 for 16 h liquidates 10 borrowers whose collateral never lost value ($823k bad debt).
@@ -91,9 +94,10 @@ cd ../src && python -m defi_risk.sim_report && python -m defi_risk.dashboard
 
 ## Honest limits
 - Liquidator behaviour is bracketed by two runs: dump everything vs flash-loan liquidators who stop when the pool is full.
-- Only liquidators sell; other panicking holders are not simulated, so in-window exit values are optimistic.
+- Other sellers are modelled as a queue of PT sold ahead of the fund, not as a full behavioural model.
 - The fork has no Pendle limit orders; live quotes look cheaper than the pool alone.
 - The probability cohort is small (2 persistent depegs of 3%+) and biased towards survivors; for PT-reUSD it is a proxy.
 - Borrower lists are fetched after the fork block; positions opened in between are missing.
 
-The earlier live-data pipeline (`python -m defi_risk.report`) is kept for reference.
+The earlier live-data pipeline (`python -m defi_risk.report`) is kept for reference only: its cascade model assumed the
+lending oracle follows the PT market, which the fork showed is false for PT-sUSDe.

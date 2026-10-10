@@ -48,6 +48,19 @@ contract SusdsScenarios is ScenarioBase {
         L.badDebtByMarket = new uint256[](marketIds.length);
     }
 
+    /// Inside the 16 h window after a 2% USDS depeg, others sell before the fund.
+    function test_susds_crowdedExit() public {
+        _open("susds_crowd_exit");
+        _setUsds(0.98e8);
+        uint256[6] memory crowd = [uint256(0), 500_000, 1_000_000, 1_500_000, 2_000_000, 3_000_000];
+        for (uint256 j; j < crowd.length; j++) {
+            (uint256 syOut, uint256 unsold) = exitAfterCrowd(crowd[j] * ptUnit, _fundPt());
+            _row(string.concat("{", _kv("severity_bps", 200), ",", _kv("crowd_pt", crowd[j] * ptUnit), ",",
+                _kv("fund_exit", _usd(syOut)), ",", _kv("fund_unsold", unsold), "}"));
+        }
+        vm.clearMockedCalls();
+    }
+
     function test_susds_baseline() public {
         _open("susds_baseline");
         _row(string.concat(

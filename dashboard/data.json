@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-10T21:27+00:00",
+ "asof": "2026-10-10T21:29+00:00",
  "fork_block": 26164635,
  "fund_pt": 1000000,
  "positions": [
@@ -339,6 +339,49 @@
      "fund_exit_after": 0
     }
    ],
+   "crowd": {
+    "severity": 0.01,
+    "rows": [
+     {
+      "crowd_pt": 0.0,
+      "severity": 0.01,
+      "fund_exit": 980922.431353,
+      "fund_unsold": 0.0
+     },
+     {
+      "crowd_pt": 500000.0,
+      "severity": 0.01,
+      "fund_exit": 979778.73017,
+      "fund_unsold": 0.0
+     },
+     {
+      "crowd_pt": 1000000.0,
+      "severity": 0.01,
+      "fund_exit": 978426.834581,
+      "fund_unsold": 0.0
+     },
+     {
+      "crowd_pt": 1500000.0,
+      "severity": 0.01,
+      "fund_exit": 976310.965569,
+      "fund_unsold": 0.0
+     },
+     {
+      "crowd_pt": 2000000.0,
+      "severity": 0.01,
+      "fund_exit": 716723.487014,
+      "fund_unsold": 265625.0
+     },
+     {
+      "crowd_pt": 3000000.0,
+      "severity": 0.01,
+      "fund_exit": 0.0,
+      "fund_unsold": 1000000.0
+     }
+    ],
+    "room_pt": 1500000.0,
+    "blocked_from_pt": 2000000.0
+   },
    "probabilities": {
     "0.005": {
      "p": 0.13291986750299528,
@@ -713,6 +756,49 @@
     }
    ],
    "proxy": true,
+   "crowd": {
+    "severity": 0.01,
+    "rows": [
+     {
+      "crowd_pt": 0.0,
+      "severity": 0.01,
+      "fund_exit": 969391.86352,
+      "fund_unsold": 0.0
+     },
+     {
+      "crowd_pt": 1000000.0,
+      "severity": 0.01,
+      "fund_exit": 967991.596913,
+      "fund_unsold": 0.0
+     },
+     {
+      "crowd_pt": 2000000.0,
+      "severity": 0.01,
+      "fund_exit": 966509.435647,
+      "fund_unsold": 0.0
+     },
+     {
+      "crowd_pt": 3000000.0,
+      "severity": 0.01,
+      "fund_exit": 964839.223943,
+      "fund_unsold": 0.0
+     },
+     {
+      "crowd_pt": 4000000.0,
+      "severity": 0.01,
+      "fund_exit": 962780.345306,
+      "fund_unsold": 0.0
+     },
+     {
+      "crowd_pt": 6000000.0,
+      "severity": 0.01,
+      "fund_exit": 687975.299445,
+      "fund_unsold": 281250.0
+     }
+    ],
+    "room_pt": 4000000.0,
+    "blocked_from_pt": 6000000.0
+   },
    "probabilities": {
     "0.005": {
      "p": 0.1733737402212982,
@@ -965,6 +1051,49 @@
     }
    ],
    "oracle_note": "Ojo returns the lower of the Pendle 15-min TWAP and a conservative feed: the market must first fall below that floor before the oracle moves.",
+   "crowd": {
+    "severity": 0.02,
+    "rows": [
+     {
+      "crowd_pt": 0.0,
+      "severity": 0.02,
+      "fund_exit": 971144.518524,
+      "fund_unsold": 0.0
+     },
+     {
+      "crowd_pt": 500000.0,
+      "severity": 0.02,
+      "fund_exit": 970135.238557,
+      "fund_unsold": 0.0
+     },
+     {
+      "crowd_pt": 1000000.0,
+      "severity": 0.02,
+      "fund_exit": 969103.33608,
+      "fund_unsold": 0.0
+     },
+     {
+      "crowd_pt": 1500000.0,
+      "severity": 0.02,
+      "fund_exit": 967939.734063,
+      "fund_unsold": 0.0
+     },
+     {
+      "crowd_pt": 2000000.0,
+      "severity": 0.02,
+      "fund_exit": 966424.127175,
+      "fund_unsold": 0.0
+     },
+     {
+      "crowd_pt": 3000000.0,
+      "severity": 0.02,
+      "fund_exit": 568400.644107,
+      "fund_unsold": 410156.25
+     }
+    ],
+    "room_pt": 2000000.0,
+    "blocked_from_pt": 3000000.0
+   },
    "probabilities": {
     "0.005": {
      "p": 0.13291986750299528,
@@ -1077,11 +1206,11 @@
     "kind": "amm",
     "label": "Pendle pool PT-sUSDe",
     "data": {
-     "liquidity_usd": 3820216.601853261,
+     "liquidity_usd": 3820254.8359155543,
      "total_pt": 971271.206194636,
      "total_sy": 2282035.210152903,
-     "pt_discount": 0.006157803894695668,
-     "implied_apy": 0.050110361899201816,
+     "pt_discount": 0.006157341622715973,
+     "implied_apy": 0.050110361911818835,
      "volume_24h_usd": 24825.257592986363
     }
    },
@@ -1102,7 +1231,7 @@
     "kind": "asset",
     "label": "sUSDe",
     "data": {
-     "underlying_apy": 0.049450997442711975
+     "underlying_apy": 0.049450579624619184
     }
    },
    {
@@ -1131,7 +1260,7 @@
     "kind": "perp_venue",
     "label": "Binance",
     "data": {
-     "eth_funding_annualized": -0.08836649999999999
+     "eth_funding_annualized": -0.0894834
     }
    },
    {
@@ -1139,7 +1268,7 @@
     "kind": "perp_venue",
     "label": "OKX",
     "data": {
-     "eth_funding_annualized": -0.024859736621804997
+     "eth_funding_annualized": -0.025305679434255
     }
    },
    {
@@ -1147,7 +1276,7 @@
     "kind": "perp_venue",
     "label": "Hyperliquid",
     "data": {
-     "eth_funding_annualized": -0.012519792
+     "eth_funding_annualized": -0.03176376
     }
    },
    {
@@ -1210,9 +1339,9 @@
      "backup": "0xe2f4cfe07aecd7fd8fb0d293a22cde7d08175465",
      "active": "primary",
      "challenged": false,
-     "price": 0.9924208885083714,
-     "primary_price": 0.9924208885083714,
-     "backup_price": 0.9920207642545426,
+     "price": 0.9924211853120244,
+     "primary_price": 0.9924211853120244,
+     "backup_price": 0.9920210609385303,
      "deviation": 0.000403342619677401,
      "threshold": 0.0075,
      "timelock_hours": 16.0,
@@ -1265,12 +1394,12 @@
     "kind": "amm",
     "label": "Pendle pool PT-reUSD",
     "data": {
-     "liquidity_usd": 12250526.678266877,
-     "total_pt": 5457854.679169,
-     "total_sy": 6231467.803130573,
-     "pt_discount": 0.018232471595036492,
-     "implied_apy": 0.11821476696058997,
-     "volume_24h_usd": 3799826.538112228
+     "liquidity_usd": 12330199.212297143,
+     "total_pt": 5485182.602797,
+     "total_sy": 6279161.110870191,
+     "pt_discount": 0.01821977720149881,
+     "implied_apy": 0.11813418662816222,
+     "volume_24h_usd": 3828817.648939451
     }
    },
    {
@@ -1338,7 +1467,7 @@
      "address": "0x217d6DdCDB95112C51657F6270e8C079CFDB51f0",
      "morpho_type": "ChainlinkOracleV2",
      "pattern": "MorphoChainlinkOracleV2",
-     "price": 0.9817886345556731,
+     "price": 0.9817816268886362,
      "market_sensitive": true,
      "reads": [
       "Ojo PT Feed Pendle Chainlink-compatible Oracle"
@@ -1451,7 +1580,7 @@
      "address": "0xda5901EF31ecAFa6561B2e56B4997FAdd3dB4646",
      "morpho_type": "ChainlinkOracleV2",
      "pattern": "MorphoChainlinkOracleV2",
-     "price": 0.9873681855657027,
+     "price": 0.9873686802384576,
      "market_sensitive": false,
      "reads": [
       "Linear discount 10.0%/yr to maturity (ignores the market)"
@@ -1494,9 +1623,9 @@
      "backup": "0x77ae9b629096d0ae0206878b163cca232276c88e",
      "active": "primary",
      "challenged": false,
-     "price": 0.9835786412354135,
-     "primary_price": 0.9835786412354135,
-     "backup_price": 0.9834587528348333,
+     "price": 0.983579284309995,
+     "primary_price": 0.983579284309995,
+     "backup_price": 0.9834593958310304,
      "deviation": 0.000121904858983261,
      "threshold": 0.0075,
      "timelock_hours": 16.0,
@@ -1559,7 +1688,7 @@
     "source": "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
     "target": "amm:0x47ad2cd1dd15739a7a035b9d3b7828d916fef77e",
     "relation": "exits_through",
-    "exposure_usd": 3820216.601853261,
+    "exposure_usd": 3820254.8359155543,
     "confidence": "measured",
     "evidence": ""
    },
@@ -1743,7 +1872,7 @@
     "source": "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
     "target": "amm:0x13285bcbc27f92b47b4edb99d744c07b48c977c0",
     "relation": "exits_through",
-    "exposure_usd": 12250526.678266877,
+    "exposure_usd": 12330199.212297143,
     "confidence": "measured",
     "evidence": ""
    },
@@ -2110,17 +2239,7 @@
   ]
  },
  "shared": {
-  "stable:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": [
-   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
-   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
-   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
-  ],
-  "chain:1": [
-   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
-   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
-   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
-  ],
-  "protocol:pendle": [
+  "protocol:morpho-blue": [
    "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
@@ -2130,7 +2249,17 @@
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
   ],
-  "protocol:morpho-blue": [
+  "stable:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": [
+   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
+   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
+  ],
+  "protocol:pendle": [
+   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
+   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
+  ],
+  "chain:1": [
    "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"

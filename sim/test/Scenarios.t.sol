@@ -139,6 +139,22 @@ contract Scenarios is ScenarioBase {
         }
     }
 
+    /// Inside the 16 h window, other holders rush for the exit too: the fund sells after them.
+    function test_crowdedExit() public {
+        _open("crowd_exit");
+        uint256[2] memory depegs = [uint256(100), 300];
+        uint256[6] memory crowd = [uint256(0), 500_000, 1_000_000, 1_500_000, 2_000_000, 3_000_000];
+        for (uint256 i; i < depegs.length; i++) {
+            setUsdePrice(1e8 * (10_000 - depegs[i]) / 10_000);
+            for (uint256 j; j < crowd.length; j++) {
+                (uint256 syOut, uint256 unsold) = exitAfterCrowd(crowd[j] * 1e18, FUND_PT);
+                _row(string.concat("{", _kv("severity_bps", depegs[i]), ",", _kv("crowd_pt", crowd[j] * 1e18), ",",
+                    _kv("fund_exit", syToUsd(syOut)), ",", _kv("fund_unsold", unsold), "}"));
+            }
+            vm.clearMockedCalls();
+        }
+    }
+
     /// Bybit-like dip: USDe at -4%, then recovers. Does it last long enough to switch the oracle?
     function test_shortDip() public {
         _open("short_dip");

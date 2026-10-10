@@ -36,6 +36,10 @@ def main():
             worst = max(pos["events_prudent"], key=lambda e: e["severity"])
             print(f"  LENDERS (flash-loan liquidators): at {worst['severity']:.0%}, ${worst['debt_at_risk']:,.0f} of debt left unhealthy, "
                   f"${worst['underwater']:,.0f} not covered by collateral")
+        c = pos.get("crowd")
+        if c:
+            print(f"  QUEUE: inside the window the fund still exits at ~fair value with up to {c['room_pt']:,.0f} PT sold ahead of it; "
+                  f"from {c['blocked_from_pt']:,.0f} PT ahead, part of the position is stuck. Size the position against that room.")
         print(f"  ACTION: watch {pos['trigger']}.")
         print(f"          Exit window once it fires: {pos['window']}.")
 
