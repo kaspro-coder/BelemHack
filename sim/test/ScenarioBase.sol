@@ -31,6 +31,7 @@ abstract contract ScenarioBase is Test {
     bytes32[] marketIds;
     mapping(bytes32 => MarketParams) paramsOf;
     mapping(bytes32 => address[]) borrowersOf;
+    mapping(bytes32 => uint256) toUsd6; // divide loan-token amounts by this to get 6 decimals
 
     /// Scenario contracts call this in setUp for every Morpho market of the pool.
     function addMarket(bytes32 id, address[] memory borrowers) internal {
@@ -38,6 +39,7 @@ abstract contract ScenarioBase is Test {
         paramsOf[id] = MarketParams(loan, coll, orc, irm, lltv);
         borrowersOf[id] = borrowers;
         marketIds.push(id);
+        toUsd6[id] = 10 ** (_decimals(loan) - 6);
         deal(loan, LIQUIDATOR, 500_000_000 * 10 ** _decimals(loan));
         vm.prank(LIQUIDATOR);
         (bool ok,) = loan.call(abi.encodeWithSelector(IERC20.approve.selector, address(MORPHO), type(uint256).max));
@@ -100,7 +102,7 @@ abstract contract ScenarioBase is Test {
     struct Liquidations {
         uint256 count;
         uint256 seizedPt;
-        uint256 repaid; // loan-token units, all loan tokens here have 6 decimals
+        uint256 repaid; // dollars with 6 decimals, whatever the loan token
         uint256 badDebt;
         uint256 failed;
         uint256[] badDebtByMarket; // same order as marketIds
@@ -120,7 +122,7 @@ abstract contract ScenarioBase is Test {
                 if (healthFactor(id, bs[i]) >= WAD) continue;
                 uint256 before = L.badDebt;
                 _liquidate(id, p, bs[i], lif, L);
-                L.badDebtByMarket[m] += L.badDebt - before;
+                L.badDebtByMarket[m] += L.badDebt - before; // already in 6 decimals
             }
         }
     }
@@ -136,8 +138,8 @@ abstract contract ScenarioBase is Test {
             uint256 repaid = loanBefore - IERC20(p.loanToken).balanceOf(LIQUIDATOR);
             L.count++;
             L.seizedPt += PT.balanceOf(LIQUIDATOR) - ptBefore;
-            L.repaid += repaid;
-            if (repaid < debt && collateralOf(id, b) == 0) L.badDebt += debt - repaid;
+            L.repaid += repaid / toUsd6[id];
+            if (repaid < debt && collateralOf(id, b) == 0) L.badDebt += (debt - repaid) / toUsd6[id];
         } catch {
             L.failed++;
         }
@@ -148,7 +150,7 @@ abstract contract ScenarioBase is Test {
         uint256 seizedPt;
         uint256 syOut;
         uint256 skipped; // unhealthy borrowers left alone because the pool could not take their PT
-        uint256 debtAtRisk; // debt of borrowers still unhealthy afterwards (loan units)
+        uint256 debtAtRisk; // debt of borrowers still unhealthy afterwards (dollars, 6 decimals)
         uint256 underwater; // part of that debt not covered by collateral at the oracle price
     }
 
@@ -169,8 +171,8 @@ abstract contract ScenarioBase is Test {
                 if (healthFactor(id, bs[i]) >= WAD) continue;
                 uint256 debt = borrowAssets(id, bs[i]);
                 uint256 value = collateralOf(id, bs[i]) * oraclePrice(id) / 1e36;
-                P.debtAtRisk += debt;
-                if (debt > value) P.underwater += debt - value;
+                P.debtAtRisk += debt / toUsd6[id];
+                if (debt > value) P.underwater += (debt - value) / toUsd6[id];
             }
         }
     }

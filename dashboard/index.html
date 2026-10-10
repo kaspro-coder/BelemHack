@@ -250,8 +250,10 @@ function renderExtra(p) {
     const x = D.exchange_hacks;
     h += `<h3>Exchange hacks behind USDe's hedge</h3><p class="sub">${x.incidents} hacks of $10M+ over ${Math.round(x.exchange_years)} exchange-years on the 25 largest perp venues: ${pct(x.per_year, 1)} per venue per year (range ${pct(x.lo, 1)} to ${pct(x.hi, 1)}). The Bybit hack (Feb 2025) took USDe below $0.96 for about a day: the short-dip table above shows when that becomes a cascade.</p></div></div>`;
   } else {
-    h += `<h2>Panic in the PT-reUSD market</h2><p class="lead">The oracle reads a 15-minute TWAP of this very pool, so a dump does reach it. The pool's 96% PT cap bounds how far the TWAP can fall.</p><table><tr><th>PT dumped</th><th>Oracle low</th><th>Fall</th><th>Liquidated</th><th>Implied APY after</th><th>Fund exit</th></tr>`;
-    p.pt_panic.forEach(r => h += `<tr><td>${num(r.dump_pt)}</td><td>${r.oracle_low.toFixed(4)}</td><td>${pct(1 - r.oracle_low / r.oracle_start)}</td><td>${r.liquidated}</td><td>${pct(r.apy_after)}</td><td>${r.fund_exit ? usd(r.fund_exit) : "stuck"}</td></tr>`);
+    const lead = p.oracle_note || "The oracle reads a 15-minute TWAP of this very pool, so a dump does reach it. The pool's 96% PT cap bounds how far the TWAP can fall.";
+    h += `<h2>Panic in the ${p.name} market</h2><p class="lead">${lead}</p><table><tr><th>PT dumped</th><th>Oracle low</th><th>Fall</th><th>Liquidated</th><th>Implied APY after</th><th>Fund exit</th></tr>`;
+    p.pt_panic.forEach(r => h += `<tr class="${r.fund_exit ? "" : "bad"}"><td>${num(r.dump_pt)}</td><td>${r.oracle_low.toFixed(4)}</td><td>${pct(Math.max(0, 1 - r.oracle_low / r.oracle_start))}</td><td>${r.liquidated}</td><td>${pct(r.apy_after)}</td><td>${r.fund_exit ? usd(r.fund_exit) : "stuck"}</td></tr>`);
+    if (p.oracle_note) { h += `</table><p class="sub">No liquidation, but a dump that saturates the pool still leaves the fund unable to sell until the pool rebalances: the oracle floor protects borrowers, not sellers.</p>`; $("extra").innerHTML = h; return; }
     const big = p.pt_panic.filter(r => r.liquidated > 0 && r.fund_exit === 0);
     h += `</table><p class="sub">The pool cap bounds the TWAP fall to about ${pct(Math.max(...p.pt_panic.map(r => 1 - r.oracle_low / r.oracle_start)), 1)}. ` +
       (big.length ? `On this block that is enough to liquidate a borrower sitting just above the line: from a ${num(big[0].dump_pt)} PT dump the cascade leaves the fund unable to sell.` : "Borrowers' buffers absorb it; the dangerous path is the issuer's own NAV, above.") + `</p>`;
@@ -333,7 +335,7 @@ function renderLimits() {
     "The pool is simulated without Pendle's off-chain limit orders (they cannot exist on a fork). Live quotes use them and look cheaper; in a crisis market makers can pull them.",
     "Probabilities come from 17 non-fiat stablecoins above $100M (2 persistent depegs of 3%+). For PT-reUSD the same cohort is a proxy for an issuer write-down. Size is measured today, so survivors are over-represented.",
     "Borrower lists come from Morpho's API at generation time and the fork is pinned a few hours earlier: a borrower who opened in between is missing.",
-    "PT-sUSDS is simulated only through the contagion path (vault run); its own depeg and market scenarios are not.",
+    
     "The vault run assumes depositors withdraw everything the market lets them. Borrowers who repay or get liquidated would reduce the rate spike over time.",
   ].map(x => `<li>${x}</li>`).join("");
 }

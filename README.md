@@ -8,12 +8,12 @@ and turns the measured impact into a **stay / exit / unclear** verdict with an a
 
 ## What it found (fork block 26164635, 10 Oct 2026)
 
-| | PT-sUSDe (26 Nov) | PT-reUSD (10 Dec) |
-|---|---|---|
-| Oracle the lending market uses | primary: linear discount, blind to the market; backup adds Chainlink USDe/USD; switch after a **16 h** permissionless challenge above 0.75% deviation | 15-minute TWAP of the Pendle pool itself |
-| Position becomes unsellable from | a **1%** USDe depeg lasting > 16 h | a **1%** NAV write-down by re.xyz |
-| Exit window once the signal fires | **16 h** | **15 min** (must be automated) |
-| Verdict for 1M PT | UNCLEAR (probability range straddles the threshold) | STAY (carry dominates across the range) |
+| | PT-sUSDe (26 Nov) | PT-reUSD (10 Dec) | PT-sUSDS (26 Nov) |
+|---|---|---|---|
+| Oracle the lending market uses | primary: linear discount, blind to the market; backup adds Chainlink USDe/USD; switch after a **16 h** permissionless challenge above 0.75% deviation | 15-minute TWAP of the Pendle pool itself | primary: min(pool TWAP, conservative floor); backup adds Chainlink USDS/USD behind the same 16 h challenge |
+| Position becomes unsellable from | a **1%** USDe depeg lasting > 16 h (5% with flash-loan liquidators) | a **1%** NAV write-down by re.xyz | a **2%** USDS depeg lasting > 16 h |
+| Exit window once the signal fires | **16 h** | **15 min** (must be automated) | **16 h** |
+| Verdict for 1M PT | UNCLEAR (probability range straddles the threshold) | STAY (carry dominates across the range) | UNCLEAR |
 
 Other results replayed on the fork:
 - A USDe dip shorter than 16 h liquidates nobody; at 24 h it liquidates 3 borrowers.
@@ -23,6 +23,7 @@ Other results replayed on the fork:
   enough to liquidate an $11M borrower sitting 0.67% from liquidation.
 - **Risk moves within the hour**: between two forks ~35 minutes apart, that borrower levered up 4.7%. The
   write-down that makes PT-reUSD unsellable dropped from 2% to 1%. Hence the live watcher and `--fresh` re-forks.
+- PT-sUSDS market panic barely moves its oracle (0.05% for a pool-saturating dump): the floor in Ojo's min() absorbs it.
 - **Contagion**: Smokehouse USDT supplies 38% of PT-reUSD/USDT and 83% of PT-sUSDS/USDT. A run on it after a
   reUSD loss locks $3.4M in the sUSDS market and lifts its borrow rate from 4.3% to 18% at once, 47% a week later.
 - Pendle's live quotes fill off-chain limit orders; the on-chain pool alone saturates near 2.7M PT-sUSDe.
@@ -34,6 +35,7 @@ sim/                    Foundry project: the controlled scenarios
   test/ScenarioBase.sol   building blocks: liquidate, sell into the pool, measure exit value, revert
   test/Scenarios.t.sol    PT-sUSDe: USDe depeg, short dip, PT panic, feed failure, baseline
   test/ReUsdCascade.t.sol PT-reUSD: reflexive market cascade, issuer write-down, baseline
+  test/SusdsScenarios.t.sol  PT-sUSDS: USDS depeg, market panic, baseline
   test/SusdsContagion.t.sol  vault run on PT-sUSDS/USDT
   out-scenarios/*.jsonl   results (committed)
   gen_borrowers.py        borrower lists from Morpho's API -> src/Borrowers.sol
@@ -78,8 +80,7 @@ cd ../src && python -m defi_risk.sim_report && python -m defi_risk.dashboard
    range agrees, UNCLEAR otherwise. The liquidity risk and the exit window come from the simulation.
 
 ## Honest limits
-- Liquidators are assumed to sell at once into the pool; a real one that cannot sell would stop, turning stuck
-  collateral into bad debt for lenders.
+- Liquidator behaviour is bracketed by two runs: dump everything vs flash-loan liquidators who stop when the pool is full.
 - Only liquidators sell; other panicking holders are not simulated, so in-window exit values are optimistic.
 - The fork has no Pendle limit orders; live quotes look cheaper than the pool alone.
 - The probability cohort is small (2 persistent depegs of 3%+) and biased towards survivors; for PT-reUSD it is a proxy.

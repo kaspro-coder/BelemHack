@@ -141,6 +141,39 @@ def reusd_bad_debt_by_market():
     return out
 
 
+def susds():
+    base = load("susds_baseline")
+    meta, exits = base[0], base[1:]
+    depeg = load("susds_depeg")
+    mark = exits[0]["exit_usd"] / 1e6 / (exits[0]["exit_pt"] / 1e18)
+    stuck = [r for r in depeg if r["fund_unsold_after"] > 0]
+    calm = load("susds_baseline")[3]["exit_usd"] / 1e6  # the 1M PT sale
+    return {
+        "name": "PT-sUSDS", "expiry": "2026-11-26",
+        "days": (meta["expiry"] - meta["timestamp"]) / 86400,
+        "implied_apy": _apy(meta["ln_implied_rate"]),
+        "mark": mark, "calm_exit": calm,
+        "exit_curve": [(r["exit_pt"] / 1e18, r["exit_usd"] / 1e6, r["unsold_pt"] / 1e18) for r in exits],
+        "driver": "USDS depeg (Chainlink USDS/USD)",
+        "stuck_from": min(r["severity"] for r in stuck) / 1e4 if stuck else None,
+        "window": "16 h", "window_hours": meta["challenge_timelock"] / 3600,
+        "trigger": f"USDS/USD below {1 - meta['threshold'] / 1e18:.4f} (deviation threshold {meta['threshold'] / 1e16:.2f}%): "
+                   f"challenge, then liquidations {meta['challenge_timelock'] / 3600:.0f} h later",
+        "events": [{
+            "severity": r["severity"] / 1e4, "liquidated": r["liquidated"], "seized_pt": r["seized_pt"] / 1e18,
+            "stuck_pt": r["unsold_pt"] / 1e18, "bad_debt": r["bad_debt"] / 1e6,
+            "exit_in_window": r["fund_exit_t0"] / 1e6, "exit_after": r["fund_exit_after"] / 1e6,
+            "fund_stuck": r["fund_unsold_after"] > 0,
+        } for r in depeg],
+        "pt_panic": [{"dump_pt": r["severity"] / 1e18, "liquidated": r["liquidated"],
+                      "oracle_start": r["oracle_start"] / 1e24, "oracle_low": r["oracle_low"] / 1e24,
+                      "apy_after": _apy(r["ln_implied_rate"]), "fund_exit": r["fund_exit_after"] / 1e6,
+                      "fund_stuck": r["fund_unsold_after"] > 0} for r in load("susds_panic")],
+        "oracle_note": "Ojo returns the lower of the Pendle 15-min TWAP and a conservative feed: the market "
+                       "must first fall below that floor before the oracle moves.",
+    }
+
+
 def probabilities(days):
     """P(persistent depeg >= d within the holding window) per severity, with 90% ranges."""
     prices = cohort.load_prices()
@@ -182,7 +215,7 @@ def decide(pos, probs, risk_free):
 def run():
     rf = sources.risk_free_rate()
     out = []
-    for pos in (susde(), reusd()):
+    for pos in (susde(), reusd(), susds()):
         probs = probabilities(round(pos["days"]))
         pos["probabilities"] = {d: {k: v[k] for k in ("p", "lo", "hi", "episodes", "coins")} for d, v in probs.items()}
         pos["decision"] = decide(pos, probs, rf)
