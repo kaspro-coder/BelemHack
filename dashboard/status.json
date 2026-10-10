@@ -1,11 +1,25 @@
 {
- "checked_at": "2026-10-10T21:13:51+00:00",
+ "checked_at": "2026-10-10T21:24:32+00:00",
  "signals": [
   {
    "name": "PT-sUSDe oracle deviation",
    "level": "green",
    "value": "0.040% (threshold 0.75%), USDe $0.9996",
    "meaning": "Primary vs backup oracle. The backup reads Chainlink USDe/USD; the primary does not.",
+   "action": "No action."
+  },
+  {
+   "name": "PT-sUSDS oracle deviation",
+   "level": "green",
+   "value": "0.012% (threshold 0.75%)",
+   "meaning": "Primary vs backup; the backup adds Chainlink USDS/USD.",
+   "action": "No action."
+  },
+  {
+   "name": "PT-sUSDS market cushion",
+   "level": "green",
+   "value": "pool TWAP 0.9940 vs floor 0.9836 (+1.06%)",
+   "meaning": "The oracle only follows the market once the TWAP falls below the floor.",
    "action": "No action."
   },
   {

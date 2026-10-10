@@ -25,6 +25,8 @@ STATUS = ROOT / "dashboard" / "status.json"
 STATE = ROOT / "data" / "watch_state.json"
 
 SUSDE_ORACLE = "0xF8b29e7E9c00CE531434775f7923CC9fbCa01b08"
+SUSDS_ORACLE = "0x3464a61A68C486241FE07201C913F055Bdce35BF"
+SUSDS_OJO = "0x16bdf4c1a1fbd0d3a181dcee4141bb106e22b002"
 USDE_FEED = "0xa569d910839Ae8865Da8F8e70FfFb0cBA869F961"
 REUSD_SHARE_PRICE = "0xd1D104a7515989ac82F1AFDa15a23650411b05B8"
 SMOKEHOUSE_USDT = "0xa0804346780b4c2e3be118ac957d1db82f9d7484"
@@ -35,7 +37,8 @@ MARKETS = {
 }
 SEL = {"getDeviation": "89ab3532", "deviationThreshold": "d94ad837", "isChallenged": "9df4d0fe",
        "challengeExpiresAt": "ccc1b9cd", "currentOracle": "2289445e", "primaryOracle": "bd8f238e",
-       "latestRoundData": "feaf968c", "getSharePrice": "5b1dac60"}
+       "latestRoundData": "feaf968c", "getSharePrice": "5b1dac60",
+       "FEED_1": "d84bd024", "FEED_2": "41299f94"}
 
 
 def _call(to, sel):
@@ -75,6 +78,30 @@ def susde_signals():
     return [_signal("PT-sUSDe oracle deviation", lvl,
                     f"{dev:.3%} (threshold {thr:.2%}), USDe ${usde:.4f}",
                     "Primary vs backup oracle. The backup reads Chainlink USDe/USD; the primary does not.", act)]
+
+
+def susds_signals():
+    dev = _uint(SUSDS_ORACLE, "getDeviation") / 1e18
+    thr = _uint(SUSDS_ORACLE, "deviationThreshold") / 1e18
+    challenged = _uint(SUSDS_ORACLE, "isChallenged") == 1
+    if challenged or dev > thr:
+        lvl, act = "red", "USDS deviation above threshold or challenge running: on the fork a 2% USDS depeg made the position unsellable. Exit inside the 16 h."
+    elif dev > thr / 2:
+        lvl, act = "amber", "Deviation above half the threshold: watch closely."
+    else:
+        lvl, act = "green", "No action."
+    out = [_signal("PT-sUSDS oracle deviation", lvl, f"{dev:.3%} (threshold {thr:.2%})",
+                   "Primary vs backup; the backup adds Chainlink USDS/USD.", act)]
+    # Ojo returns min(Pendle TWAP, conservative feed): the gap is the cushion against market panic.
+    f1 = "0x" + _call(SUSDS_OJO, SEL["FEED_1"])[-40:]
+    f2 = "0x" + _call(SUSDS_OJO, SEL["FEED_2"])[-40:]
+    twap, floor = _uint(f1, "latestRoundData", 1) / 1e18, _uint(f2, "latestRoundData", 1) / 1e18
+    gap = twap / floor - 1
+    lvl = "green" if gap > 0.005 else "amber" if gap > 0 else "red"
+    out.append(_signal("PT-sUSDS market cushion", lvl, f"pool TWAP {twap:.4f} vs floor {floor:.4f} ({gap:+.2%})",
+                       "The oracle only follows the market once the TWAP falls below the floor.",
+                       "No action." if lvl == "green" else "Market price at the floor: the next sell-off reaches Morpho."))
+    return out
 
 
 def reusd_signals(state):
@@ -143,7 +170,7 @@ def borrower_signals():
 def check():
     state = json.loads(STATE.read_text()) if STATE.exists() else {}
     signals = []
-    for fn in (susde_signals, lambda: reusd_signals(state), lender_signals, borrower_signals):
+    for fn in (susde_signals, susds_signals, lambda: reusd_signals(state), lender_signals, borrower_signals):
         try:
             signals += fn()
         except Exception as e:  # one broken source must not hide the others
