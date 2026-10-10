@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-10T21:02+00:00",
+ "asof": "2026-10-10T21:04+00:00",
  "fork_block": 26164460,
  "fund_pt": 1000000,
  "positions": [
@@ -727,7 +727,7 @@
     "kind": "perp_venue",
     "label": "Binance",
     "data": {
-     "eth_funding_annualized": -0.08666925
+     "eth_funding_annualized": -0.0871401
     }
    },
    {
@@ -735,7 +735,7 @@
     "kind": "perp_venue",
     "label": "OKX",
     "data": {
-     "eth_funding_annualized": -0.020498642356788
+     "eth_funding_annualized": -0.0208089843529575
     }
    },
    {
@@ -743,7 +743,7 @@
     "kind": "perp_venue",
     "label": "Hyperliquid",
     "data": {
-     "eth_funding_annualized": -0.183825972
+     "eth_funding_annualized": -0.17457716400000003
     }
    },
    {
@@ -806,9 +806,9 @@
      "backup": "0xe2f4cfe07aecd7fd8fb0d293a22cde7d08175465",
      "active": "primary",
      "challenged": false,
-     "price": 0.9924181259512938,
-     "primary_price": 0.9924181259512938,
-     "backup_price": 0.9920180028112727,
+     "price": 0.9924183085996956,
+     "primary_price": 0.9924183085996956,
+     "backup_price": 0.9920181853860344,
      "deviation": 0.000403342619677401,
      "threshold": 0.0075,
      "timelock_hours": 16.0,
@@ -934,7 +934,7 @@
      "address": "0x217d6DdCDB95112C51657F6270e8C079CFDB51f0",
      "morpho_type": "ChainlinkOracleV2",
      "pattern": "MorphoChainlinkOracleV2",
-     "price": 0.9818240259224303,
+     "price": 0.9818243587542735,
      "market_sensitive": true,
      "reads": [
       "Ojo PT Feed Pendle Chainlink-compatible Oracle"
@@ -958,8 +958,8 @@
     "data": {
      "lltv": 0.915,
      "collateral_usd": 136133913.96051887,
-     "borrow_usd": 106841277.14061703,
-     "utilization": 0.886774379609855,
+     "borrow_usd": 106841319.43250714,
+     "utilization": 0.8867744193542342,
      "market_id": "0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64"
     }
    },
@@ -974,7 +974,7 @@
        "market": "Morpho PT-reUSD-10DEC2026/USDC",
        "usd": 3186526.5202759304,
        "share_of_vault": 0.25000211753165463,
-       "share_of_market_supply": 0.02644792493830834
+       "share_of_market_supply": 0.02644791565457596
       }
      }
     }
@@ -1047,7 +1047,7 @@
      "address": "0xda5901EF31ecAFa6561B2e56B4997FAdd3dB4646",
      "morpho_type": "ChainlinkOracleV2",
      "pattern": "MorphoChainlinkOracleV2",
-     "price": 0.9873635432521563,
+     "price": 0.9873638476661593,
      "market_sensitive": false,
      "reads": [
       "Linear discount 10.0%/yr to maturity (ignores the market)"
@@ -1090,9 +1090,9 @@
      "backup": "0x77ae9b629096d0ae0206878b163cca232276c88e",
      "active": "primary",
      "challenged": false,
-     "price": 0.9835726062278032,
-     "primary_price": 0.9835726062278032,
-     "backup_price": 0.98345271856283,
+     "price": 0.983573001966007,
+     "primary_price": 0.983573001966007,
+     "backup_price": 0.9834531142527975,
      "deviation": 0.000121904858983261,
      "threshold": 0.0075,
      "timelock_hours": 16.0,
@@ -1706,22 +1706,12 @@
   ]
  },
  "shared": {
-  "protocol:morpho-blue": [
-   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
-   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
-   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
-  ],
-  "liquidity:pendle-limit-orders": [
-   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
-   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
-   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
-  ],
-  "stable:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": [
-   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
-   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
-   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
-  ],
   "protocol:pendle": [
+   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
+   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
+  ],
+  "protocol:morpho-blue": [
    "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
@@ -1731,11 +1721,21 @@
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
   ],
-  "vault:0xa0804346780b4c2e3be118ac957d1db82f9d7484": [
+  "stable:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": [
+   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
+   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
+  ],
+  "liquidity:pendle-limit-orders": [
+   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
   ],
   "stable:0xdac17f958d2ee523a2206206994597c13d831ec7": [
+   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
+  ],
+  "vault:0xa0804346780b4c2e3be118ac957d1db82f9d7484": [
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
   ]
