@@ -24,5 +24,5 @@ fi
 echo "fork at block $(cast block-number --rpc-url $RPC)"
 
 (cd sim && forge test --fork-url $RPC)
-(cd src && python -m defi_risk.sim_report && python -m defi_risk.dashboard)
+(cd src && python -m defi_risk.sim_report && python -m defi_risk.portfolio && python -m defi_risk.dashboard)
 echo "done: serve dashboard/ (python -m http.server 8765) and open http://localhost:8765"

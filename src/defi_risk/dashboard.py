@@ -10,7 +10,7 @@ from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
 
-from . import simulation, venues
+from . import portfolio, simulation, venues
 from .discover import contagion_paths, discover_many, shared_dependencies
 
 ROOT = Path(__file__).resolve().parents[2]
@@ -20,6 +20,7 @@ TOKENS = [("sUSDe", "2026-11-26"), ("reUSD", "2026-12-10"), ("sUSDS", "2026-11-2
 
 def export():
     positions = simulation.run()
+    book = portfolio.build(positions)
     for p in positions:
         p["probabilities"] = {f"{d:g}": v for d, v in p["probabilities"].items()}
     g = discover_many(TOKENS)
@@ -35,6 +36,7 @@ def export():
         "shared": shared,
         "contagion": {"paths": contagion_paths(g), "vault_run": simulation.contagion(),
                       "reusd_bad_debt": {f"{k:g}": v for k, v in simulation.reusd_bad_debt_by_market().items()}},
+        "book": book,
         "exchange_hacks": {k: hack[k] for k in ("incidents", "exchange_years", "per_year", "lo", "hi")},
     }
 

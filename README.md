@@ -15,6 +15,9 @@ and turns the measured impact into a **stay / exit / unclear** verdict with an a
 | Exit window once the signal fires | **16 h** | **15 min** (must be automated) | **16 h** |
 | Verdict for 1M PT | UNCLEAR (probability range straddles the threshold) | STAY (carry dominates across the range) | UNCLEAR |
 
+Book of 1M PT in each pocket: **8.5%** chance at least one pocket becomes unsellable before expiry (range 5.2% to 14.9%),
+with one contagion path where two pockets that share no issuer fall together.
+
 Other results replayed on the fork:
 - A USDe dip shorter than 16 h liquidates nobody; at 24 h it liquidates 3 borrowers.
 - A crash of the PT-sUSDe market liquidates nobody (the oracle ignores the market): lenders carry it silently.
@@ -45,6 +48,7 @@ src/defi_risk/
   cohort.py, venues.py    measured base rates (stablecoin depegs, exchange hacks)
   simulation.py           decision layer fed by the fork results
   sim_report.py           text report;  dashboard.py: exports dashboard/data.json
+  portfolio.py            book view: which event hits which pocket, with contagion
   watch.py                live signals from mainnet (oracle deviation, issuer share price, vault, whales)
 dashboard/index.html      the demo page
 ```

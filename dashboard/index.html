@@ -79,6 +79,14 @@ pre { background: var(--bg); border-radius: 8px; padding: 10px 12px; font-size: 
     <table id="livetable"></table>
   </section>
 
+  <section class="card">
+    <h2>The book: which event hits which pocket</h2>
+    <p class="lead" id="booklead"></p>
+    <div class="nums" id="booknums"></div>
+    <table id="booktable" style="margin-top:12px"></table>
+    <p class="sub" id="booknote"></p>
+  </section>
+
   <div class="tabs" id="tabs"></div>
 
   <section class="card">
@@ -328,6 +336,19 @@ function renderLive() {
   }).catch(() => {});
 }
 
+function renderBook() {
+  const b = D.book, n = (v, l) => `<div class="num"><div class="v">${v}</div><div class="l">${l}</div></div>`, c = b.book;
+  $("booklead").textContent = `${b.fund_pt.toLocaleString("en")} PT in each of ${b.pockets.join(", ")}. Each row is an event replayed on the fork; probabilities come from the stablecoin cohort.`;
+  $("booknums").innerHTML = n(pct(c.p.any_stuck, 1), `chance at least one pocket becomes unsellable before expiry (range ${pct(c.lo.any_stuck, 1)} to ${pct(c.hi.any_stuck, 1)})`) +
+    n(c.p.expected_stuck_pockets_with_contagion.toFixed(3), `expected pockets stuck, ${c.p.expected_stuck_pockets.toFixed(3)} without contagion`);
+  let t = `<tr><th>Event</th><th>Chance before expiry</th><th>Exit window</th>${b.pockets.map(p => `<th>${p}</th>`).join("")}</tr>`;
+  b.rows.forEach(r => t += `<tr><td>${r.event}</td><td>${pct(r.p, 2)} <span class="sub">(${pct(r.lo, 1)}-${pct(r.hi, 1)})</span></td><td>${r.window}</td>` +
+    b.pockets.map(p => { const h = r.hits[p]; return `<td style="color:var(--${h === "-" ? "muted" : "exit"})">${h === "stuck if the vault run happens" ? "stuck*" : h}</td>`; }).join("") + "</tr>");
+  $("booktable").innerHTML = t;
+  const k = b.contagion;
+  $("booknote").innerHTML = k ? `* Contagion, assuming Smokehouse USDT's depositors run after its loss: on the fork the run locks ${usd(k.locked)} in PT-sUSDS/USDT and lifts its borrow rate from ${pct(k.rate_before, 1)} to ${pct(k.rate_after, 1)}; a forced sale of ${num(k.saturating_dump_pt)} PT-sUSDS saturates its pool. Two pockets that share no issuer fall together. Shared protocols (Pendle, Morpho, Ethereum) would hit all three at once; they are mapped, not priced.` : "";
+}
+
 function renderLimits() {
   $("limits").innerHTML = [
     "Liquidator behaviour is bracketed by two runs: liquidators who seize everything and dump it, and flash-loan liquidators who stop when the pool is full. Real behaviour sits in between.",
@@ -346,7 +367,7 @@ fetch("data.json").then(r => r.json()).then(d => {
   $("blk").textContent = d.fork_block;
   $("tabs").innerHTML = d.positions.map((p, i) => `<button class="tab" data-i="${i}">${p.name}</button>`).join("");
   document.querySelectorAll(".tab").forEach(t => t.onclick = () => { cur = +t.dataset.i; renderPosition(); });
-  renderPosition(); renderGraph(); renderContagion(); renderLimits(); renderLive(); setInterval(renderLive, 60000);
+  renderBook(); renderPosition(); renderGraph(); renderContagion(); renderLimits(); renderLive(); setInterval(renderLive, 60000);
 }).catch(e => { document.body.insertAdjacentHTML("afterbegin", "<p style='padding:16px'>Could not load data.json. Run python -m defi_risk.dashboard, then serve this folder.</p>"); console.error(e); });
 </script>
 </body>

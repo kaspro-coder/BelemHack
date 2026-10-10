@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-10T21:24+00:00",
+ "asof": "2026-10-10T21:25+00:00",
  "fork_block": 26164635,
  "fund_pt": 1000000,
  "positions": [
@@ -1131,7 +1131,7 @@
     "kind": "perp_venue",
     "label": "Binance",
     "data": {
-     "eth_funding_annualized": -0.08802705
+     "eth_funding_annualized": -0.08749050000000001
     }
    },
    {
@@ -1139,7 +1139,7 @@
     "kind": "perp_venue",
     "label": "OKX",
     "data": {
-     "eth_funding_annualized": -0.024359026696695
+     "eth_funding_annualized": -0.024590079480940503
     }
    },
    {
@@ -1147,7 +1147,7 @@
     "kind": "perp_venue",
     "label": "Hyperliquid",
     "data": {
-     "eth_funding_annualized": -0.002254824
+     "eth_funding_annualized": -0.004982688
     }
    },
    {
@@ -1210,9 +1210,9 @@
      "backup": "0xe2f4cfe07aecd7fd8fb0d293a22cde7d08175465",
      "active": "primary",
      "challenged": false,
-     "price": 0.9924205232115677,
-     "primary_price": 0.9924205232115677,
-     "backup_price": 0.9920203991050193,
+     "price": 0.99242075152207,
+     "primary_price": 0.99242075152207,
+     "backup_price": 0.9920206273234713,
      "deviation": 0.000403342619677401,
      "threshold": 0.0075,
      "timelock_hours": 16.0,
@@ -1338,7 +1338,7 @@
      "address": "0x217d6DdCDB95112C51657F6270e8C079CFDB51f0",
      "morpho_type": "ChainlinkOracleV2",
      "pattern": "MorphoChainlinkOracleV2",
-     "price": 0.9818002079932148,
+     "price": 0.9817929460566663,
      "market_sensitive": true,
      "reads": [
       "Ojo PT Feed Pendle Chainlink-compatible Oracle"
@@ -1451,7 +1451,7 @@
      "address": "0xda5901EF31ecAFa6561B2e56B4997FAdd3dB4646",
      "morpho_type": "ChainlinkOracleV2",
      "pattern": "MorphoChainlinkOracleV2",
-     "price": 0.9873675767376966,
+     "price": 0.98736791920345,
      "market_sensitive": false,
      "reads": [
       "Linear discount 10.0%/yr to maturity (ignores the market)"
@@ -1494,9 +1494,9 @@
      "backup": "0x77ae9b629096d0ae0206878b163cca232276c88e",
      "active": "primary",
      "challenged": false,
-     "price": 0.9835778497590055,
-     "primary_price": 0.9835778497590055,
-     "backup_price": 0.9834579614548985,
+     "price": 0.983578294964485,
+     "primary_price": 0.983578294964485,
+     "backup_price": 0.9834584066061118,
      "deviation": 0.000121904858983261,
      "threshold": 0.0075,
      "timelock_hours": 16.0,
@@ -2120,12 +2120,12 @@
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
   ],
-  "protocol:morpho-blue": [
+  "protocol:pendle": [
    "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
   ],
-  "protocol:pendle": [
+  "protocol:morpho-blue": [
    "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
@@ -2253,6 +2253,95 @@
    "0.2": {
     "usdc": 8576829.717585,
     "usdt": 718130.032171
+   }
+  }
+ },
+ "book": {
+  "pockets": [
+   "PT-sUSDe",
+   "PT-reUSD",
+   "PT-sUSDS"
+  ],
+  "fund_pt": 1000000,
+  "rows": [
+   {
+    "event": "USDe depeg >= 1%",
+    "source": "PT-sUSDe",
+    "p": 0.032419479878779335,
+    "lo": 0.019999600769059458,
+    "hi": 0.054990632521193,
+    "hits": {
+     "PT-sUSDe": "stuck",
+     "PT-reUSD": "-",
+     "PT-sUSDS": "-"
+    },
+    "window": "16 h"
+   },
+   {
+    "event": "reUSD NAV write-down >= 1%",
+    "source": "PT-reUSD",
+    "p": 0.042286278102755655,
+    "lo": 0.026086435785729733,
+    "hi": 0.0717269119841648,
+    "hits": {
+     "PT-sUSDe": "-",
+     "PT-reUSD": "stuck",
+     "PT-sUSDS": "-"
+    },
+    "window": "15 min"
+   },
+   {
+    "event": "USDS depeg >= 2%",
+    "source": "PT-sUSDS",
+    "p": 0.012967791951511735,
+    "lo": 0.006387122427989176,
+    "hi": 0.02967523259041006,
+    "hits": {
+     "PT-sUSDe": "-",
+     "PT-reUSD": "-",
+     "PT-sUSDS": "stuck"
+    },
+    "window": "16 h"
+   },
+   {
+    "event": "reUSD write-down >= 10% -> Smokehouse USDT run",
+    "source": "contagion",
+    "p": 0.004228627810275566,
+    "lo": 0.0015026915668418994,
+    "hi": 0.0200600374306459,
+    "hits": {
+     "PT-sUSDe": "-",
+     "PT-reUSD": "stuck",
+     "PT-sUSDS": "stuck if the vault run happens"
+    },
+    "window": "15 min, then days"
+   }
+  ],
+  "contagion": {
+   "severity": 0.1,
+   "p": 0.004228627810275566,
+   "lo": 0.0015026915668418994,
+   "hi": 0.0200600374306459,
+   "saturating_dump_pt": 4000000.0,
+   "rate_before": 0.042474971601504,
+   "rate_after": 0.179548373793024,
+   "locked": 3405198.270925
+  },
+  "book": {
+   "lo": {
+    "any_stuck": 0.05166041580254266,
+    "expected_stuck_pockets": 0.052473158982778365,
+    "expected_stuck_pockets_with_contagion": 0.053975850549620265
+   },
+   "p": {
+    "any_stuck": 0.0853516595987227,
+    "expected_stuck_pockets": 0.08767354993304673,
+    "expected_stuck_pockets_with_contagion": 0.0919021777433223
+   },
+   "hi": {
+    "any_stuck": 0.14880514449547266,
+    "expected_stuck_pockets": 0.15639277709576785,
+    "expected_stuck_pockets_with_contagion": 0.17645281452641376
    }
   }
  },
