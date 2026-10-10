@@ -73,6 +73,11 @@ pre { background: var(--bg); border-radius: 8px; padding: 10px 12px; font-size: 
   <h1>DeFi Risk Dependency: stay or exit, simulated on the real contracts</h1>
   <div class="sub" id="sub"></div>
 
+  <section class="card" style="border-left:4px solid var(--accent)">
+    <h2>What a portfolio manager should take away</h2>
+    <ol class="lim" id="summary" style="color:var(--ink); font-size:14px"></ol>
+  </section>
+
   <section class="card" id="live" style="display:none">
     <h2>Live signals on mainnet</h2>
     <p class="lead" id="livelead"></p>
@@ -348,6 +353,21 @@ function renderLive() {
   }).catch(() => {});
 }
 
+function renderSummary() {
+  const P = Object.fromEntries(D.positions.map(p => [p.name, p])), b = D.book.book.p, k = D.book.contagion;
+  const fmtWin = p => `${p.name}: ${p.window}`;
+  const items = [
+    `<b>Same product, opposite risks.</b> Three PTs that look alike react differently because of their lending oracle. ` +
+      D.positions.map(p => `${p.name} becomes unsellable from a <b>${pct(p.stuck_from, 0)}</b> ${p.driver.split(" (")[0]}`).join("; ") + ".",
+    `<b>The exit window is set by the oracle, not by the market.</b> ${D.positions.map(fmtWin).join(", ")}. Inside it the exit is a queue: the first ~${num(Math.min(...D.positions.map(p => p.crowd.room_pt)))} PT out get fair value, the rest get nothing.` +
+      (D.positions.some(p => p.window_hours < 1) ? " A 15-minute window cannot be met by a human: the exit must be automated." : ""),
+    `<b>The book is more correlated than its issuers.</b> With 1M PT in each pocket, there is a <b>${pct(b.any_stuck, 1)}</b> chance that at least one becomes unsellable before expiry` +
+      (k ? `, and a shared lender (Smokehouse USDT) can drag PT-sUSDS down with PT-reUSD although they share no issuer.` : "."),
+    `<b>Verdicts:</b> ${D.positions.map(p => `${p.name} ${p.decision.verdict}`).join(", ")}. UNCLEAR means the measured probability range straddles the break-even: reduce size rather than choose all-or-nothing.`,
+  ];
+  $("summary").innerHTML = items.map(x => `<li>${x}</li>`).join("");
+}
+
 function renderBook() {
   const b = D.book, n = (v, l) => `<div class="num"><div class="v">${v}</div><div class="l">${l}</div></div>`, c = b.book;
   $("booklead").textContent = `${b.fund_pt.toLocaleString("en")} PT in each of ${b.pockets.join(", ")}. Each row is an event replayed on the fork; probabilities come from the stablecoin cohort.`;
@@ -393,7 +413,7 @@ fetch("data.json").then(r => r.json()).then(d => {
   $("blk").textContent = d.fork_block;
   $("tabs").innerHTML = d.positions.map((p, i) => `<button class="tab" data-i="${i}">${p.name}</button>`).join("");
   document.querySelectorAll(".tab").forEach(t => t.onclick = () => { cur = +t.dataset.i; renderPosition(); });
-  renderBook(); renderPosition(); renderGraph(); renderContagion(); renderLimits(); renderLive(); renderEco(); setInterval(renderLive, 60000);
+  renderSummary(); renderBook(); renderPosition(); renderGraph(); renderContagion(); renderLimits(); renderLive(); renderEco(); setInterval(renderLive, 60000);
 }).catch(e => { document.body.insertAdjacentHTML("afterbegin", "<p style='padding:16px'>Could not load data.json. Run python -m defi_risk.dashboard, then serve this folder.</p>"); console.error(e); });
 </script>
 </body>
