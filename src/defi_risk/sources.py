@@ -61,3 +61,31 @@ def morpho_markets_by_collateral(token_address, chain_id=1):
         "state { supplyAssetsUsd borrowAssetsUsd collateralAssetsUsd utilization } } } }"
     ) % (token_address, chain_id)
     return _request(MORPHO, {"query": query})["data"]["markets"]["items"]
+
+
+def morpho_positions(market_id):
+    """Active borrowers of a Morpho market: health factor, debt and collateral in USD."""
+    rows, skip = [], 0
+    while True:
+        query = (
+            '{ marketPositions(first: 100, skip: %d, where: {marketUniqueKey_in: ["%s"], borrowShares_gte: 1}) '
+            "{ items { healthFactor state { borrowAssetsUsd collateralUsd } } } }"
+        ) % (skip, market_id)
+        items = _request(MORPHO, {"query": query})["data"]["marketPositions"]["items"]
+        rows += [r for r in items if r["state"]["borrowAssetsUsd"]]
+        if len(items) < 100:
+            return rows
+        skip += 100
+
+
+def usde_price_history(days=1100):
+    """Daily USDe/USD prices [(unix_ts, price)], oldest first (DefiLlama, 400-day chunks)."""
+    import time
+    coin = "ethereum:0x4c9EDD5852cd905f086C759E8383e09bff1E68B3"
+    now, pts = int(time.time()), {}
+    for k in range(-(-days // 400)):
+        start = now - (k + 1) * 400 * 86400
+        data = _request(f"https://coins.llama.fi/chart/{coin}?start={start}&span=400&period=1d")
+        for p in data["coins"][coin]["prices"]:
+            pts[p["timestamp"]] = p["price"]
+    return sorted(pts.items())
