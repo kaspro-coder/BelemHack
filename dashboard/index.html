@@ -97,6 +97,13 @@ ul.lim li { margin: 4px 0; }
     </div>
   </section>
 
+  <section class="card" id="venue-card">
+    <h2>Second scenario: a perp exchange is hacked</h2>
+    <p class="lead" id="venue-lead"></p>
+    <div class="nums" id="venue-nums"></div>
+    <div class="flip" id="venue-note" style="margin-top:14px"></div>
+  </section>
+
   <section class="card">
     <h2>What this position depends on</h2>
     <p class="lead">Discovered automatically from Pendle, DefiLlama, Morpho, Ethena's docs and the chain itself. Click a node.</p>
@@ -277,6 +284,16 @@ function renderScen() {
   D.scenarios.forEach(r => h += `<tr class="${r.unsellable_usd > 0 ? "danger" : ""}"><td>${pct(r.depeg, 1)}</td><td>${pct(r.pt_price_fall)}</td><td>${usd(r.seized_usd)}</td><td>${usd(r.unsellable_usd)}</td><td>${pct(r.cascade_impact)}</td><td>${pct(r.holder_loss)}</td></tr>`);
   $("scen").innerHTML = h;
 }
+function renderVenue() {
+  const v = D.venue, s = v.scenario;
+  $("venue-lead").textContent = `${v.incidents} hacks of $10M or more over ${Math.round(v.exchange_years)} exchange-years on the 25 largest perp venues (DefiLlama): ${pct(v.per_year, 1)} per venue per year.`;
+  const n = (val, label) => `<div class="num"><div class="v">${val}</div><div class="l">${label}</div></div>`;
+  $("venue-nums").innerHTML =
+    n(pct(v.p_any, 1), `chance one of ${v.n_venues} possible venues is hit in ${D.position.days} days (range ${pct(v.p_any_lo, 1)} to ${pct(v.p_any_hi, 1)})`) +
+    n(usd(s.seized_usd), `Morpho collateral seized by a ${pct(v.depeg, 0)} USDe dip (pool absorbs ${usd(D.capacity)})`) +
+    n(pct(s.holder_loss, 1), "mark-to-market loss on the position");
+  $("venue-note").innerHTML = `Precedent: when Bybit was hacked in Feb 2025, USDe dipped below $0.96 for about a day and recovered, with no bad debt reported (secondary sources, not verified on-chain). That ${pct(v.depeg, 0)} dip is the size used here. The seizure includes our rate-shock assumption; without it it would be ${usd(v.seized_without_rate_shock)}. Not priced as a permanent loss: one precedent is not enough to estimate it.`;
+}
 function renderLimits() {
   const o = D.oracle, L = [
     `The cascade impact uses Pendle quotes taken in calm conditions. In a real stress the pool moves, so it is a minimum.`,
@@ -284,7 +301,7 @@ function renderLimits() {
     `Depeg base rate: ${D.estimate.coins} non-fiat stablecoins above $100M today, weekly prices. Size is measured today, so survivors are over-represented and the true risk may be higher. Smaller coins (> $10M) show ${pct(D.tiers[1].p, 1)}.`,
     `USDe's own price history is a daily sample: it misses depegs lasting hours and shifts by a few tenths of a percent depending on the sampling hour. Do not read much into small dips.`,
     `Only Bybit is confirmed by Ethena's docs as a hedging venue. Binance, OKX and Hyperliquid come from an undated third-party note, and no per-venue split is published.`,
-    `Only the USDe depeg scenario is modelled. A frozen perp venue, an oracle failure and a smart-contract exploit are mapped but not yet priced.`,
+    `Two scenarios are modelled (USDe depeg, perp exchange hack). Oracle failure and smart-contract exploit are mapped but not priced. The exchange rate counts hacks only, not freezes or outages, and uses today's largest exchanges, so true risk is probably higher.`,
   ];
   if (o) L.unshift(`The Morpho oracle's primary leg reads no USDe/USD feed${o.primary_sees_depeg ? "" : " (it cannot see a USDe depeg)"}; the backup does, after a ${o.timelock_hours}h challenge delay. This is inferred from the contract's feed list, not tested.`);
   $("limits").innerHTML = L.map(x => `<li>${x}</li>`).join("");
@@ -296,7 +313,7 @@ fetch("data.json").then(r => r.json()).then(d => {
   $("asof").textContent = "Live data as of " + d.asof.replace("T", " ").slice(0, 16) + " UTC";
   $("size").value = 1000000; $("p3").value = Math.min(0.05, d.estimate.p);
   ["size", "p3"].forEach(i => $(i).oninput = renderVerdict);
-  renderVerdict(); renderGraph(); renderCascade(); renderBorrowers(); renderScen(); renderLimits();
+  renderVerdict(); renderGraph(); renderCascade(); renderBorrowers(); renderScen(); renderVenue(); renderLimits();
 }).catch(e => { document.body.insertAdjacentHTML("afterbegin", "<p style='padding:16px'>Could not load data.json. Run: python -m defi_risk.dashboard, then serve this folder (python -m http.server).</p>"); console.error(e); });
 </script>
 </body>

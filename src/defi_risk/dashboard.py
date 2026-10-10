@@ -9,7 +9,7 @@ from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
 
-from . import cohort, risk, sources
+from . import cohort, risk, sources, venues
 from .discover import discover
 from .report import build_book
 
@@ -27,6 +27,16 @@ def export(name="sUSDe", expiry="2026-11-26"):
     for label, mc in (("all sizes", 0), ("> $10M", 1e7), ("> $100M", 1e8), ("> $1B", 1e9)):
         t = cohort.base_rate(prices, 0.03, book.days_to_expiry, lambda m: m != "fiat-backed", mc)
         tiers.append({"label": label, **{k: t[k] for k in ("coins", "episodes", "p", "lo", "hi")}})
+    vr = venues.incident_rate(book.days_to_expiry)
+    n_venues = sum(1 for n in g.nodes.values() if n.kind == "perp_venue")
+    vs = risk.scenario(book, venues.PRECEDENT_DEPEG)
+    venue = {"incidents": vr["incidents"], "exchange_years": vr["exchange_years"], "per_year": vr["per_year"],
+             "lo": vr["lo"], "hi": vr["hi"], "n_venues": n_venues,
+             "p_any": venues.prob_any(vr["per_year"], n_venues, book.days_to_expiry),
+             "p_any_lo": venues.prob_any(vr["lo"], n_venues, book.days_to_expiry),
+             "p_any_hi": venues.prob_any(vr["hi"], n_venues, book.days_to_expiry),
+             "depeg": venues.PRECEDENT_DEPEG, "scenario": vs,
+             "seized_without_rate_shock": risk.liquidated_collateral(book.positions, venues.PRECEDENT_DEPEG)}
     curve = [[s, book.curve.cost(s)] for s in CURVE_SIZES if s < book.capacity_usd]
     lending = next(n for n in g.nodes.values() if n.kind == "lending")
     oracle = next((n for n in g.nodes.values() if n.kind == "oracle" and "primary" in n.data), None)
@@ -39,7 +49,7 @@ def export(name="sUSDe", expiry="2026-11-26"):
         "scenarios": [risk.scenario(book, d) for d in risk.SCENARIOS],
         "params": {"yield_shock": risk.YIELD_SHOCK, "risk_free": book.risk_free,
                    "tail_alpha": risk.TAIL_ALPHA, "sizes": list(risk.SCENARIOS)},
-        "estimate": est, "tiers": tiers, "market_p3": risk.market_implied_p3(book),
+        "estimate": est, "tiers": tiers, "venue": venue, "market_p3": risk.market_implied_p3(book),
         "borrowers": sorted(
             ({"hf": p["healthFactor"], "debt": p["state"]["borrowAssetsUsd"],
               "coll": p["state"]["collateralUsd"]} for p in book.positions),

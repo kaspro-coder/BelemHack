@@ -2,7 +2,7 @@
 import sys
 from datetime import datetime, timezone
 
-from . import cohort, risk, sources
+from . import cohort, risk, sources, venues
 from .discover import discover
 from .exit_cost import ExitCurve
 
@@ -59,6 +59,23 @@ def main():
         a = r["at"][k]
         print(f"    at {lab:8} ({est[k]:.2%}): {a['verdict']} ({a['edge']:+.3%})")
     print(f"  VERDICT: {r['verdict']}" + ("  (the range does not agree: consider reducing size)" if r["verdict"] == "UNCLEAR" else ""))
+
+    vr = venues.incident_rate(book.days_to_expiry)
+    n_venues = sum(1 for n in discover(name, expiry).nodes.values() if n.kind == "perp_venue")
+    vs = risk.scenario(book, venues.PRECEDENT_DEPEG)
+    print()
+    print("Second scenario: a perp exchange is hacked")
+    print(f"  {vr['incidents']} hacks of >=$10M over {vr['exchange_years']:.0f} exchange-years on the 25 largest perp venues "
+          f"= {vr['per_year']:.1%}/venue/year (90% range {vr['lo']:.1%} to {vr['hi']:.1%})")
+    print(f"  P(at least one of the {n_venues} venues Ethena may use is hit in {book.days_to_expiry}d): "
+          f"{venues.prob_any(vr['per_year'], n_venues, book.days_to_expiry):.1%} "
+          f"(range {venues.prob_any(vr['lo'], n_venues, book.days_to_expiry):.1%} to {venues.prob_any(vr['hi'], n_venues, book.days_to_expiry):.1%})")
+    print(f"  Precedent (Bybit, Feb 2025): USDe dipped below $0.96 for ~1 day, no bad debt reported.")
+    print(f"  On today's Morpho book a {venues.PRECEDENT_DEPEG:.0%} dip would seize ${vs['seized_usd']/1e6:.1f}M "
+          f"(pool absorbs ${book.capacity_usd/1e6:.1f}M), mark-to-market loss {vs['holder_loss']:.1%}. "
+          f"That includes our rate-shock assumption; without it the seizure would be "
+          f"${risk.liquidated_collateral(book.positions, venues.PRECEDENT_DEPEG)/1e6:.1f}M. "
+          f"Not priced as a permanent loss: one precedent is not enough to estimate it.")
 
     t = risk.triggers(book)
     print()
