@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-10T21:22+00:00",
+ "asof": "2026-10-10T21:24+00:00",
  "fork_block": 26164635,
  "fund_pt": 1000000,
  "positions": [
@@ -1077,11 +1077,11 @@
     "kind": "amm",
     "label": "Pendle pool PT-sUSDe",
     "data": {
-     "liquidity_usd": 3820254.8094568937,
+     "liquidity_usd": 3820216.601853261,
      "total_pt": 971271.206194636,
      "total_sy": 2282035.210152903,
-     "pt_discount": 0.006158266166460202,
-     "implied_apy": 0.050110361886585686,
+     "pt_discount": 0.006157803894695668,
+     "implied_apy": 0.050110361899201816,
      "volume_24h_usd": 24825.257592986363
     }
    },
@@ -1102,7 +1102,7 @@
     "kind": "asset",
     "label": "sUSDe",
     "data": {
-     "underlying_apy": 0.04945141526139585
+     "underlying_apy": 0.049450997442711975
     }
    },
    {
@@ -1131,7 +1131,7 @@
     "kind": "perp_venue",
     "label": "Binance",
     "data": {
-     "eth_funding_annualized": -0.0897681
+     "eth_funding_annualized": -0.08802705
     }
    },
    {
@@ -1139,7 +1139,7 @@
     "kind": "perp_venue",
     "label": "OKX",
     "data": {
-     "eth_funding_annualized": -0.0239839556422815
+     "eth_funding_annualized": -0.024359026696695
     }
    },
    {
@@ -1147,7 +1147,7 @@
     "kind": "perp_venue",
     "label": "Hyperliquid",
     "data": {
-     "eth_funding_annualized": -0.01268886
+     "eth_funding_annualized": -0.002254824
     }
    },
    {
@@ -1210,9 +1210,9 @@
      "backup": "0xe2f4cfe07aecd7fd8fb0d293a22cde7d08175465",
      "active": "primary",
      "challenged": false,
-     "price": 0.9924202949010654,
-     "primary_price": 0.9924202949010654,
-     "backup_price": 0.9920201708865672,
+     "price": 0.9924205232115677,
+     "primary_price": 0.9924205232115677,
+     "backup_price": 0.9920203991050193,
      "deviation": 0.000403342619677401,
      "threshold": 0.0075,
      "timelock_hours": 16.0,
@@ -1265,12 +1265,12 @@
     "kind": "amm",
     "label": "Pendle pool PT-reUSD",
     "data": {
-     "liquidity_usd": 12250568.15439064,
+     "liquidity_usd": 12250526.678266877,
      "total_pt": 5457854.679169,
      "total_sy": 6231467.803130573,
-     "pt_discount": 0.018233515125721356,
-     "implied_apy": 0.11821476694252486,
-     "volume_24h_usd": 3816209.906375101
+     "pt_discount": 0.018232471595036492,
+     "implied_apy": 0.11821476696058997,
+     "volume_24h_usd": 3799826.538112228
     }
    },
    {
@@ -1338,7 +1338,7 @@
      "address": "0x217d6DdCDB95112C51657F6270e8C079CFDB51f0",
      "morpho_type": "ChainlinkOracleV2",
      "pattern": "MorphoChainlinkOracleV2",
-     "price": 0.9818078279266741,
+     "price": 0.9818002079932148,
      "market_sensitive": true,
      "reads": [
       "Ojo PT Feed Pendle Chainlink-compatible Oracle"
@@ -1397,11 +1397,11 @@
     "kind": "amm",
     "label": "Pendle pool PT-sUSDS",
     "data": {
-     "liquidity_usd": 4769940.503425635,
+     "liquidity_usd": 4769919.87793527,
      "total_pt": 1041762.9048571691,
      "total_sy": 3357490.6810856718,
-     "pt_discount": 0.006007696134513463,
-     "implied_apy": 0.0488519272578285,
+     "pt_discount": 0.006007245131133043,
+     "implied_apy": 0.04885192727012155,
      "volume_24h_usd": 2095382.544424371
     }
    },
@@ -1410,7 +1410,7 @@
     "kind": "asset",
     "label": "sUSDS",
     "data": {
-     "underlying_apy": 0.03690712761063453
+     "underlying_apy": 0.03690811958607121
     }
    },
    {
@@ -1451,7 +1451,7 @@
      "address": "0xda5901EF31ecAFa6561B2e56B4997FAdd3dB4646",
      "morpho_type": "ChainlinkOracleV2",
      "pattern": "MorphoChainlinkOracleV2",
-     "price": 0.9873671962201928,
+     "price": 0.9873675767376966,
      "market_sensitive": false,
      "reads": [
       "Linear discount 10.0%/yr to maturity (ignores the market)"
@@ -1494,9 +1494,9 @@
      "backup": "0x77ae9b629096d0ae0206878b163cca232276c88e",
      "active": "primary",
      "challenged": false,
-     "price": 0.9835773550862507,
-     "primary_price": 0.9835773550862507,
-     "backup_price": 0.9834574668424392,
+     "price": 0.9835778497590055,
+     "primary_price": 0.9835778497590055,
+     "backup_price": 0.9834579614548985,
      "deviation": 0.000121904858983261,
      "threshold": 0.0075,
      "timelock_hours": 16.0,
@@ -1559,7 +1559,7 @@
     "source": "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
     "target": "amm:0x47ad2cd1dd15739a7a035b9d3b7828d916fef77e",
     "relation": "exits_through",
-    "exposure_usd": 3820254.8094568937,
+    "exposure_usd": 3820216.601853261,
     "confidence": "measured",
     "evidence": ""
    },
@@ -1743,7 +1743,7 @@
     "source": "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
     "target": "amm:0x13285bcbc27f92b47b4edb99d744c07b48c977c0",
     "relation": "exits_through",
-    "exposure_usd": 12250568.15439064,
+    "exposure_usd": 12250526.678266877,
     "confidence": "measured",
     "evidence": ""
    },
@@ -1903,7 +1903,7 @@
     "source": "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094",
     "target": "amm:0x9c560ebaf78e596cbcc27411d633a74d628dd7dc",
     "relation": "exits_through",
-    "exposure_usd": 4769940.503425635,
+    "exposure_usd": 4769919.87793527,
     "confidence": "measured",
     "evidence": ""
    },
@@ -2110,6 +2110,16 @@
   ]
  },
  "shared": {
+  "chain:1": [
+   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
+   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
+  ],
+  "stable:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": [
+   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
+   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
+  ],
   "protocol:morpho-blue": [
    "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
@@ -2120,26 +2130,16 @@
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
   ],
-  "stable:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": [
-   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
-   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
-   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
-  ],
   "liquidity:pendle-limit-orders": [
    "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
   ],
-  "chain:1": [
-   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
+  "vault:0xa0804346780b4c2e3be118ac957d1db82f9d7484": [
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
   ],
   "stable:0xdac17f958d2ee523a2206206994597c13d831ec7": [
-   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
-   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
-  ],
-  "vault:0xa0804346780b4c2e3be118ac957d1db82f9d7484": [
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
   ]
