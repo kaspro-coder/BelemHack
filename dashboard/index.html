@@ -8,131 +8,126 @@
 :root {
   --bg: #f6f7f9; --card: #ffffff; --ink: #14181f; --muted: #5d6675; --line: #e2e6ec;
   --stay: #1a7f4b; --stay-bg: #e6f4ec; --exit: #b42318; --exit-bg: #fdeceb;
-  --accent: #2459d6; --warn: #b26a00; --warn-bg: #fff4e0;
+  --warn: #b26a00; --warn-bg: #fff4e0; --accent: #2459d6; --accent-bg: #eaf0fd;
   --n-pos: #2459d6; --n-amm: #0f8b8d; --n-asset: #6b5bd2; --n-issuer: #b26a00;
-  --n-lend: #b42318; --n-oracle: #8a4fb0; --n-venue: #3d7a2a; --n-other: #6b7280;
+  --n-lend: #b42318; --n-oracle: #8a4fb0; --n-venue: #3d7a2a; --n-vault: #c2410c; --n-other: #6b7280;
 }
 @media (prefers-color-scheme: dark) {
   :root {
     --bg: #0f1218; --card: #171b23; --ink: #e8ebf0; --muted: #98a2b3; --line: #2a303b;
     --stay: #4ac385; --stay-bg: #12301f; --exit: #f47067; --exit-bg: #3a1a18;
-    --accent: #6c93f5; --warn: #f0a63a; --warn-bg: #33270f;
+    --warn: #f0a63a; --warn-bg: #33270f; --accent: #6c93f5; --accent-bg: #1b2440;
     --n-pos: #6c93f5; --n-amm: #3fc1c3; --n-asset: #9b8cf0; --n-issuer: #f0a63a;
-    --n-lend: #f47067; --n-oracle: #c58ae6; --n-venue: #7fcf63; --n-other: #98a2b3;
+    --n-lend: #f47067; --n-oracle: #c58ae6; --n-venue: #7fcf63; --n-vault: #fb923c; --n-other: #98a2b3;
   }
 }
 * { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink);
-  font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
-.wrap { max-width: 1120px; margin: 0 auto; padding: 24px 16px 48px; }
-header { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; align-items: baseline; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+.wrap { max-width: 1160px; margin: 0 auto; padding: 24px 16px 56px; }
 h1 { font-size: 22px; margin: 0; }
-.sub { color: var(--muted); font-size: 13px; }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-top: 16px; }
 h2 { font-size: 16px; margin: 0 0 4px; }
-.lead { color: var(--muted); font-size: 13px; margin: 0 0 14px; }
-.verdict { display: grid; grid-template-columns: minmax(180px, 240px) 1fr; gap: 24px; }
+h3 { font-size: 14px; margin: 14px 0 6px; }
+.sub, .lead { color: var(--muted); font-size: 13px; }
+.lead { margin: 0 0 14px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-top: 16px; }
+.tabs { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
+.tab { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 7px 16px; font: inherit; cursor: pointer; }
+.tab.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.grid { display: grid; grid-template-columns: minmax(200px, 250px) 1fr; gap: 22px; }
+.two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+@media (max-width: 860px) { .grid, .two { grid-template-columns: 1fr; } }
 .badge { border-radius: 10px; padding: 18px; text-align: center; }
-.badge.stay { background: var(--stay-bg); color: var(--stay); }
-.badge.exit { background: var(--exit-bg); color: var(--exit); }
-.badge.unclear { background: var(--warn-bg); color: var(--warn); }
-.badge .word.sm { font-size: 30px; }
-.rng { width: 100%; margin-top: 14px; font-size: 13px; }
-.rng td, .rng th { padding: 5px 8px; }
-.badge .word { font-size: 40px; font-weight: 700; letter-spacing: .02em; }
-.badge .edge { font-size: 13px; margin-top: 2px; }
+.badge .word { font-size: 38px; font-weight: 750; letter-spacing: .02em; }
+.badge .small { font-size: 12.5px; margin-top: 4px; }
+.stay { background: var(--stay-bg); color: var(--stay); }
+.exit { background: var(--exit-bg); color: var(--exit); }
+.unclear { background: var(--warn-bg); color: var(--warn); }
 .nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
 .num .v { font-size: 22px; font-weight: 650; font-variant-numeric: tabular-nums; }
 .num .l { font-size: 12px; color: var(--muted); }
-.sliders { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 18px; }
-.sl label { display: flex; justify-content: space-between; font-size: 13px; }
-.sl label b { font-variant-numeric: tabular-nums; }
-.sl input { width: 100%; accent-color: var(--accent); }
-.sl small { color: var(--muted); font-size: 11.5px; }
-.flip { margin-top: 14px; font-size: 13.5px; background: var(--warn-bg); color: var(--warn);
-  border-radius: 8px; padding: 10px 12px; }
-.two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-@media (max-width: 820px) { .verdict, .two { grid-template-columns: 1fr; } }
+.callout { border-radius: 10px; padding: 12px 14px; margin-top: 14px; font-size: 13.5px; }
+.callout b.big { font-size: 26px; display: block; line-height: 1.2; }
+.action { display: grid; grid-template-columns: 130px 1fr; gap: 14px; align-items: center; background: var(--accent-bg); }
+table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+th:first-child, td:first-child { text-align: left; }
+th { color: var(--muted); font-weight: 550; font-size: 12px; }
+tr.bad td { color: var(--exit); }
 svg { width: 100%; height: auto; display: block; }
 svg text { fill: var(--ink); font-size: 11.5px; font-family: inherit; }
 svg .muted { fill: var(--muted); }
 .legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); margin-top: 8px; }
-.legend i { display: inline-block; width: 22px; height: 0; border-top: 2px solid var(--muted); vertical-align: middle; margin-right: 5px; }
-.detail { margin-top: 10px; font-size: 13px; min-height: 48px; background: var(--bg); border-radius: 8px; padding: 10px 12px; }
-table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
-th, td { text-align: right; padding: 7px 8px; border-bottom: 1px solid var(--line); }
-th:first-child, td:first-child { text-align: left; }
-th { color: var(--muted); font-weight: 550; font-size: 12px; }
-tr.danger td { color: var(--exit); font-weight: 600; }
+.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 5px; }
+.detail { margin-top: 10px; font-size: 13px; min-height: 44px; background: var(--bg); border-radius: 8px; padding: 10px 12px; }
+.tag { font-size: 11px; padding: 1px 6px; border-radius: 4px; background: var(--warn-bg); color: var(--warn); }
 ul.lim { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13px; }
 ul.lim li { margin: 4px 0; }
-.tag { font-size: 11px; padding: 1px 6px; border-radius: 4px; background: var(--warn-bg); color: var(--warn); }
+code { font-size: 12.5px; background: var(--bg); padding: 1px 5px; border-radius: 4px; }
+pre { background: var(--bg); border-radius: 8px; padding: 10px 12px; font-size: 12.5px; overflow-x: auto; margin: 6px 0 0; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <header>
-    <h1 id="title">DeFi Risk Dependency</h1>
-    <div class="sub" id="asof"></div>
-  </header>
+  <h1>DeFi Risk Dependency: stay or exit, simulated on the real contracts</h1>
+  <div class="sub" id="sub"></div>
+
+  <div class="tabs" id="tabs"></div>
 
   <section class="card">
-    <div class="verdict">
-      <div class="badge" id="badge"><div class="word" id="word">–</div><div class="edge" id="edge"></div></div>
+    <div class="grid">
       <div>
-        <div class="nums">
-          <div class="num"><div class="v" id="n-exit">–</div><div class="l">certain cost of exiting now</div></div>
-          <div class="num"><div class="v" id="n-carry">–</div><div class="l">carry given up by exiting</div></div>
-          <div class="num"><div class="v" id="n-loss">–</div><div class="l">expected permanent loss if we stay</div></div>
+        <div class="badge" id="badge"><div class="word" id="word"></div><div class="small" id="wsmall"></div></div>
+        <div class="callout action" style="margin-top:12px; grid-template-columns:1fr">
+          <div><span class="sub">Exit window once the signal fires</span><b class="big" id="window"></b></div>
         </div>
-        <table class="rng" id="rng"></table>
-        <div class="sliders">
-          <div class="sl"><label>Position size <b id="v-size"></b></label>
-            <input id="size" type="range" min="100000" max="4000000" step="50000"><small>Exit cost comes from live Pendle quotes.</small></div>
-          <div class="sl"><label>What if I disagree? P(depeg ≥ 3%) <b id="v-p3"></b></label>
-            <input id="p3" type="range" min="0" max="0.05" step="0.001"><small id="whatif">Only a what-if. The verdict above does not use it.</small></div>
-        </div>
-        <div class="flip" id="flip"></div>
+      </div>
+      <div>
+        <div class="nums" id="nums"></div>
+        <table id="range" style="margin-top:12px"></table>
+        <div class="callout exit" id="liq"></div>
+        <div class="callout action" style="grid-template-columns:1fr"><div><b>Action.</b> <span id="trigger"></span></div></div>
       </div>
     </div>
   </section>
 
-  <section class="card" id="venue-card">
-    <h2>Second scenario: a perp exchange is hacked</h2>
-    <p class="lead" id="venue-lead"></p>
-    <div class="nums" id="venue-nums"></div>
-    <div class="flip" id="venue-note" style="margin-top:14px"></div>
-  </section>
-
-  <section class="card">
-    <h2>What this position depends on</h2>
-    <p class="lead">Discovered automatically from Pendle, DefiLlama, Morpho, Ethena's docs and the chain itself. Click a node.</p>
-    <svg id="graph" viewBox="0 0 1080 460" role="img" aria-label="Dependency graph"></svg>
-    <div class="legend">
-      <span><i></i>measured (live data)</span>
-      <span><i style="border-top-style:dashed"></i>documented (official docs)</span>
-      <span><i style="border-top-style:dotted"></i>unverified (third-party)</span>
-    </div>
-    <div class="detail" id="detail">Select a node to see its data.</div>
-  </section>
-
   <div class="two">
     <section class="card">
-      <h2>If USDe depegs: the liquidation cascade</h2>
-      <p class="lead">Collateral seized on Morpho against what the Pendle pool can absorb in one sale.</p>
-      <svg id="cascade" viewBox="0 0 520 300"></svg>
+      <h2 id="ctitle">Cascade</h2>
+      <p class="lead">Collateral seized on Morpho, and how much of it the Pendle pool could not absorb.</p>
+      <svg id="cascade" viewBox="0 0 520 290"></svg>
+      <div class="legend"><span><i class="sw" style="background:var(--accent)"></i>seized and sold</span><span><i class="sw" style="background:var(--exit)"></i>stuck (pool saturated)</span></div>
     </section>
     <section class="card">
-      <h2>Who gets liquidated first</h2>
-      <p class="lead">Morpho borrowers by distance to liquidation. Two accounts hold most of the debt.</p>
-      <table id="borrowers"></table>
+      <h2>What the fund gets for its 1M PT</h2>
+      <p class="lead">Selling inside the exit window vs after the cascade. Zero means the pool refuses the sale.</p>
+      <svg id="exitchart" viewBox="0 0 520 290"></svg>
+      <div class="legend"><span><i class="sw" style="background:var(--stay)"></i>exit inside the window</span><span><i class="sw" style="background:var(--exit)"></i>exit after the cascade</span></div>
     </section>
   </div>
 
   <section class="card">
-    <h2>Scenario table</h2>
-    <p class="lead">Mark-to-market loss includes the rate shock and the forced-sale impact. It hurts a forced seller, not a holder to maturity.</p>
-    <table id="scen"></table>
+    <h2>Scenario results</h2>
+    <p class="lead" id="slead"></p>
+    <table id="events"></table>
+  </section>
+
+  <section class="card" id="extra"></section>
+
+  <section class="card">
+    <h2>Three tokens, mapped together: what they share</h2>
+    <p class="lead">Discovered automatically from Pendle, Morpho, DefiLlama and on-chain reads. Outlined nodes are dependencies shared by two or more positions. Click a node.</p>
+    <svg id="graph" role="img" aria-label="Dependency graph"></svg>
+    <div class="detail" id="detail">Select a node.</div>
+    <h3>Shared dependencies</h3>
+    <table id="shared"></table>
+  </section>
+
+  <section class="card">
+    <h2>How this was produced</h2>
+    <p class="lead">An Anvil fork of Ethereum mainnet, pinned at one block. Each scenario starts from the real state, forces one event with Foundry cheatcodes (mocked feed, issuer write-down, whale dump, time warp), lets the real Morpho, Pendle and oracle contracts react, measures, then reverts.</p>
+    <pre>anvil --fork-url $ETH_RPC_URL --fork-block-number <span id="blk"></span>
+cd sim &amp;&amp; forge test --fork-url http://127.0.0.1:8545
+cd ../src &amp;&amp; python -m defi_risk.sim_report &amp;&amp; python -m defi_risk.dashboard</pre>
   </section>
 
   <section class="card">
@@ -144,177 +139,150 @@ ul.lim li { margin: 4px 0; }
 <script>
 const $ = id => document.getElementById(id);
 const pct = (x, d = 2) => (x * 100).toFixed(d) + "%";
-const usd = x => x >= 1e6 ? "$" + (x / 1e6).toFixed(2) + "M" : "$" + Math.round(x / 1e3) + "k";
-let D;
+const usd = x => Math.abs(x) >= 1e6 ? "$" + (x / 1e6).toFixed(2) + "M" : Math.abs(x) >= 1e3 ? "$" + Math.round(x / 1e3) + "k" : "$" + Math.round(x);
+const sev = x => pct(x, Number.isInteger(+(x * 100).toFixed(4)) ? 0 : 2);
+const num = x => x >= 1e8 ? Math.round(x / 1e6) + "M" : x >= 1e6 ? (x / 1e6).toFixed(1) + "M" : x >= 1e3 ? Math.round(x / 1e3) + "k" : Math.round(x);
+let D, cur = 0;
 
-function exitCost(size) {
-  const c = D.curve;
-  if (size <= c[0][0]) return c[0][1];
-  for (let i = 1; i < c.length; i++) if (size <= c[i][0]) {
-    const [x0, y0] = c[i - 1], [x1, y1] = c[i];
-    return y0 + (y1 - y0) * (size - x0) / (x1 - x0);
-  }
-  return c[c.length - 1][1];
-}
-const exceed = (d, p3) => Math.min(1, p3 * Math.pow(0.03 / d, D.params.tail_alpha));
-function expLoss(p3) {
-  const s = D.params.sizes; let t = 0;
-  s.forEach((d, i) => {
-    const nxt = i + 1 < s.length ? exceed(s[i + 1], p3) : 0;
-    t += Math.max(0, exceed(d, p3) - nxt) * d;
+function renderPosition() {
+  const p = D.positions[cur], d = p.decision;
+  document.querySelectorAll(".tab").forEach((t, i) => t.classList.toggle("on", i === cur));
+  $("word").textContent = d.verdict;
+  $("badge").className = "badge " + d.verdict.toLowerCase();
+  $("wsmall").textContent = d.verdict === "UNCLEAR" ? "the probability range does not agree" : "the whole probability range agrees";
+  $("window").textContent = p.window;
+  const n = (v, l) => `<div class="num"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+  $("nums").innerHTML = n(pct(d.exit_cost, 3), "cost of exiting now (pool only)") + n(pct(d.carry, 3), "carry given up by exiting") +
+    n(pct(d.at.p.expected_loss, 3), "expected permanent loss if we stay") + n(pct(p.implied_apy, 2), "implied APY, " + Math.round(p.days) + " days left");
+  let r = "<tr><th>Probability estimate (cohort)</th><th>Expected loss</th><th>Verdict</th></tr>";
+  [["lo", "Low end of 90% range"], ["p", "Central"], ["hi", "High end"]].forEach(([k, l]) => {
+    const a = d.at[k];
+    r += `<tr><td>${l}</td><td>${pct(a.expected_loss, 3)}</td><td><b style="color:var(--${a.verdict === "STAY" ? "stay" : "exit"})">${a.verdict}</b> (${a.edge > 0 ? "+" : ""}${pct(a.edge, 3)})</td></tr>`;
   });
-  return t;
-}
-function breakeven(carry, cost) {
-  let lo = 0, hi = 1;
-  for (let i = 0; i < 50; i++) { const m = (lo + hi) / 2; (carry - expLoss(m) + cost > 0) ? lo = m : hi = m; }
-  return lo;
-}
-
-function decideAt(p3, size) {
-  const T = D.position.days / 365, cost = exitCost(size);
-  const carry = (D.position.implied_apy - D.params.risk_free) * T, loss = expLoss(p3);
-  return { cost, carry, loss, edge: carry - loss + cost };
-}
-function renderVerdict() {
-  const size = +$("size").value, E = D.estimate;
-  const at = { lo: decideAt(E.lo, size), p: decideAt(E.p, size), hi: decideAt(E.hi, size) };
-  const vs = Object.values(at).map(a => a.edge > 0);
-  const v = vs.every(x => x) ? "STAY" : vs.every(x => !x) ? "EXIT" : "UNCLEAR";
-  $("v-size").textContent = usd(size);
-  $("word").textContent = v; $("word").className = "word" + (v === "UNCLEAR" ? " sm" : "");
-  $("badge").className = "badge " + v.toLowerCase();
-  $("edge").textContent = v === "UNCLEAR" ? "the data range does not agree" : "the whole data range agrees";
-  const c = at.p;
-  $("n-exit").textContent = pct(c.cost, 3); $("n-carry").textContent = pct(c.carry, 3); $("n-loss").textContent = pct(c.loss, 3);
-  let r = "<tr><th>Risk estimate (from data)</th><th>P(depeg ≥ 3%)</th><th>Verdict</th></tr>";
-  [["lo", "Low end"], ["p", "Central"], ["hi", "High end"]].forEach(([k, l]) =>
-    r += `<tr><td>${l}</td><td>${pct(E[k], 2)}</td><td><b style="color:var(--${at[k].edge > 0 ? "stay" : "exit"})">${at[k].edge > 0 ? "STAY" : "EXIT"}</b> (${at[k].edge > 0 ? "+" : ""}${pct(at[k].edge, 3)})</td></tr>`);
-  r += `<tr><td>The market's price of this risk (max)</td><td>${pct(D.market_p3, 2)}</td><td></td></tr>`;
-  $("rng").innerHTML = r;
-  $("flip").innerHTML = v === "UNCLEAR"
-    ? `The data cannot separate STAY from EXIT. Staying is fine at the central estimate but loses at the high end: <b>consider reducing the position</b> rather than choosing all-or-nothing.`
-    : `Risk estimated from ${E.coins} comparable stablecoins (${E.episodes} persistent depegs of 3% or more observed). No human input.`;
-  const w = +$("p3").value; $("v-p3").textContent = pct(w, 1);
-  const wi = decideAt(w, size);
-  $("whatif").textContent = `If you believed ${pct(w, 1)}: ${wi.edge > 0 ? "STAY" : "EXIT"}. Only a what-if; the verdict above does not use it.`;
+  $("range").innerHTML = r;
+  $("liq").innerHTML = p.stuck_from != null && d.p_stuck
+    ? `<b>Liquidity risk.</b> From a ${pct(p.stuck_from, 0)} move in the ${p.driver.split(" (")[0]}, the cascade saturates the pool and the fund's PT becomes unsellable before maturity. Chance before expiry: <b>${pct(d.p_stuck.p, 2)}</b> (range ${pct(d.p_stuck.lo, 2)} to ${pct(d.p_stuck.hi, 2)}).`
+    : "No severity tested made the position unsellable.";
+  $("trigger").textContent = `Watch ${p.trigger}. Once it fires, the fund has ${p.window} to exit before liquidations reach the pool.` +
+    (p.window_hours < 1 ? " That is too short for a human: the exit has to be automated." : "");
+  renderCascade(p); renderExit(p); renderEvents(p); renderExtra(p);
 }
 
-const COL = { position: 0, amm: 1, asset: 1, lending: 1, chain: 2, issuer: 2, oracle: 2, perp_venue: 3, oes: 3, infra: 3 };
-const COLOR = { position: "--n-pos", amm: "--n-amm", asset: "--n-asset", issuer: "--n-issuer", lending: "--n-lend",
-  oracle: "--n-oracle", perp_venue: "--n-venue", chain: "--n-other", oes: "--n-other", infra: "--n-other" };
-
-function nodeLabel(n) {
-  if (n.kind === "oracle" && n.data && n.data.pattern) return "Morpho oracle (primary/backup)";
-  return n.label
-    .replace(/^Morpho PT-.*\/(\w+)$/, "Morpho PT/$1 lending")
-    .replace(" (off-exchange settlement)", " (settlement)")
-    .replace(/ \(Ethena hedging price feed\)/, " (price feed)")
-    .replace(" (hedging system hosting)", " (hosting)");
+function bars(svgId, rows, series, yfmt) {
+  const W = 520, H = 290, L = 66, B = 34, T = 12, R = 8;
+  const mx = Math.max(1, ...rows.map(r => series.reduce((a, s) => s.stack ? a + r[s.key] : Math.max(a, r[s.key]), 0))) * 1.1;
+  const y = v => T + (H - T - B) * (1 - v / mx), bw = (W - L - R) / rows.length;
+  let s = "";
+  for (let g = 0; g <= 4; g++) { const v = mx * g / 4; s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text class="muted" x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${yfmt(v)}</text>`; }
+  const grouped = series.filter(x => !x.stack), stacked = series.filter(x => x.stack);
+  rows.forEach((r, i) => {
+    const x0 = L + i * bw;
+    if (stacked.length) {
+      let base = 0;
+      stacked.forEach(sr => { const v = r[sr.key]; s += `<rect x="${x0 + bw * .2}" y="${y(base + v)}" width="${bw * .6}" height="${y(base) - y(base + v)}" fill="${sr.color}" rx="2"/>`; base += v; });
+    } else {
+      const w = bw * .7 / grouped.length;
+      grouped.forEach((sr, j) => { const v = r[sr.key]; s += `<rect x="${x0 + bw * .15 + j * w}" y="${y(v)}" width="${w - 2}" height="${Math.max(0, y(0) - y(v))}" fill="${sr.color}" rx="2"/>`;
+        if (v === 0) s += `<text x="${x0 + bw * .15 + j * w + w / 2 - 1}" y="${y(0) - 4}" text-anchor="middle" style="fill:${sr.color};font-size:10px">0</text>`; });
+    }
+    s += `<text x="${x0 + bw / 2}" y="${H - B + 16}" text-anchor="middle">${sev(r.severity)}</text>`;
+  });
+  $(svgId).innerHTML = s;
 }
+function renderCascade(p) {
+  $("ctitle").textContent = "Cascade after a " + p.driver.split(" (")[0];
+  bars("cascade", p.events.map(e => ({ severity: e.severity, sold: Math.max(0, e.seized_pt - e.stuck_pt), stuck: e.stuck_pt })),
+    [{ key: "sold", color: "var(--accent)", stack: true }, { key: "stuck", color: "var(--exit)", stack: true }], v => num(v) + " PT");
+}
+function renderExit(p) {
+  bars("exitchart", p.events.map(e => ({ severity: e.severity, win: e.exit_in_window, after: e.fund_stuck ? 0 : e.exit_after })),
+    [{ key: "win", color: "var(--stay)" }, { key: "after", color: "var(--exit)" }], v => usd(v));
+}
+function renderEvents(p) {
+  $("slead").textContent = `${p.driver}, forced on the fork and held until the system settles. ${p.borrowers ? p.borrowers + " real borrowers across the Morpho markets." : ""}`;
+  let h = "<tr><th>Severity</th><th>Liquidated</th><th>PT seized</th><th>PT stuck</th><th>Bad debt</th><th>Fund exit in window</th><th>Fund exit after</th></tr>";
+  p.events.forEach(e => h += `<tr class="${e.fund_stuck ? "bad" : ""}"><td>${sev(e.severity)}</td><td>${e.liquidated}</td><td>${num(e.seized_pt)}</td><td>${num(e.stuck_pt)}</td><td>${usd(e.bad_debt)}</td><td>${usd(e.exit_in_window)}</td><td>${e.fund_stuck ? "stuck" : usd(e.exit_after)}</td></tr>`);
+  $("events").innerHTML = h;
+}
+function renderExtra(p) {
+  let h = "";
+  if (p.name === "PT-sUSDe") {
+    h += `<h2>Other controlled scenarios on PT-sUSDe</h2><p class="lead">Each answers one question about the oracle, which is the dependency that decides when the cascade starts.</p><div class="two"><div>`;
+    h += `<h3>Does a short dip trigger anything? (USDe at $0.96)</h3><table><tr><th>Hours depegged</th><th>Oracle switched</th><th>Liquidated</th></tr>`;
+    p.short_dip.forEach(r => h += `<tr class="${r.switched ? "bad" : ""}"><td>${r.hours_depegged} h</td><td>${r.switched ? "yes" : "no"}</td><td>${r.liquidated}</td></tr>`);
+    h += `</table><p class="sub">The 16-hour challenge filters short dips. A Bybit-style dip only matters if it lasts.</p>`;
+    h += `<h3>Panic in the PT market (whale dump)</h3><table><tr><th>PT dumped</th><th>Implied APY after</th><th>Oracle moved</th><th>Liquidated</th></tr>`;
+    p.pt_panic.forEach(r => h += `<tr><td>${num(r.dump_pt / 1e18)}</td><td>${pct(Math.exp(r.ln_implied_rate_after / 1e18) - 1)}</td><td>${r.oracle_after === r.oracle_before ? "no" : "yes"}</td><td>${r.unhealthy}</td></tr>`);
+    h += `</table><p class="sub">The oracle reads a linear discount, not the market: a crash in the pool liquidates nobody, so lenders carry the risk silently.</p></div><div>`;
+    h += `<h3>The Chainlink USDe feed misreports for 16 h (USDe really at $1)</h3><table><tr><th>Wrong price</th><th>Liquidated</th><th>PT stuck</th><th>Bad debt</th></tr>`;
+    p.feed_failure.forEach(r => h += `<tr class="bad"><td>$${(r.wrong_price / 1e8).toFixed(2)}</td><td>${r.liquidated}</td><td>${num(r.unsold_pt / 1e18)}</td><td>${usd(r.bad_debt_usdc / 1e6)}</td></tr>`);
+    h += `</table><p class="sub">Anyone can start the challenge. A feed fault that persists 16 h is enough to liquidate borrowers whose collateral never lost value.</p>`;
+    const x = D.exchange_hacks;
+    h += `<h3>Exchange hacks behind USDe's hedge</h3><p class="sub">${x.incidents} hacks of $10M+ over ${Math.round(x.exchange_years)} exchange-years on the 25 largest perp venues: ${pct(x.per_year, 1)} per venue per year (range ${pct(x.lo, 1)} to ${pct(x.hi, 1)}). The Bybit hack (Feb 2025) took USDe below $0.96 for about a day: the short-dip table above shows when that becomes a cascade.</p></div></div>`;
+  } else {
+    h += `<h2>Panic in the PT-reUSD market</h2><p class="lead">The oracle reads a 15-minute TWAP of this very pool, so a dump does reach it. The pool's 96% PT cap bounds how far the TWAP can fall.</p><table><tr><th>PT dumped</th><th>Oracle low</th><th>Fall</th><th>Liquidated</th><th>Implied APY after</th><th>Fund exit</th></tr>`;
+    p.pt_panic.forEach(r => h += `<tr><td>${num(r.dump_pt)}</td><td>${r.oracle_low.toFixed(4)}</td><td>${pct(1 - r.oracle_low / r.oracle_start)}</td><td>${r.liquidated}</td><td>${pct(r.apy_after)}</td><td>${r.fund_exit ? usd(r.fund_exit) : "stuck"}</td></tr>`);
+    h += `</table><p class="sub">Market panic alone moves the oracle by at most ~1.5%: borrowers' buffers absorb it. The dangerous path is the issuer's own NAV, above.</p>`;
+  }
+  $("extra").innerHTML = h;
+}
+
+const COL = { position: 0, amm: 1, asset: 1, offchain: 1, lending: 2, issuer: 3, oracle: 3, vault: 3, stablecoin: 3, protocol: 3, chain: 4, price_feed: 4, perp_venue: 4, oes: 4, infra: 4 };
+const COLOR = { position: "--n-pos", amm: "--n-amm", asset: "--n-asset", offchain: "--n-amm", issuer: "--n-issuer", lending: "--n-lend",
+  oracle: "--n-oracle", price_feed: "--n-oracle", perp_venue: "--n-venue", vault: "--n-vault", stablecoin: "--n-other", protocol: "--n-other", chain: "--n-other", oes: "--n-other", infra: "--n-other" };
 function renderGraph() {
-  const nodes = D.graph.nodes, edges = D.graph.edges;
-  const col = n => n.id.startsWith("feed:") ? 3 : COL[n.kind] ?? 3;
-  const cols = [[], [], [], []];
-  nodes.forEach(n => cols[col(n)].push(n));
-  const W = 1080, H = 460, bw = 190, bh = 30, xs = [10, 290, 570, 880 - bw + 190 - 190];
-  const xpos = [10, 295, 580, 880];
+  const nodes = D.graph.nodes, edges = D.graph.edges, cols = [[], [], [], [], []];
+  nodes.forEach(n => cols[COL[n.kind] ?? 4].push(n));
+  cols.forEach(c => c.sort((a, b) => a.kind.localeCompare(b.kind) || a.label.localeCompare(b.label)));
+  const bw = 196, bh = 26, gap = 32, W = 1120, xs = [6, 236, 466, 696, 924];
+  const H = Math.max(...cols.map(c => c.length)) * gap + 16;
+  $("graph").setAttribute("viewBox", `0 0 ${W} ${H}`);
   const pos = {};
-  cols.forEach((list, ci) => list.forEach((n, i) => {
-    const gap = (H - 20) / list.length;
-    pos[n.id] = { x: xpos[ci], y: 10 + gap * i + (gap - bh) / 2 };
-  }));
+  cols.forEach((c, ci) => { const off = (H - c.length * gap) / 2; c.forEach((n, i) => pos[n.id] = { x: xs[ci], y: off + i * gap }); });
   const dash = { measured: "", documented: "6 4", unverified: "2 4" };
   let s = "";
-  edges.forEach(e => {
-    const a = pos[e.source], b = pos[e.target]; if (!a || !b) return;
-    const fwd = a.x < b.x, x1 = fwd ? a.x + bw : a.x, x2 = fwd ? b.x : b.x + bw;
-    const mx = (x1 + x2) / 2;
-    s += `<path d="M${x1},${a.y + bh / 2} C${mx},${a.y + bh / 2} ${mx},${b.y + bh / 2} ${x2},${b.y + bh / 2}"
-      fill="none" stroke="var(--muted)" stroke-opacity=".55" stroke-width="1.4" stroke-dasharray="${dash[e.confidence] || ""}"/>`;
-  });
-  nodes.forEach(n => {
-    const p = pos[n.id], c = `var(${COLOR[n.kind] || "--n-other"})`;
-    s += `<g data-id="${n.id}" style="cursor:pointer"><rect x="${p.x}" y="${p.y}" width="${bw}" height="${bh}" rx="7"
-      fill="var(--card)" stroke="${c}" stroke-width="1.8"/><rect x="${p.x}" y="${p.y}" width="5" height="${bh}" rx="2" fill="${c}"/>
-      <title>${n.label}</title><text x="${p.x + 13}" y="${p.y + 19}">${nodeLabel(n).replace(/&/g, "&amp;")}</text></g>`;
-  });
+  edges.forEach(e => { const a = pos[e.source], b = pos[e.target]; if (!a || !b) return;
+    const fwd = a.x <= b.x, x1 = fwd ? a.x + bw : a.x, x2 = fwd ? b.x : b.x + bw, mx = (x1 + x2) / 2;
+    s += `<path d="M${x1},${a.y + bh / 2} C${mx},${a.y + bh / 2} ${mx},${b.y + bh / 2} ${x2},${b.y + bh / 2}" fill="none" stroke="var(--muted)" stroke-opacity=".35" stroke-width="1.1" stroke-dasharray="${dash[e.confidence] || ""}"/>`; });
+  nodes.forEach(n => { const p = pos[n.id], c = `var(${COLOR[n.kind] || "--n-other"})`, sh = D.shared[n.id];
+    s += `<g data-id="${n.id}" style="cursor:pointer"><title>${n.label}</title><rect x="${p.x}" y="${p.y}" width="${bw}" height="${bh}" rx="6" fill="var(--card)" stroke="${c}" stroke-width="${sh ? 3 : 1.3}"/>
+      <rect x="${p.x}" y="${p.y}" width="5" height="${bh}" rx="2" fill="${c}"/><text x="${p.x + 11}" y="${p.y + 17}">${n.label.length > 29 ? n.label.slice(0, 28) + "…" : n.label}</text></g>`; });
   $("graph").innerHTML = s;
   $("graph").querySelectorAll("g").forEach(g => g.onclick = () => showNode(g.dataset.id));
+  const label = id => (nodes.find(n => n.id === id) || {}).label;
+  let t = "<tr><th>Dependency</th><th>Kind</th><th>Positions exposed</th></tr>";
+  Object.entries(D.shared).sort((a, b) => b[1].length - a[1].length).forEach(([id, ps]) => {
+    const n = nodes.find(x => x.id === id); t += `<tr><td>${n.label}</td><td>${n.kind}</td><td>${ps.map(label).map(s => s.split(" ")[0]).join(", ")}</td></tr>`; });
+  $("shared").innerHTML = t;
 }
 function showNode(id) {
-  const n = D.graph.nodes.find(x => x.id === id), lines = [];
-  const d = n.data || {};
-  const fmt = (k, v) => typeof v === "number" ? (Math.abs(v) < 1 ? pct(v, 2) : v.toLocaleString("en", { maximumFractionDigits: 0 })) : v;
-  Object.entries(d).forEach(([k, v]) => { if (typeof v !== "object" && v !== null) lines.push(`${k}: <b>${fmt(k, v)}</b>`); });
+  const n = D.graph.nodes.find(x => x.id === id), d = n.data || {};
+  const f = v => typeof v === "number" ? (Math.abs(v) < 1 ? pct(v, 2) : v.toLocaleString("en", { maximumFractionDigits: 2 })) : Array.isArray(v) ? v.join("; ") : v;
+  const kv = Object.entries(d).filter(([k, v]) => v !== null && typeof v !== "object" || Array.isArray(v)).map(([k, v]) => `${k}: <b>${f(v)}</b>`);
   const out = D.graph.edges.filter(e => e.source === id).map(e => `${e.relation} → ${(D.graph.nodes.find(x => x.id === e.target) || {}).label} <span class="tag">${e.confidence}</span>`);
-  $("detail").innerHTML = `<b>${nodeLabel(n)}</b> (${n.kind})<br>` + (lines.join(" · ") || "") + (out.length ? "<br>" + out.join("<br>") : "");
+  const sh = D.shared[id] ? `<br><b>Shared by:</b> ${D.shared[id].map(p => D.graph.nodes.find(x => x.id === p).label).join(", ")}` : "";
+  $("detail").innerHTML = `<b>${n.label}</b> (${n.kind})${sh}<br>${kv.join(" · ")}${out.length ? "<br>" + out.join("<br>") : ""}`;
 }
 
-function renderCascade() {
-  const sc = D.scenarios, cap = D.capacity, W = 520, H = 300, L = 46, B = 36, T = 14, R = 10;
-  const mx = Math.max(...sc.map(s => s.seized_usd), cap) * 1.1;
-  const y = v => T + (H - T - B) * (1 - v / mx), bw = (W - L - R) / sc.length;
-  let s = "";
-  for (let g = 0; g <= 4; g++) { const v = mx * g / 4;
-    s += `<line x1="${L}" x2="${W - R}" y1="${y(v)}" y2="${y(v)}" stroke="var(--line)"/><text class="muted" x="${L - 6}" y="${y(v) + 4}" text-anchor="end">${(v / 1e6).toFixed(0)}M</text>`; }
-  sc.forEach((r, i) => {
-    const x = L + i * bw + bw * .18, w = bw * .64, over = r.seized_usd > cap;
-    s += `<rect x="${x}" y="${y(r.seized_usd)}" width="${w}" height="${y(0) - y(r.seized_usd)}" rx="3" fill="${over ? "var(--exit)" : "var(--accent)"}"/>
-      <text x="${x + w / 2}" y="${H - B + 16}" text-anchor="middle">${pct(r.depeg, 1)}</text>`;
-  });
-  s += `<line x1="${L}" x2="${W - R}" y1="${y(cap)}" y2="${y(cap)}" stroke="var(--warn)" stroke-width="2" stroke-dasharray="6 4"/>
-    <text x="${L + 4}" y="${y(cap) - 6}" style="fill:var(--warn)">pool can absorb ${usd(cap)} in one sale</text>
-    <text class="muted" x="${(L + W) / 2}" y="${H - 4}" text-anchor="middle">USDe depeg size (red = more seized than the pool can sell)</text>`;
-  $("cascade").innerHTML = s;
-}
-function renderBorrowers() {
-  const tot = D.borrowers.reduce((a, b) => a + b.debt, 0);
-  let h = "<tr><th>Borrower</th><th>Debt</th><th>Share</th><th>To liquidation</th></tr>";
-  D.borrowers.slice(0, 7).forEach((b, i) => {
-    const dist = 1 - 1 / b.hf;
-    h += `<tr class="${dist < 0.02 ? "danger" : ""}"><td>#${i + 1}</td><td>${usd(b.debt)}</td><td>${pct(b.debt / tot, 0)}</td><td>${pct(dist, 2)}</td></tr>`;
-  });
-  const rest = D.borrowers.slice(7);
-  if (rest.length) h += `<tr><td>${rest.length} others</td><td>${usd(rest.reduce((a, b) => a + b.debt, 0))}</td><td>${pct(rest.reduce((a, b) => a + b.debt, 0) / tot, 0)}</td><td>–</td></tr>`;
-  $("borrowers").innerHTML = h;
-}
-function renderScen() {
-  let h = "<tr><th>USDe depeg</th><th>PT price fall</th><th>Seized</th><th>Unsellable</th><th>Cascade impact</th><th>MTM loss</th></tr>";
-  D.scenarios.forEach(r => h += `<tr class="${r.unsellable_usd > 0 ? "danger" : ""}"><td>${pct(r.depeg, 1)}</td><td>${pct(r.pt_price_fall)}</td><td>${usd(r.seized_usd)}</td><td>${usd(r.unsellable_usd)}</td><td>${pct(r.cascade_impact)}</td><td>${pct(r.holder_loss)}</td></tr>`);
-  $("scen").innerHTML = h;
-}
-function renderVenue() {
-  const v = D.venue, s = v.scenario;
-  $("venue-lead").textContent = `${v.incidents} hacks of $10M or more over ${Math.round(v.exchange_years)} exchange-years on the 25 largest perp venues (DefiLlama): ${pct(v.per_year, 1)} per venue per year.`;
-  const n = (val, label) => `<div class="num"><div class="v">${val}</div><div class="l">${label}</div></div>`;
-  $("venue-nums").innerHTML =
-    n(pct(v.p_any, 1), `chance one of ${v.n_venues} possible venues is hit in ${D.position.days} days (range ${pct(v.p_any_lo, 1)} to ${pct(v.p_any_hi, 1)})`) +
-    n(usd(s.seized_usd), `Morpho collateral seized by a ${pct(v.depeg, 0)} USDe dip (pool absorbs ${usd(D.capacity)})`) +
-    n(pct(s.holder_loss, 1), "mark-to-market loss on the position");
-  $("venue-note").innerHTML = `Precedent: when Bybit was hacked in Feb 2025, USDe dipped below $0.96 for about a day and recovered, with no bad debt reported (secondary sources, not verified on-chain). That ${pct(v.depeg, 0)} dip is the size used here. The seizure includes our rate-shock assumption; without it it would be ${usd(v.seized_without_rate_shock)}. Not priced as a permanent loss: one precedent is not enough to estimate it.`;
-}
 function renderLimits() {
-  const o = D.oracle, L = [
-    `The cascade impact uses Pendle quotes taken in calm conditions. In a real stress the pool moves, so it is a minimum.`,
-    `The rate shock (${D.params.yield_shock}× the depeg, annualised) and the tail shape are judgements. The depeg probability and the cash yield (T-bill ${pct(D.params.risk_free, 2)}) are measured.`,
-    `Depeg base rate: ${D.estimate.coins} non-fiat stablecoins above $100M today, weekly prices. Size is measured today, so survivors are over-represented and the true risk may be higher. Smaller coins (> $10M) show ${pct(D.tiers[1].p, 1)}.`,
-    `USDe's own price history is a daily sample: it misses depegs lasting hours and shifts by a few tenths of a percent depending on the sampling hour. Do not read much into small dips.`,
-    `Only Bybit is confirmed by Ethena's docs as a hedging venue. Binance, OKX and Hyperliquid come from an undated third-party note, and no per-venue split is published.`,
-    `Two scenarios are modelled (USDe depeg, perp exchange hack). Oracle failure and smart-contract exploit are mapped but not priced. The exchange rate counts hacks only, not freezes or outages, and uses today's largest exchanges, so true risk is probably higher.`,
-  ];
-  if (o) L.unshift(`The Morpho oracle's primary leg reads no USDe/USD feed${o.primary_sees_depeg ? "" : " (it cannot see a USDe depeg)"}; the backup does, after a ${o.timelock_hours}h challenge delay. This is inferred from the contract's feed list, not tested.`);
-  $("limits").innerHTML = L.map(x => `<li>${x}</li>`).join("");
+  $("limits").innerHTML = [
+    "Liquidators are assumed to liquidate and sell at once into the Pendle pool. A real liquidator that cannot sell would stop: the stuck PT would then show up as bad debt for the lenders rather than as unsold collateral. The risk moves, it does not vanish.",
+    "Only liquidators sell. Other holders panicking at the same time are not simulated, so exit values inside the window are optimistic.",
+    "The pool is simulated without Pendle's off-chain limit orders (they cannot exist on a fork). Live quotes use them and look cheaper; in a crisis market makers can pull them.",
+    "Probabilities come from 17 non-fiat stablecoins above $100M (2 persistent depegs of 3%+). For PT-reUSD the same cohort is a proxy for an issuer write-down. Size is measured today, so survivors are over-represented.",
+    "Borrower lists come from Morpho's API at generation time and the fork is pinned a few hours earlier: a borrower who opened in between is missing.",
+    "PT-sUSDS is mapped but not simulated.",
+  ].map(x => `<li>${x}</li>`).join("");
 }
 
 fetch("data.json").then(r => r.json()).then(d => {
   D = d;
-  $("title").textContent = `${d.position.name}  ·  expiry ${d.position.expiry}  ·  ${d.position.days} days`;
-  $("asof").textContent = "Live data as of " + d.asof.replace("T", " ").slice(0, 16) + " UTC";
-  $("size").value = 1000000; $("p3").value = Math.min(0.05, d.estimate.p);
-  ["size", "p3"].forEach(i => $(i).oninput = renderVerdict);
-  renderVerdict(); renderGraph(); renderCascade(); renderBorrowers(); renderScen(); renderVenue(); renderLimits();
-}).catch(e => { document.body.insertAdjacentHTML("afterbegin", "<p style='padding:16px'>Could not load data.json. Run: python -m defi_risk.dashboard, then serve this folder (python -m http.server).</p>"); console.error(e); });
+  $("sub").textContent = `Anvil fork of Ethereum mainnet at block ${d.fork_block}. Fund position: ${d.fund_pt.toLocaleString("en")} PT. Data exported ${d.asof.replace("T", " ").slice(0, 16)} UTC.`;
+  $("blk").textContent = d.fork_block;
+  $("tabs").innerHTML = d.positions.map((p, i) => `<button class="tab" data-i="${i}">${p.name}</button>`).join("");
+  document.querySelectorAll(".tab").forEach(t => t.onclick = () => { cur = +t.dataset.i; renderPosition(); });
+  renderPosition(); renderGraph(); renderLimits();
+}).catch(e => { document.body.insertAdjacentHTML("afterbegin", "<p style='padding:16px'>Could not load data.json. Run python -m defi_risk.dashboard, then serve this folder.</p>"); console.error(e); });
 </script>
 </body>
 </html>

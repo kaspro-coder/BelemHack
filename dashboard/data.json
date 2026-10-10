@@ -1,284 +1,656 @@
 {
- "asof": "2026-10-10T13:16+00:00",
- "position": {
-  "name": "PT-sUSDe",
-  "expiry": "2026-11-26",
-  "days": 46,
-  "implied_apy": 0.05011036067180319,
-  "pt_usd": 0.9930884596085578
- },
- "capacity": 4576138.115974162,
- "curve": [
-  [
-   100000.0,
-   0.0002774685355139098
-  ],
-  [
-   250000.0,
-   0.0002870094070866549
-  ],
-  [
-   500000.0,
-   0.00032267894179872035
-  ],
-  [
-   1000000.0,
-   0.00045309260553969433
-  ],
-  [
-   1500000.0,
-   0.000606300412287488
-  ],
-  [
-   2000000.0,
-   0.0006860039018053446
-  ],
-  [
-   3000000.0,
-   0.00149452087055724
-  ],
-  [
-   4000000.0,
-   0.003247028282447543
-  ]
- ],
- "scenarios": [
+ "asof": "2026-10-10T20:57+00:00",
+ "fork_block": 26164460,
+ "fund_pt": 1000000,
+ "positions": [
   {
-   "depeg": 0.005,
-   "pt_price_fall": 0.00815068493150685,
-   "seized_usd": 0,
-   "unsellable_usd": 0.0,
-   "cascade_impact": 0.0,
-   "holder_loss": 0.00815068493150685
-  },
-  {
-   "depeg": 0.01,
-   "pt_price_fall": 0.0163013698630137,
-   "seized_usd": 3249904.6837947755,
-   "unsellable_usd": 0.0,
-   "cascade_impact": 0.0018431030504695162,
-   "holder_loss": 0.018144472913483214
-  },
-  {
-   "depeg": 0.02,
-   "pt_price_fall": 0.0326027397260274,
-   "seized_usd": 3379229.770338486,
-   "unsellable_usd": 0.0,
-   "cascade_impact": 0.002042149926199136,
-   "holder_loss": 0.034644889652226535
-  },
-  {
-   "depeg": 0.03,
-   "pt_price_fall": 0.048904109589041095,
-   "seized_usd": 3789422.850562085,
-   "unsellable_usd": 0.0,
-   "cascade_impact": 0.0027787737365285036,
-   "holder_loss": 0.0516828833255696
-  },
-  {
-   "depeg": 0.05,
-   "pt_price_fall": 0.08150684931506849,
-   "seized_usd": 7761861.771846923,
-   "unsellable_usd": 3185723.6558727613,
-   "cascade_impact": 0.00551695482112492,
-   "holder_loss": 0.08702380413619341
-  },
-  {
-   "depeg": 0.1,
-   "pt_price_fall": 0.16301369863013698,
-   "seized_usd": 7910564.577083942,
-   "unsellable_usd": 3334426.46110978,
-   "cascade_impact": 0.00551695482112492,
-   "holder_loss": 0.1685306534512619
-  }
- ],
- "params": {
-  "yield_shock": 5.0,
-  "risk_free": 0.0405,
-  "tail_alpha": 1.0,
-  "sizes": [
-   0.005,
-   0.01,
-   0.02,
-   0.03,
-   0.05,
-   0.1
-  ]
- },
- "estimate": {
-  "p": 0.0064838959757558675,
-  "lo": 0.002650913141838174,
-  "hi": 0.02041063546452262,
-  "coins": 17,
-  "episodes": 2
- },
- "tiers": [
-  {
-   "label": "all sizes",
-   "coins": 150,
-   "episodes": 137,
-   "p": 0.057386901726524366,
-   "lo": 0.04995690247458662,
-   "hi": 0.06613076033377646
-  },
-  {
-   "label": "> $10M",
-   "coins": 57,
-   "episodes": 24,
-   "p": 0.028033111573815446,
-   "lo": 0.020303128046329253,
-   "hi": 0.039424370286919086
-  },
-  {
-   "label": "> $100M",
-   "coins": 17,
-   "episodes": 2,
-   "p": 0.0064838959757558675,
-   "lo": 0.002650913141838174,
-   "hi": 0.02041063546452262
-  },
-  {
-   "label": "> $1B",
-   "coins": 6,
-   "episodes": 0,
-   "p": 0.0,
-   "lo": 0.0,
-   "hi": 0.028407273672126074
-  }
- ],
- "venue": {
-  "incidents": 9,
-  "exchange_years": 160.31506849314815,
-  "per_year": 0.05613945142271302,
-  "lo": 0.03384214439781857,
-  "hi": 0.09796469271250509,
-  "n_venues": 4,
-  "p_any": 0.028001506919983155,
-  "p_any_lo": 0.016951316244234627,
-  "p_any_hi": 0.048477868323670736,
-  "depeg": 0.04,
-  "scenario": {
-   "depeg": 0.04,
-   "pt_price_fall": 0.0652054794520548,
-   "seized_usd": 7742371.1978180045,
-   "unsellable_usd": 3166233.0818438428,
-   "cascade_impact": 0.0055169703648311206,
-   "holder_loss": 0.07072244981688591
-  },
-  "seized_without_rate_shock": 3379229.770338486
- },
- "market_p3": 0.01248627569278149,
- "borrowers": [
-  {
-   "hf": 1.0098105731962752,
-   "debt": 2941649.3407545523,
-   "coll": 3249904.6837947755
-  },
-  {
-   "hf": 1.02487655820353,
-   "debt": 14081.253077173105,
-   "coll": 15788.929021911354
-  },
-  {
-   "hf": 1.0256873487290927,
-   "debt": 101176.43774293606,
-   "coll": 113536.1575217991
-  },
-  {
-   "hf": 1.0498852507945506,
-   "debt": 357113.84389643086,
-   "coll": 410193.0802235991
-  },
-  {
-   "hf": 1.0533169686379051,
-   "debt": 3414021.209745197,
-   "coll": 3934278.541948783
-  },
-  {
-   "hf": 1.0590442888314573,
-   "debt": 16113.350640567198,
-   "coll": 18669.80530713602
-  },
-  {
-   "hf": 1.0800997446584326,
-   "debt": 16493.808877732172,
-   "coll": 19490.574028919043
-  },
-  {
-   "hf": 1.0970131838404182,
-   "debt": 100398.24685786718,
-   "coll": 120497.43018137796
-  },
-  {
-   "hf": 1.124594834980844,
-   "debt": 10326.999154026913,
-   "coll": 12706.034631536531
-  },
-  {
-   "hf": 1.1783844171574802,
-   "debt": 12022.26834844896,
-   "coll": 15499.340424103768
-  },
-  {
-   "hf": 1.3756501376368646,
-   "debt": 579.1098408569887,
-   "coll": 871.5829975983333
-  },
-  {
-   "hf": 1.8339114004071198,
-   "debt": 8018.673993568942,
-   "coll": 16088.691204113937
-  },
-  {
-   "hf": 3.345666197995006,
-   "debt": 0.2713213532162208,
-   "coll": 0.9931306647553342
-  }
- ],
- "lending": {
-  "lltv": 0.915,
-  "collateral_usd": 7927525.844416319,
-  "borrow_usd": 6992099.886693436,
-  "utilization": 0.9014612772017935
- },
- "oracle": {
-  "morpho_type": "Unknown",
-  "pattern": "primary/backup with challenge timelock",
-  "primary": "0x8fca98c9abee4dcb33ba9f3d17db4ad57f72706d",
-  "backup": "0xe2f4cfe07aecd7fd8fb0d293a22cde7d08175465",
-  "active": "primary",
-  "challenged": false,
-  "primary_price": 0.9923648154490107,
-  "backup_price": 0.9919647138027179,
-  "deviation": 0.000403342619677401,
-  "timelock_hours": 16.0,
-  "primary_feeds": {
-   "BASE_FEED_1": {
-    "address": "0xa572dad7db3d975e9ce780db1cf3bf959401cd35",
-    "description": null
+   "name": "PT-sUSDe",
+   "expiry": "2026-11-26",
+   "days": 46.142094907407404,
+   "implied_apy": 0.05011019435191311,
+   "mark": 0.9925967007600001,
+   "calm_exit": 990426.453209,
+   "exit_curve": [
+    [
+     99999.99999999999,
+     99259.670076,
+     0.0
+    ],
+    [
+     500000.0,
+     495785.914831,
+     0.0
+    ],
+    [
+     1000000.0,
+     990426.453209,
+     0.0
+    ],
+    [
+     2000000.0,
+     1975767.297134,
+     0.0
+    ],
+    [
+     3000000.0,
+     2700158.904407,
+     266601.5625
+    ],
+    [
+     4000000.0,
+     2699433.13891,
+     1265625.0
+    ],
+    [
+     6000000.0,
+     2700158.904407,
+     3266601.5625
+    ]
+   ],
+   "driver": "USDe depeg (Chainlink USDe/USD)",
+   "stuck_from": 0.01,
+   "window": "16 h",
+   "window_hours": 16.0,
+   "trigger": "USDe/USD below 0.9925 (oracle deviation threshold 0.75%): the challenge can start, liquidations follow 16 h later",
+   "events": [
+    {
+     "severity": 0.005,
+     "liquidated": 0,
+     "seized_pt": 0.0,
+     "stuck_pt": 0.0,
+     "bad_debt": 0.0,
+     "exit_in_window": 985871.804737,
+     "exit_after": 985871.804737,
+     "fund_stuck": false
+    },
+    {
+     "severity": 0.0075,
+     "liquidated": 0,
+     "seized_pt": 0.0,
+     "stuck_pt": 0.0,
+     "bad_debt": 0.0,
+     "exit_in_window": 983394.739901,
+     "exit_after": 983525.481046,
+     "fund_stuck": false
+    },
+    {
+     "severity": 0.01,
+     "liquidated": 1,
+     "seized_pt": 3073274.9752092026,
+     "stuck_pt": 339140.6955064843,
+     "bad_debt": 0.0,
+     "exit_in_window": 980917.675065,
+     "exit_after": 0.0,
+     "fund_stuck": true
+    },
+    {
+     "severity": 0.02,
+     "liquidated": 1,
+     "seized_pt": 3104634.9239358273,
+     "stuck_pt": 371404.0802559949,
+     "bad_debt": 0.0,
+     "exit_in_window": 971009.415721,
+     "exit_after": 0.0,
+     "fund_stuck": true
+    },
+    {
+     "severity": 0.03,
+     "liquidated": 3,
+     "seized_pt": 3259539.2084736098,
+     "stuck_pt": 525218.7201153765,
+     "bad_debt": 0.0,
+     "exit_in_window": 961101.156377,
+     "exit_after": 0.0,
+     "fund_stuck": true
+    },
+    {
+     "severity": 0.04,
+     "liquidated": 3,
+     "seized_pt": 3293492.74189521,
+     "stuck_pt": 559636.4620017251,
+     "bad_debt": 0.0,
+     "exit_in_window": 951192.897032,
+     "exit_after": 0.0,
+     "fund_stuck": true
+    },
+    {
+     "severity": 0.05,
+     "liquidated": 4,
+     "seized_pt": 3716963.3584000715,
+     "stuck_pt": 983688.5450453312,
+     "bad_debt": 0.0,
+     "exit_in_window": 941284.637688,
+     "exit_after": 0.0,
+     "fund_stuck": true
+    },
+    {
+     "severity": 0.1,
+     "liquidated": 8,
+     "seized_pt": 7889319.9816723075,
+     "stuck_pt": 5154252.995838646,
+     "bad_debt": 96150.842791,
+     "exit_in_window": 891743.340968,
+     "exit_after": 0.0,
+     "fund_stuck": true
+    }
+   ],
+   "short_dip": [
+    {
+     "hours_depegged": 6,
+     "switched": false,
+     "liquidated": 0,
+     "seized_pt": 0,
+     "bad_debt_usdc": 0
+    },
+    {
+     "hours_depegged": 12,
+     "switched": false,
+     "liquidated": 0,
+     "seized_pt": 0,
+     "bad_debt_usdc": 0
+    },
+    {
+     "hours_depegged": 15,
+     "switched": false,
+     "liquidated": 0,
+     "seized_pt": 0,
+     "bad_debt_usdc": 0
+    },
+    {
+     "hours_depegged": 24,
+     "switched": true,
+     "liquidated": 3,
+     "seized_pt": 3293421965495791530813704,
+     "bad_debt_usdc": 0
+    }
+   ],
+   "feed_failure": [
+    {
+     "wrong_price": 95000000,
+     "switched": true,
+     "liquidated": 4,
+     "seized_pt": 3716963358400071017520506,
+     "repaid_usdc": 3415348327635,
+     "bad_debt_usdc": 0,
+     "sold_pt": 2733274813354739722844666,
+     "unsold_pt": 983688545045331294675840,
+     "fund_exit_after": 0
+    },
+    {
+     "wrong_price": 90000000,
+     "switched": true,
+     "liquidated": 8,
+     "seized_pt": 7889319981672307744249046,
+     "repaid_usdc": 6867603268908,
+     "bad_debt_usdc": 96150842791,
+     "sold_pt": 2735066985833661376180087,
+     "unsold_pt": 5154252995838646368068959,
+     "fund_exit_after": 0
+    },
+    {
+     "wrong_price": 80000000,
+     "switched": true,
+     "liquidated": 10,
+     "seized_pt": 7965217475054501264232279,
+     "repaid_usdc": 6163263607158,
+     "bad_debt_usdc": 822848461963,
+     "sold_pt": 2734154240704743353884415,
+     "unsold_pt": 5231063234349757910347864,
+     "fund_exit_after": 0
+    }
+   ],
+   "pt_panic": [
+    {
+     "dump_pt": 500000000000000000000000,
+     "sold_pt": 500000000000000000000000,
+     "unsold_pt": 0,
+     "sy_out": 396027201338335542445040,
+     "ln_implied_rate_after": 59344308045563790,
+     "oracle_before": 992414998097412481000000,
+     "oracle_after": 992414998097412481000000,
+     "unhealthy": 0,
+     "fund_exit_after": 989271067557
+    },
+    {
+     "dump_pt": 1000000000000000000000000,
+     "sold_pt": 1000000000000000000000000,
+     "unsold_pt": 0,
+     "sy_out": 791139491183955671689558,
+     "ln_implied_rate_after": 68433908411914929,
+     "oracle_before": 992414998097412481000000,
+     "oracle_after": 992414998097412481000000,
+     "unhealthy": 0,
+     "fund_exit_after": 987905363177
+    },
+    {
+     "dump_pt": 2000000000000000000000000,
+     "sold_pt": 2000000000000000000000000,
+     "unsold_pt": 0,
+     "sy_out": 1578216665243409755104972,
+     "ln_implied_rate_after": 88404102751637768,
+     "oracle_before": 992414998097412481000000,
+     "oracle_after": 992414998097412481000000,
+     "unhealthy": 0,
+     "fund_exit_after": 723665841776
+    },
+    {
+     "dump_pt": 3000000000000000000000000,
+     "sold_pt": 2733398437500000000000000,
+     "unsold_pt": 266601562500000000000000,
+     "sy_out": 2156851056256640759282456,
+     "ln_implied_rate_after": 121881900231733345,
+     "oracle_before": 992414998097412481000000,
+     "oracle_after": 992414998097412481000000,
+     "unhealthy": 0,
+     "fund_exit_after": 0
+    },
+    {
+     "dump_pt": 4000000000000000000000000,
+     "sold_pt": 2734375000000000000000000,
+     "unsold_pt": 1265625000000000000000000,
+     "sy_out": 2156271324420920095720135,
+     "ln_implied_rate_after": 121806771137334296,
+     "oracle_before": 992414998097412481000000,
+     "oracle_after": 992414998097412481000000,
+     "unhealthy": 0,
+     "fund_exit_after": 0
+    },
+    {
+     "dump_pt": 8000000000000000000000000,
+     "sold_pt": 2734375000000000000000000,
+     "unsold_pt": 5265625000000000000000000,
+     "sy_out": 2156271324420920095720135,
+     "ln_implied_rate_after": 121806771137334296,
+     "oracle_before": 992414998097412481000000,
+     "oracle_after": 992414998097412481000000,
+     "unhealthy": 0,
+     "fund_exit_after": 0
+    }
+   ],
+   "probabilities": {
+    "0.005": {
+     "p": 0.13291986750299528,
+     "lo": 0.10354175862920438,
+     "hi": 0.1724632691227443,
+     "episodes": 41,
+     "coins": 17
+    },
+    "0.01": {
+     "p": 0.032419479878779335,
+     "lo": 0.019999600769059458,
+     "hi": 0.054990632521193,
+     "episodes": 10,
+     "coins": 17
+    },
+    "0.02": {
+     "p": 0.012967791951511735,
+     "lo": 0.006387122427989176,
+     "hi": 0.02967523259041006,
+     "episodes": 4,
+     "coins": 17
+    },
+    "0.03": {
+     "p": 0.0064838959757558675,
+     "lo": 0.002650913141838174,
+     "hi": 0.02041063546452262,
+     "episodes": 2,
+     "coins": 17
+    },
+    "0.05": {
+     "p": 0.0032419479878779338,
+     "lo": 0.0011520635345787895,
+     "hi": 0.015379362030161856,
+     "episodes": 1,
+     "coins": 17
+    },
+    "0.07": {
+     "p": 0.0032419479878779338,
+     "lo": 0.0011520635345787895,
+     "hi": 0.015379362030161856,
+     "episodes": 1,
+     "coins": 17
+    },
+    "0.1": {
+     "p": 0.0032419479878779338,
+     "lo": 0.0011520635345787895,
+     "hi": 0.015379362030161856,
+     "episodes": 1,
+     "coins": 17
+    },
+    "0.2": {
+     "p": 0.0032419479878779338,
+     "lo": 0.0011520635345787895,
+     "hi": 0.015379362030161856,
+     "episodes": 1,
+     "coins": 17
+    }
+   },
+   "decision": {
+    "verdict": "UNCLEAR",
+    "at": {
+     "lo": {
+      "expected_loss": 0.000903937953567987,
+      "edge": 0.0024973854661331013,
+      "verdict": "STAY"
+     },
+     "p": {
+      "expected_loss": 0.0015723447741207979,
+      "edge": 0.0018289786455802906,
+      "verdict": "STAY"
+     },
+     "hi": {
+      "expected_loss": 0.004252619733896529,
+      "edge": -0.0008512963141954401,
+      "verdict": "EXIT"
+     }
+    },
+    "exit_cost": 0.002186434378976143,
+    "carry": 0.0012148890407249454,
+    "risk_free": 0.0405,
+    "p_stuck": {
+     "lo": 0.019999600769059458,
+     "p": 0.032419479878779335,
+     "hi": 0.054990632521193
+    }
    }
   },
-  "backup_feeds": {
-   "BASE_FEED_1": {
-    "address": "0xa572dad7db3d975e9ce780db1cf3bf959401cd35",
-    "description": null
+  {
+   "name": "PT-reUSD",
+   "expiry": "2026-12-10",
+   "days": 60.142094907407404,
+   "implied_apy": 0.11779656590968579,
+   "mark": 0.979881603278,
+   "calm_exit": 979174.922179,
+   "exit_curve": [
+    [
+     500000.0,
+     489940.801639,
+     0.0
+    ],
+    [
+     1000000.0,
+     979174.922179,
+     0.0
+    ],
+    [
+     2000000.0,
+     1955485.230531,
+     0.0
+    ],
+    [
+     5000000.0,
+     4861439.257469,
+     0.0
+    ],
+    [
+     10000000.0,
+     6509530.739593,
+     3297119.140625
+    ],
+    [
+     20000000.0,
+     6509530.739593,
+     13297119.140625
+    ]
+   ],
+   "driver": "reUSD NAV write-down (re.xyz share price)",
+   "stuck_from": 0.02,
+   "window": "15 min",
+   "window_hours": 0.25,
+   "trigger": "re.xyz getSharePrice() falls: the oracle's 15-minute TWAP passes it on, liquidations follow within one TWAP period",
+   "borrowers": 306,
+   "events": [
+    {
+     "severity": 0.01,
+     "rounds": 2,
+     "liquidated": 1,
+     "seized_pt": 8437.605972,
+     "stuck_pt": 0.0,
+     "bad_debt": 0.0,
+     "exit_in_window": 969383.615563,
+     "exit_after": 969379.453039,
+     "fund_stuck": false,
+     "oracle_path": [
+      0.972000976008128,
+      0.9720038673718213,
+      0.9719952443239527
+     ]
+    },
+    {
+     "severity": 0.02,
+     "rounds": 4,
+     "liquidated": 31,
+     "seized_pt": 24097587.820426,
+     "stuck_pt": 17397816.287268,
+     "bad_debt": 0.0,
+     "exit_in_window": 959591.423736,
+     "exit_after": 0.0,
+     "fund_stuck": true,
+     "oracle_path": [
+      0.9621823450141157,
+      0.9621852071708084,
+      0.9573621903564599,
+      0.9475532821209594,
+      0.9475591795144112
+     ]
+    },
+    {
+     "severity": 0.03,
+     "rounds": 3,
+     "liquidated": 50,
+     "seized_pt": 37204616.718288,
+     "stuck_pt": 30505178.114184,
+     "bad_debt": 0.0,
+     "exit_in_window": 949800.117119,
+     "exit_after": 0.0,
+     "fund_stuck": true,
+     "oracle_path": [
+      0.9523646016200848,
+      0.9523674345724169,
+      0.9378717812526222,
+      0.9378776197190066
+     ]
+    },
+    {
+     "severity": 0.05,
+     "rounds": 3,
+     "liquidated": 117,
+     "seized_pt": 76580799.008658,
+     "stuck_pt": 69873725.230381,
+     "bad_debt": 0.0,
+     "exit_in_window": 930216.618675,
+     "exit_after": 0.0,
+     "fund_stuck": true,
+     "oracle_path": [
+      0.9327282272320416,
+      0.9327310017730127,
+      0.9185380771552896,
+      0.9185437945535085
+     ]
+    },
+    {
+     "severity": 0.07,
+     "rounds": 3,
+     "liquidated": 147,
+     "seized_pt": 85090306.489997,
+     "stuck_pt": 78388686.047027,
+     "bad_debt": 54.83101,
+     "exit_in_window": 910633.120232,
+     "exit_after": 0.0,
+     "fund_stuck": true,
+     "oracle_path": [
+      0.9130918528439985,
+      0.9130945689736084,
+      0.8991983917573997,
+      0.8992039891556673
+     ]
+    },
+    {
+     "severity": 0.1,
+     "rounds": 3,
+     "liquidated": 185,
+     "seized_pt": 95620292.321896,
+     "stuck_pt": 88909705.097117,
+     "bad_debt": 357704.650337,
+     "exit_in_window": 881257.429961,
+     "exit_after": 0.0,
+     "fund_stuck": true,
+     "oracle_path": [
+      0.883636847461943,
+      0.8836394759731913,
+      0.8701917872594426,
+      0.8701972040548768
+     ]
+    },
+    {
+     "severity": 0.2,
+     "rounds": 3,
+     "liquidated": 243,
+     "seized_pt": 133246343.65849,
+     "stuck_pt": 126548587.721064,
+     "bad_debt": 8790092.169363,
+     "exit_in_window": 783339.937743,
+     "exit_after": 0.0,
+     "fund_stuck": true,
+     "oracle_path": [
+      0.7854549755217272,
+      0.78545731197617,
+      0.7735070148700627,
+      0.7735118292271315
+     ]
+    }
+   ],
+   "pt_panic": [
+    {
+     "dump_pt": 500000.0,
+     "liquidated": 0,
+     "oracle_low": 0.9811147519226779,
+     "oracle_start": 0.9818187194021589,
+     "fund_exit": 978476.617632,
+     "apy_after": 0.12269414481296059
+    },
+    {
+     "dump_pt": 1000000.0,
+     "liquidated": 0,
+     "oracle_low": 0.9804153665080788,
+     "oracle_start": 0.9818187194021589,
+     "fund_exit": 977764.028239,
+     "apy_after": 0.12756435715302872
+    },
+    {
+     "dump_pt": 2000000.0,
+     "liquidated": 1,
+     "oracle_low": 0.9789959441373806,
+     "oracle_start": 0.9818187194021589,
+     "fund_exit": 976257.742235,
+     "apy_after": 0.1375515331295476
+    },
+    {
+     "dump_pt": 4000000.0,
+     "liquidated": 1,
+     "oracle_low": 0.9758265281564416,
+     "oracle_start": 0.9818187194021589,
+     "fund_exit": 972483.785858,
+     "apy_after": 0.16016828097709124
+    },
+    {
+     "dump_pt": 8000000.0,
+     "liquidated": 2,
+     "oracle_low": 0.9668788917084697,
+     "oracle_start": 0.9818187194021589,
+     "fund_exit": 0.0,
+     "apy_after": 0.2268997815248166
+    }
+   ],
+   "proxy": true,
+   "probabilities": {
+    "0.005": {
+     "p": 0.1733737402212982,
+     "lo": 0.1350544677772231,
+     "hi": 0.22495209016010126,
+     "episodes": 41,
+     "coins": 17
+    },
+    "0.01": {
+     "p": 0.042286278102755655,
+     "lo": 0.026086435785729733,
+     "hi": 0.0717269119841648,
+     "episodes": 10,
+     "coins": 17
+    },
+    "0.02": {
+     "p": 0.016914511241102263,
+     "lo": 0.008331029253898925,
+     "hi": 0.03870682511792617,
+     "episodes": 4,
+     "coins": 17
+    },
+    "0.03": {
+     "p": 0.008457255620551132,
+     "lo": 0.003457712793701966,
+     "hi": 0.026622567997203424,
+     "episodes": 2,
+     "coins": 17
+    },
+    "0.05": {
+     "p": 0.004228627810275566,
+     "lo": 0.0015026915668418994,
+     "hi": 0.0200600374306459,
+     "episodes": 1,
+     "coins": 17
+    },
+    "0.07": {
+     "p": 0.004228627810275566,
+     "lo": 0.0015026915668418994,
+     "hi": 0.0200600374306459,
+     "episodes": 1,
+     "coins": 17
+    },
+    "0.1": {
+     "p": 0.004228627810275566,
+     "lo": 0.0015026915668418994,
+     "hi": 0.0200600374306459,
+     "episodes": 1,
+     "coins": 17
+    },
+    "0.2": {
+     "p": 0.004228627810275566,
+     "lo": 0.0015026915668418994,
+     "hi": 0.0200600374306459,
+     "episodes": 1,
+     "coins": 17
+    }
    },
-   "BASE_FEED_2": {
-    "address": "0xa569d910839ae8865da8f8e70fffb0cba869f961",
-    "description": "USDe / USD"
-   },
-   "QUOTE_FEED_1": {
-    "address": "0xc3866d726c204c0836e0677a31973c649888973d",
-    "description": "Dummy feed with 12 decimals"
+   "decision": {
+    "verdict": "STAY",
+    "at": {
+     "lo": {
+      "expected_loss": 0.001179049504653896,
+      "edge": 0.012278517233198012,
+      "verdict": "STAY"
+     },
+     "p": {
+      "expected_loss": 0.0020508844879836494,
+      "edge": 0.01140668224986826,
+      "verdict": "STAY"
+     },
+     "hi": {
+      "expected_loss": 0.005546895305082429,
+      "edge": 0.00791067143276948,
+      "verdict": "STAY"
+     }
+    },
+    "exit_cost": 0.0007211902913943913,
+    "carry": 0.012736376446457517,
+    "risk_free": 0.0405,
+    "p_stuck": {
+     "lo": 0.008331029253898925,
+     "p": 0.016914511241102263,
+     "hi": 0.03870682511792617
+    }
    }
-  },
-  "primary_sees_depeg": false,
-  "backup_sees_depeg": true
- },
- "wobble": {
-  "d1": 0.0,
-  "d3": 0.0
- },
+  }
+ ],
  "graph": {
   "nodes": [
    {
@@ -286,7 +658,8 @@
     "kind": "position",
     "label": "PT-sUSDe (2026-11-26)",
     "data": {
-     "pt": "0xb195b618ea52b77cb2a58846f452f59f8dfa9390"
+     "pt": "0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
+     "market": "0x47ad2cd1dd15739a7a035b9d3b7828d916fef77e"
     }
    },
    {
@@ -298,34 +671,47 @@
    {
     "id": "amm:0x47ad2cd1dd15739a7a035b9d3b7828d916fef77e",
     "kind": "amm",
-    "label": "Pendle PT market",
+    "label": "Pendle pool PT-sUSDe",
     "data": {
-     "liquidity_usd": 3820957.1433604965,
+     "liquidity_usd": 3820216.535709728,
      "total_pt": 971271.206194636,
      "total_sy": 2282035.210152903,
-     "pt_discount": 0.00620310550565184,
-     "implied_apy": 0.05011036067180319,
-     "volume_24h_usd": 85770.1818427809
+     "pt_discount": 0.006160115251368281,
+     "implied_apy": 0.05011036183614048,
+     "volume_24h_usd": 24825.257592986363
     }
+   },
+   {
+    "id": "protocol:pendle",
+    "kind": "protocol",
+    "label": "Pendle",
+    "data": {}
+   },
+   {
+    "id": "liquidity:pendle-limit-orders",
+    "kind": "offchain",
+    "label": "Pendle limit orders (off-chain makers)",
+    "data": {}
    },
    {
     "id": "asset:1-0x9d39a5de30e57443bff2a8307a4256c8797a3497",
     "kind": "asset",
     "label": "sUSDe",
     "data": {
-     "underlying_apy": 0.04949202687849552
+     "underlying_apy": 0.049453086541446645
     }
    },
    {
-    "id": "issuer:ethena",
+    "id": "issuer:ethena-usde",
     "kind": "issuer",
     "label": "Ethena",
     "data": {
+     "pendle_protocol": "Ethena",
+     "defillama_slug": "ethena-usde",
      "tvl_by_chain": {
-      "Ethereum": 5206984614.9742,
-      "TON": 2976187
+      "Ethereum": 4776422827.66259
      },
-     "usde_supply_usd": 4778256053.82331
+     "usde_supply_usd": 4775904001.452404
     }
    },
    {
@@ -333,7 +719,7 @@
     "kind": "perp_venue",
     "label": "Bybit",
     "data": {
-     "eth_funding_annualized": 0.00331785
+     "eth_funding_annualized": 0.03266385
     }
    },
    {
@@ -341,7 +727,7 @@
     "kind": "perp_venue",
     "label": "Binance",
     "data": {
-     "eth_funding_annualized": 0.048048600000000004
+     "eth_funding_annualized": -0.08401935
     }
    },
    {
@@ -349,7 +735,7 @@
     "kind": "perp_venue",
     "label": "OKX",
     "data": {
-     "eth_funding_annualized": 0.035153958357105004
+     "eth_funding_annualized": -0.019228445419503
     }
    },
    {
@@ -357,7 +743,7 @@
     "kind": "perp_venue",
     "label": "Hyperliquid",
     "data": {
-     "eth_funding_annualized": 0.026937000000000003
+     "eth_funding_annualized": -0.00646488
     }
    },
    {
@@ -368,13 +754,13 @@
    },
    {
     "id": "feed:pyth",
-    "kind": "oracle",
+    "kind": "price_feed",
     "label": "Pyth (Ethena hedging price feed)",
     "data": {}
    },
    {
     "id": "feed:redstone",
-    "kind": "oracle",
+    "kind": "price_feed",
     "label": "Redstone (Ethena hedging price feed)",
     "data": {}
    },
@@ -390,48 +776,349 @@
     "label": "Morpho PT-sUSDE-26NOV2026/USDC",
     "data": {
      "lltv": 0.915,
-     "collateral_usd": 7927525.844416319,
-     "borrow_usd": 6992099.886693436,
-     "utilization": 0.9014612772017935
+     "collateral_usd": 7928071.030568014,
+     "borrow_usd": 6992158.683550345,
+     "utilization": 0.9014638924910489,
+     "market_id": "0x5613b170ded221c588b6e9637b910f49e5508680ceede207f44aa72e5c46cb05"
     }
+   },
+   {
+    "id": "protocol:morpho-blue",
+    "kind": "protocol",
+    "label": "Morpho Blue",
+    "data": {}
+   },
+   {
+    "id": "stable:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "kind": "stablecoin",
+    "label": "USDC",
+    "data": {}
    },
    {
     "id": "oracle:0xf8b29e7e9c00ce531434775f7923cc9fbca01b08",
     "kind": "oracle",
-    "label": "0xF8b29e7E9c00CE531434775f7923CC9fbCa01b08",
+    "label": "Oracle: primary/backup + challenge",
     "data": {
+     "address": "0xF8b29e7E9c00CE531434775f7923CC9fbCa01b08",
      "morpho_type": "Unknown",
-     "pattern": "primary/backup with challenge timelock",
+     "pattern": "MetaOracleDeviationTimelock (primary/backup)",
      "primary": "0x8fca98c9abee4dcb33ba9f3d17db4ad57f72706d",
      "backup": "0xe2f4cfe07aecd7fd8fb0d293a22cde7d08175465",
      "active": "primary",
      "challenged": false,
-     "primary_price": 0.9923648154490107,
-     "backup_price": 0.9919647138027179,
+     "price": 0.9924174866818873,
+     "primary_price": 0.9924174866818873,
+     "backup_price": 0.9920173637996069,
      "deviation": 0.000403342619677401,
+     "threshold": 0.0075,
      "timelock_hours": 16.0,
-     "primary_feeds": {
-      "BASE_FEED_1": {
-       "address": "0xa572dad7db3d975e9ce780db1cf3bf959401cd35",
-       "description": null
-      }
-     },
-     "backup_feeds": {
-      "BASE_FEED_1": {
-       "address": "0xa572dad7db3d975e9ce780db1cf3bf959401cd35",
-       "description": null
-      },
-      "BASE_FEED_2": {
-       "address": "0xa569d910839ae8865da8f8e70fffb0cba869f961",
-       "description": "USDe / USD"
-      },
-      "QUOTE_FEED_1": {
-       "address": "0xc3866d726c204c0836e0677a31973c649888973d",
-       "description": "Dummy feed with 12 decimals"
-      }
-     },
-     "primary_sees_depeg": false,
-     "backup_sees_depeg": true
+     "healing_hours": 24.0,
+     "primary_market_sensitive": false,
+     "backup_market_sensitive": true,
+     "primary_reads": [
+      "Linear discount 6.0%/yr to maturity (ignores the market)"
+     ],
+     "backup_reads": [
+      "Linear discount 6.0%/yr to maturity (ignores the market)",
+      "USDe / USD",
+      "Dummy feed with 12 decimals"
+     ]
+    }
+   },
+   {
+    "id": "feed:0xa572dad7db3d975e9ce780db1cf3bf959401cd35",
+    "kind": "price_feed",
+    "label": "Linear discount 6.0%/yr to maturity (ignores the market)",
+    "data": {
+     "kind": "linear_discount",
+     "description": "Linear discount 6.0%/yr to maturity (ignores the market)",
+     "discount_per_year": 0.06,
+     "maturity": 1795651200,
+     "market_sensitive": false
+    }
+   },
+   {
+    "id": "feed:0xa569d910839ae8865da8f8e70fffb0cba869f961",
+    "kind": "price_feed",
+    "label": "USDe / USD",
+    "data": {
+     "kind": "aggregator",
+     "description": "USDe / USD",
+     "market_sensitive": true
+    }
+   },
+   {
+    "id": "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+    "kind": "position",
+    "label": "PT-reUSD (2026-12-10)",
+    "data": {
+     "pt": "0xecfafdc7741323a945a163ed068b5a3c43483957",
+     "market": "0x13285bcbc27f92b47b4edb99d744c07b48c977c0"
+    }
+   },
+   {
+    "id": "amm:0x13285bcbc27f92b47b4edb99d744c07b48c977c0",
+    "kind": "amm",
+    "label": "Pendle pool PT-reUSD",
+    "data": {
+     "liquidity_usd": 12413497.097106474,
+     "total_pt": 5486330.506571,
+     "total_sy": 6350029.110724229,
+     "pt_discount": 0.01817722219597706,
+     "implied_apy": 0.11779677699962243,
+     "volume_24h_usd": 3747160.6116350563
+    }
+   },
+   {
+    "id": "asset:1-0x5086bf358635b81d8c47c66d1c8b9e567db70c72",
+    "kind": "asset",
+    "label": "reUSD",
+    "data": {
+     "underlying_apy": 0.07250958967277388
+    }
+   },
+   {
+    "id": "issuer:re.xyz",
+    "kind": "issuer",
+    "label": "re.xyz",
+    "data": {
+     "pendle_protocol": "re.xyz",
+     "defillama_slug": null
+    }
+   },
+   {
+    "id": "lending:morpho:0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca",
+    "kind": "lending",
+    "label": "Morpho PT-reUSD-10DEC2026/USDT",
+    "data": {
+     "lltv": 0.915,
+     "collateral_usd": 9921377.41264954,
+     "borrow_usd": 8379207.149247675,
+     "utilization": 0.7392494148892805,
+     "market_id": "0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca"
+    }
+   },
+   {
+    "id": "stable:0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "kind": "stablecoin",
+    "label": "USDT",
+    "data": {}
+   },
+   {
+    "id": "vault:0xa0804346780b4c2e3be118ac957d1db82f9d7484",
+    "kind": "vault",
+    "label": "Smokehouse USDT",
+    "data": {}
+   },
+   {
+    "id": "oracle:0x217d6ddcdb95112c51657f6270e8c079cfdb51f0",
+    "kind": "oracle",
+    "label": "Oracle: Morpho Chainlink V2",
+    "data": {
+     "address": "0x217d6DdCDB95112C51657F6270e8C079CFDB51f0",
+     "morpho_type": "ChainlinkOracleV2",
+     "pattern": "MorphoChainlinkOracleV2",
+     "price": 0.9818228610118673,
+     "market_sensitive": true,
+     "reads": [
+      "Ojo PT Feed Pendle Chainlink-compatible Oracle"
+     ]
+    }
+   },
+   {
+    "id": "feed:0x77ee147391eac11c92817e771860ff4aad265d89",
+    "kind": "price_feed",
+    "label": "Ojo PT Feed Pendle Chainlink-compatible Oracle",
+    "data": {
+     "kind": "aggregator",
+     "description": "Ojo PT Feed Pendle Chainlink-compatible Oracle",
+     "market_sensitive": true
+    }
+   },
+   {
+    "id": "lending:morpho:0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64",
+    "kind": "lending",
+    "label": "Morpho PT-reUSD-10DEC2026/USDC",
+    "data": {
+     "lltv": 0.915,
+     "collateral_usd": 136133913.96051887,
+     "borrow_usd": 106835881.16553,
+     "utilization": 0.8867327942943339,
+     "market_id": "0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64"
+    }
+   },
+   {
+    "id": "vault:0x62fe596d59fb077c2df736df212e0affb522dc78",
+    "kind": "vault",
+    "label": "Clearstar USDC Reactor",
+    "data": {}
+   },
+   {
+    "id": "vault:0xbeefff209270748ddd194831b3fa287a5386f5bc",
+    "kind": "vault",
+    "label": "Smokehouse USDC",
+    "data": {}
+   },
+   {
+    "id": "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094",
+    "kind": "position",
+    "label": "PT-sUSDS (2026-11-26)",
+    "data": {
+     "pt": "0xdc169abe56461a2e0c034da431ac2a3ebf596094",
+     "market": "0x9c560ebaf78e596cbcc27411d633a74d628dd7dc"
+    }
+   },
+   {
+    "id": "amm:0x9c560ebaf78e596cbcc27411d633a74d628dd7dc",
+    "kind": "amm",
+    "label": "Pendle pool PT-sUSDS",
+    "data": {
+     "liquidity_usd": 4769948.1121171275,
+     "total_pt": 1041762.9048571691,
+     "total_sy": 3357490.6810856718,
+     "pt_discount": 0.006009500145989555,
+     "implied_apy": 0.04885192720868137,
+     "volume_24h_usd": 2095382.544424371
+    }
+   },
+   {
+    "id": "asset:1-0xa3931d71877c0e7a3148cb7eb4463524fec27fbd",
+    "kind": "asset",
+    "label": "sUSDS",
+    "data": {
+     "underlying_apy": 0.036903159718435274
+    }
+   },
+   {
+    "id": "issuer:sky-lending",
+    "kind": "issuer",
+    "label": "Sky Protocol",
+    "data": {
+     "pendle_protocol": "Sky Protocol",
+     "defillama_slug": "sky-lending",
+     "tvl_by_chain": {
+      "Ethereum": 5976164869.72774
+     }
+    }
+   },
+   {
+    "id": "lending:morpho:0x9a8dab6de1059e6dc66c34b358764b70effb289e514e237f3161ffb09eaaf24f",
+    "kind": "lending",
+    "label": "Morpho PT-sUSDS-26NOV2026/USDS",
+    "data": {
+     "lltv": 0.915,
+     "collateral_usd": 3804638.2198038474,
+     "borrow_usd": 3141109.4587454083,
+     "utilization": 0.8577562896375261,
+     "market_id": "0x9a8dab6de1059e6dc66c34b358764b70effb289e514e237f3161ffb09eaaf24f"
+    }
+   },
+   {
+    "id": "stable:0xdc035d45d973e3ec169d2276ddab16f1e407384f",
+    "kind": "stablecoin",
+    "label": "USDS",
+    "data": {}
+   },
+   {
+    "id": "oracle:0xda5901ef31ecafa6561b2e56b4997fadd3db4646",
+    "kind": "oracle",
+    "label": "Oracle: Morpho Chainlink V2",
+    "data": {
+     "address": "0xda5901EF31ecAFa6561B2e56B4997FAdd3dB4646",
+     "morpho_type": "ChainlinkOracleV2",
+     "pattern": "MorphoChainlinkOracleV2",
+     "price": 0.9873624778031456,
+     "market_sensitive": false,
+     "reads": [
+      "Linear discount 10.0%/yr to maturity (ignores the market)"
+     ]
+    }
+   },
+   {
+    "id": "feed:0xd1264c014a912da0415a03df8580bb63add0e0a4",
+    "kind": "price_feed",
+    "label": "Linear discount 10.0%/yr to maturity (ignores the market)",
+    "data": {
+     "kind": "linear_discount",
+     "description": "Linear discount 10.0%/yr to maturity (ignores the market)",
+     "discount_per_year": 0.1,
+     "maturity": 1795651200,
+     "market_sensitive": false
+    }
+   },
+   {
+    "id": "lending:morpho:0x22fe4c688161863c73571a2b8db65cc11a4a6bceee4f0dea4aa83e4b784f1bd9",
+    "kind": "lending",
+    "label": "Morpho PT-sUSDS-26NOV2026/USDC",
+    "data": {
+     "lltv": 0.915,
+     "collateral_usd": 14921069.974330045,
+     "borrow_usd": 12680772.762870353,
+     "utilization": 0.8895133494575413,
+     "market_id": "0x22fe4c688161863c73571a2b8db65cc11a4a6bceee4f0dea4aa83e4b784f1bd9"
+    }
+   },
+   {
+    "id": "oracle:0x3464a61a68c486241fe07201c913f055bdce35bf",
+    "kind": "oracle",
+    "label": "Oracle: primary/backup + challenge",
+    "data": {
+     "address": "0x3464a61A68C486241FE07201C913F055Bdce35BF",
+     "morpho_type": "Unknown",
+     "pattern": "MetaOracleDeviationTimelock (primary/backup)",
+     "primary": "0x89dae86eb86cbc4dd2f52031c997a21ab9a950c5",
+     "backup": "0x77ae9b629096d0ae0206878b163cca232276c88e",
+     "active": "primary",
+     "challenged": false,
+     "price": 0.9835712211440893,
+     "primary_price": 0.9835712211440893,
+     "backup_price": 0.983451333647944,
+     "deviation": 0.000121904858983261,
+     "threshold": 0.0075,
+     "timelock_hours": 16.0,
+     "healing_hours": 24.0,
+     "primary_market_sensitive": true,
+     "backup_market_sensitive": true,
+     "primary_reads": [
+      "Ojo PT Feed Pendle Chainlink-compatible Oracle"
+     ],
+     "backup_reads": [
+      "Ojo PT Feed Pendle Chainlink-compatible Oracle",
+      "USDS / USD",
+      "Dummy feed with 12 decimals"
+     ]
+    }
+   },
+   {
+    "id": "feed:0x16bdf4c1a1fbd0d3a181dcee4141bb106e22b002",
+    "kind": "price_feed",
+    "label": "Ojo PT Feed Pendle Chainlink-compatible Oracle",
+    "data": {
+     "kind": "aggregator",
+     "description": "Ojo PT Feed Pendle Chainlink-compatible Oracle",
+     "market_sensitive": true
+    }
+   },
+   {
+    "id": "feed:0xff30586cd0f29ed462364c7e81375fc0c71219b1",
+    "kind": "price_feed",
+    "label": "USDS / USD",
+    "data": {
+     "kind": "aggregator",
+     "description": "USDS / USD",
+     "market_sensitive": true
+    }
+   },
+   {
+    "id": "lending:morpho:0x0367161b7cb23dfd03747dd3815d1c445b0437b648a6d50346249c6e7b92ff1b",
+    "kind": "lending",
+    "label": "Morpho PT-sUSDS-26NOV2026/USDT",
+    "data": {
+     "lltv": 0.915,
+     "collateral_usd": 5091401.046213252,
+     "borrow_usd": 4300897.802709099,
+     "utilization": 0.8342443327365794,
+     "market_id": "0x0367161b7cb23dfd03747dd3815d1c445b0437b648a6d50346249c6e7b92ff1b"
     }
    }
   ],
@@ -448,9 +1135,25 @@
     "source": "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
     "target": "amm:0x47ad2cd1dd15739a7a035b9d3b7828d916fef77e",
     "relation": "exits_through",
-    "exposure_usd": 3820957.1433604965,
+    "exposure_usd": 3820216.535709728,
     "confidence": "measured",
     "evidence": ""
+   },
+   {
+    "source": "amm:0x47ad2cd1dd15739a7a035b9d3b7828d916fef77e",
+    "target": "protocol:pendle",
+    "relation": "runs_on",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
+    "target": "liquidity:pendle-limit-orders",
+    "relation": "exits_through",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": "Pendle swap quote used 8 limit-order fills on PT-sUSDe"
    },
    {
     "source": "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
@@ -461,15 +1164,7 @@
     "evidence": ""
    },
    {
-    "source": "asset:1-0x9d39a5de30e57443bff2a8307a4256c8797a3497",
-    "target": "issuer:ethena",
-    "relation": "issued_by",
-    "exposure_usd": null,
-    "confidence": "measured",
-    "evidence": "manual mapping + DefiLlama"
-   },
-   {
-    "source": "issuer:ethena",
+    "source": "issuer:ethena-usde",
     "target": "chain:1",
     "relation": "settles_on",
     "exposure_usd": null,
@@ -477,7 +1172,7 @@
     "evidence": "DefiLlama"
    },
    {
-    "source": "issuer:ethena",
+    "source": "issuer:ethena-usde",
     "target": "venue:bybit",
     "relation": "hedges_short_perps_on",
     "exposure_usd": null,
@@ -485,7 +1180,7 @@
     "evidence": "docs.ethena.fi hedging-system/managing-risk-from-dependencies"
    },
    {
-    "source": "issuer:ethena",
+    "source": "issuer:ethena-usde",
     "target": "venue:binance",
     "relation": "hedges_short_perps_on",
     "exposure_usd": null,
@@ -493,7 +1188,7 @@
     "evidence": "third-party note (4pillars), undated"
    },
    {
-    "source": "issuer:ethena",
+    "source": "issuer:ethena-usde",
     "target": "venue:okx",
     "relation": "hedges_short_perps_on",
     "exposure_usd": null,
@@ -501,7 +1196,7 @@
     "evidence": "third-party note (4pillars), undated"
    },
    {
-    "source": "issuer:ethena",
+    "source": "issuer:ethena-usde",
     "target": "venue:hyperliquid",
     "relation": "hedges_short_perps_on",
     "exposure_usd": null,
@@ -509,7 +1204,7 @@
     "evidence": "third-party note (4pillars), undated"
    },
    {
-    "source": "issuer:ethena",
+    "source": "issuer:ethena-usde",
     "target": "oes:copper",
     "relation": "depends_on",
     "exposure_usd": null,
@@ -517,7 +1212,7 @@
     "evidence": "docs.ethena.fi hedging-system/managing-risk-from-dependencies"
    },
    {
-    "source": "issuer:ethena",
+    "source": "issuer:ethena-usde",
     "target": "feed:pyth",
     "relation": "depends_on",
     "exposure_usd": null,
@@ -525,7 +1220,7 @@
     "evidence": "docs.ethena.fi hedging-system/managing-risk-from-dependencies"
    },
    {
-    "source": "issuer:ethena",
+    "source": "issuer:ethena-usde",
     "target": "feed:redstone",
     "relation": "depends_on",
     "exposure_usd": null,
@@ -533,7 +1228,7 @@
     "evidence": "docs.ethena.fi hedging-system/managing-risk-from-dependencies"
    },
    {
-    "source": "issuer:ethena",
+    "source": "issuer:ethena-usde",
     "target": "infra:aws",
     "relation": "depends_on",
     "exposure_usd": null,
@@ -541,10 +1236,18 @@
     "evidence": "docs.ethena.fi hedging-system/managing-risk-from-dependencies"
    },
    {
+    "source": "asset:1-0x9d39a5de30e57443bff2a8307a4256c8797a3497",
+    "target": "issuer:ethena-usde",
+    "relation": "issued_by",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": "Pendle market metadata"
+   },
+   {
     "source": "lending:morpho:0x5613b170ded221c588b6e9637b910f49e5508680ceede207f44aa72e5c46cb05",
     "target": "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
     "relation": "holds_as_collateral",
-    "exposure_usd": 7927525.844416319,
+    "exposure_usd": 7928071.030568014,
     "confidence": "measured",
     "evidence": ""
    },
@@ -552,9 +1255,49 @@
     "source": "lending:morpho:0x5613b170ded221c588b6e9637b910f49e5508680ceede207f44aa72e5c46cb05",
     "target": "amm:0x47ad2cd1dd15739a7a035b9d3b7828d916fef77e",
     "relation": "liquidates_through",
-    "exposure_usd": 7927525.844416319,
+    "exposure_usd": 7928071.030568014,
     "confidence": "measured",
     "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x5613b170ded221c588b6e9637b910f49e5508680ceede207f44aa72e5c46cb05",
+    "target": "protocol:morpho-blue",
+    "relation": "runs_on",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x5613b170ded221c588b6e9637b910f49e5508680ceede207f44aa72e5c46cb05",
+    "target": "stable:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "relation": "lends",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "oracle:0xf8b29e7e9c00ce531434775f7923cc9fbca01b08",
+    "target": "feed:0xa572dad7db3d975e9ce780db1cf3bf959401cd35",
+    "relation": "primary_reads",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": "on-chain read"
+   },
+   {
+    "source": "oracle:0xf8b29e7e9c00ce531434775f7923cc9fbca01b08",
+    "target": "feed:0xa572dad7db3d975e9ce780db1cf3bf959401cd35",
+    "relation": "backup_reads",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": "on-chain read"
+   },
+   {
+    "source": "oracle:0xf8b29e7e9c00ce531434775f7923cc9fbca01b08",
+    "target": "feed:0xa569d910839ae8865da8f8e70fffb0cba869f961",
+    "relation": "backup_reads",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": "on-chain read"
    },
    {
     "source": "lending:morpho:0x5613b170ded221c588b6e9637b910f49e5508680ceede207f44aa72e5c46cb05",
@@ -563,7 +1306,445 @@
     "exposure_usd": null,
     "confidence": "measured",
     "evidence": ""
+   },
+   {
+    "source": "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+    "target": "chain:1",
+    "relation": "settles_on",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+    "target": "amm:0x13285bcbc27f92b47b4edb99d744c07b48c977c0",
+    "relation": "exits_through",
+    "exposure_usd": 12413497.097106474,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "amm:0x13285bcbc27f92b47b4edb99d744c07b48c977c0",
+    "target": "protocol:pendle",
+    "relation": "runs_on",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+    "target": "liquidity:pendle-limit-orders",
+    "relation": "exits_through",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": "Pendle swap quote used 8 limit-order fills on PT-sUSDe"
+   },
+   {
+    "source": "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+    "target": "asset:1-0x5086bf358635b81d8c47c66d1c8b9e567db70c72",
+    "relation": "redeems_into",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "issuer:re.xyz",
+    "target": "chain:1",
+    "relation": "settles_on",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": "DefiLlama"
+   },
+   {
+    "source": "asset:1-0x5086bf358635b81d8c47c66d1c8b9e567db70c72",
+    "target": "issuer:re.xyz",
+    "relation": "issued_by",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": "Pendle market metadata"
+   },
+   {
+    "source": "lending:morpho:0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca",
+    "target": "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+    "relation": "holds_as_collateral",
+    "exposure_usd": 9921377.41264954,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca",
+    "target": "amm:0x13285bcbc27f92b47b4edb99d744c07b48c977c0",
+    "relation": "liquidates_through",
+    "exposure_usd": 9921377.41264954,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca",
+    "target": "protocol:morpho-blue",
+    "relation": "runs_on",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca",
+    "target": "stable:0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "relation": "lends",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "vault:0xa0804346780b4c2e3be118ac957d1db82f9d7484",
+    "target": "lending:morpho:0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca",
+    "relation": "lends_into",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "oracle:0x217d6ddcdb95112c51657f6270e8c079cfdb51f0",
+    "target": "feed:0x77ee147391eac11c92817e771860ff4aad265d89",
+    "relation": "reads",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": "on-chain read"
+   },
+   {
+    "source": "lending:morpho:0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca",
+    "target": "oracle:0x217d6ddcdb95112c51657f6270e8c079cfdb51f0",
+    "relation": "priced_by",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64",
+    "target": "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+    "relation": "holds_as_collateral",
+    "exposure_usd": 136133913.96051887,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64",
+    "target": "amm:0x13285bcbc27f92b47b4edb99d744c07b48c977c0",
+    "relation": "liquidates_through",
+    "exposure_usd": 136133913.96051887,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64",
+    "target": "protocol:morpho-blue",
+    "relation": "runs_on",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64",
+    "target": "stable:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "relation": "lends",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "vault:0x62fe596d59fb077c2df736df212e0affb522dc78",
+    "target": "lending:morpho:0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64",
+    "relation": "lends_into",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "vault:0xbeefff209270748ddd194831b3fa287a5386f5bc",
+    "target": "lending:morpho:0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64",
+    "relation": "lends_into",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64",
+    "target": "oracle:0x217d6ddcdb95112c51657f6270e8c079cfdb51f0",
+    "relation": "priced_by",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094",
+    "target": "chain:1",
+    "relation": "settles_on",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094",
+    "target": "amm:0x9c560ebaf78e596cbcc27411d633a74d628dd7dc",
+    "relation": "exits_through",
+    "exposure_usd": 4769948.1121171275,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "amm:0x9c560ebaf78e596cbcc27411d633a74d628dd7dc",
+    "target": "protocol:pendle",
+    "relation": "runs_on",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094",
+    "target": "liquidity:pendle-limit-orders",
+    "relation": "exits_through",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": "Pendle swap quote used 8 limit-order fills on PT-sUSDe"
+   },
+   {
+    "source": "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094",
+    "target": "asset:1-0xa3931d71877c0e7a3148cb7eb4463524fec27fbd",
+    "relation": "redeems_into",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "issuer:sky-lending",
+    "target": "chain:1",
+    "relation": "settles_on",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": "DefiLlama"
+   },
+   {
+    "source": "asset:1-0xa3931d71877c0e7a3148cb7eb4463524fec27fbd",
+    "target": "issuer:sky-lending",
+    "relation": "issued_by",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": "Pendle market metadata"
+   },
+   {
+    "source": "lending:morpho:0x9a8dab6de1059e6dc66c34b358764b70effb289e514e237f3161ffb09eaaf24f",
+    "target": "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094",
+    "relation": "holds_as_collateral",
+    "exposure_usd": 3804638.2198038474,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x9a8dab6de1059e6dc66c34b358764b70effb289e514e237f3161ffb09eaaf24f",
+    "target": "amm:0x9c560ebaf78e596cbcc27411d633a74d628dd7dc",
+    "relation": "liquidates_through",
+    "exposure_usd": 3804638.2198038474,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x9a8dab6de1059e6dc66c34b358764b70effb289e514e237f3161ffb09eaaf24f",
+    "target": "protocol:morpho-blue",
+    "relation": "runs_on",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x9a8dab6de1059e6dc66c34b358764b70effb289e514e237f3161ffb09eaaf24f",
+    "target": "stable:0xdc035d45d973e3ec169d2276ddab16f1e407384f",
+    "relation": "lends",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "oracle:0xda5901ef31ecafa6561b2e56b4997fadd3db4646",
+    "target": "feed:0xd1264c014a912da0415a03df8580bb63add0e0a4",
+    "relation": "reads",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": "on-chain read"
+   },
+   {
+    "source": "lending:morpho:0x9a8dab6de1059e6dc66c34b358764b70effb289e514e237f3161ffb09eaaf24f",
+    "target": "oracle:0xda5901ef31ecafa6561b2e56b4997fadd3db4646",
+    "relation": "priced_by",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x22fe4c688161863c73571a2b8db65cc11a4a6bceee4f0dea4aa83e4b784f1bd9",
+    "target": "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094",
+    "relation": "holds_as_collateral",
+    "exposure_usd": 14921069.974330045,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x22fe4c688161863c73571a2b8db65cc11a4a6bceee4f0dea4aa83e4b784f1bd9",
+    "target": "amm:0x9c560ebaf78e596cbcc27411d633a74d628dd7dc",
+    "relation": "liquidates_through",
+    "exposure_usd": 14921069.974330045,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x22fe4c688161863c73571a2b8db65cc11a4a6bceee4f0dea4aa83e4b784f1bd9",
+    "target": "protocol:morpho-blue",
+    "relation": "runs_on",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x22fe4c688161863c73571a2b8db65cc11a4a6bceee4f0dea4aa83e4b784f1bd9",
+    "target": "stable:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48",
+    "relation": "lends",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "vault:0xbeefff209270748ddd194831b3fa287a5386f5bc",
+    "target": "lending:morpho:0x22fe4c688161863c73571a2b8db65cc11a4a6bceee4f0dea4aa83e4b784f1bd9",
+    "relation": "lends_into",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "oracle:0x3464a61a68c486241fe07201c913f055bdce35bf",
+    "target": "feed:0x16bdf4c1a1fbd0d3a181dcee4141bb106e22b002",
+    "relation": "primary_reads",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": "on-chain read"
+   },
+   {
+    "source": "oracle:0x3464a61a68c486241fe07201c913f055bdce35bf",
+    "target": "feed:0x16bdf4c1a1fbd0d3a181dcee4141bb106e22b002",
+    "relation": "backup_reads",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": "on-chain read"
+   },
+   {
+    "source": "oracle:0x3464a61a68c486241fe07201c913f055bdce35bf",
+    "target": "feed:0xff30586cd0f29ed462364c7e81375fc0c71219b1",
+    "relation": "backup_reads",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": "on-chain read"
+   },
+   {
+    "source": "lending:morpho:0x22fe4c688161863c73571a2b8db65cc11a4a6bceee4f0dea4aa83e4b784f1bd9",
+    "target": "oracle:0x3464a61a68c486241fe07201c913f055bdce35bf",
+    "relation": "priced_by",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x0367161b7cb23dfd03747dd3815d1c445b0437b648a6d50346249c6e7b92ff1b",
+    "target": "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094",
+    "relation": "holds_as_collateral",
+    "exposure_usd": 5091401.046213252,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x0367161b7cb23dfd03747dd3815d1c445b0437b648a6d50346249c6e7b92ff1b",
+    "target": "amm:0x9c560ebaf78e596cbcc27411d633a74d628dd7dc",
+    "relation": "liquidates_through",
+    "exposure_usd": 5091401.046213252,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x0367161b7cb23dfd03747dd3815d1c445b0437b648a6d50346249c6e7b92ff1b",
+    "target": "protocol:morpho-blue",
+    "relation": "runs_on",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x0367161b7cb23dfd03747dd3815d1c445b0437b648a6d50346249c6e7b92ff1b",
+    "target": "stable:0xdac17f958d2ee523a2206206994597c13d831ec7",
+    "relation": "lends",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "vault:0xa0804346780b4c2e3be118ac957d1db82f9d7484",
+    "target": "lending:morpho:0x0367161b7cb23dfd03747dd3815d1c445b0437b648a6d50346249c6e7b92ff1b",
+    "relation": "lends_into",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
+   },
+   {
+    "source": "lending:morpho:0x0367161b7cb23dfd03747dd3815d1c445b0437b648a6d50346249c6e7b92ff1b",
+    "target": "oracle:0x3464a61a68c486241fe07201c913f055bdce35bf",
+    "relation": "priced_by",
+    "exposure_usd": null,
+    "confidence": "measured",
+    "evidence": ""
    }
   ]
+ },
+ "shared": {
+  "protocol:pendle": [
+   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
+   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
+  ],
+  "stable:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": [
+   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
+   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
+  ],
+  "liquidity:pendle-limit-orders": [
+   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
+   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
+  ],
+  "chain:1": [
+   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
+   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
+  ],
+  "protocol:morpho-blue": [
+   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
+   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
+  ],
+  "vault:0xa0804346780b4c2e3be118ac957d1db82f9d7484": [
+   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
+  ],
+  "stable:0xdac17f958d2ee523a2206206994597c13d831ec7": [
+   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
+  ],
+  "vault:0xbeefff209270748ddd194831b3fa287a5386f5bc": [
+   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
+  ]
+ },
+ "exchange_hacks": {
+  "incidents": 9,
+  "exchange_years": 160.31506849314815,
+  "per_year": 0.05613945142271302,
+  "lo": 0.03384214439781857,
+  "hi": 0.09796469271250509
  }
 }
