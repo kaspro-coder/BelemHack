@@ -1,4 +1,5 @@
 """Build the dependency graph of a Pendle PT position from live public data."""
+from . import oracle as oracle_mod
 from . import sources
 from .graph import Graph, Node
 
@@ -103,7 +104,9 @@ def discover(name, expiry_prefix=None, chain_id=1):
         g.add_edge(lend, pos, "holds_as_collateral", st["collateralAssetsUsd"])
         g.add_edge(lend, amm, "liquidates_through", st["collateralAssetsUsd"])
         oracle = f"oracle:{m['oracle']['address'].lower()}"
-        g.add_node(Node(oracle, "oracle", m["oracle"]["address"], {"type": m["oracle"]["type"]}))
+        analysis = oracle_mod.analyse(m["oracle"]["address"])
+        g.add_node(Node(oracle, "oracle", m["oracle"]["address"],
+                        {"morpho_type": m["oracle"]["type"], **(analysis or {})}))
         g.add_edge(lend, oracle, "priced_by")
 
     return g
