@@ -21,7 +21,8 @@ BLOCK=${FORK_BLOCK:-$(cat sim/fork_block.txt)}
 
 if ! cast block-number --rpc-url $RPC >/dev/null 2>&1; then
   echo "starting anvil fork at block $BLOCK"
-  nohup anvil --fork-url "$FORK_RPC" --fork-block-number "$BLOCK" --port 8545 --silent --auto-impersonate > data/anvil.log 2>&1 &
+  # stay under Alchemy's free-tier throughput (300 compute units/s); Anvil retries what is throttled
+  nohup anvil --fork-url "$FORK_RPC" --fork-block-number "$BLOCK" --port 8545 --silent --auto-impersonate --compute-units-per-second ${CUPS:-250} > data/anvil.log 2>&1 &
   for _ in $(seq 1 60); do cast block-number --rpc-url $RPC >/dev/null 2>&1 && break; sleep 1; done
 fi
 echo "fork at block $(cast block-number --rpc-url $RPC)"
