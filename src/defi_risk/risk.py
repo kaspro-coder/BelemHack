@@ -14,8 +14,7 @@ from . import sources
 
 # ASSUMPTION: a depeg widens the PT discount: yield shock (annualised) = YIELD_SHOCK * d.
 YIELD_SHOCK = 5.0
-# ASSUMPTION: opportunity cost of cash if we exit (T-bill-like).
-ALT_YIELD = 0.04
+# Opportunity cost of cash if we exit: the measured US 3-month T-bill yield (Book.risk_free).
 # ASSUMPTION: P(permanent depeg >= d before expiry) = p3 * (0.03 / d) ** TAIL_ALPHA.
 # No permanent USDe depeg appears in 3 years of history, so this tail is a judgement.
 TAIL_ALPHA = 1.0
@@ -29,6 +28,7 @@ class Book:
     capacity_usd: float
     days_to_expiry: float
     implied_apy: float
+    risk_free: float
 
 
 def liquidated_collateral(positions, x):
@@ -75,10 +75,10 @@ def expected_loss(p3, sizes=SCENARIOS):
     return total
 
 
-def decide(book, size_usd, p3=0.01):
+def decide(book, size_usd, p3):
     T = book.days_to_expiry / 365
     exit_cost = book.curve.cost(size_usd)
-    excess_carry = (book.implied_apy - ALT_YIELD) * T
+    excess_carry = (book.implied_apy - book.risk_free) * T
     e_loss = expected_loss(p3)
     edge = excess_carry - e_loss + exit_cost  # >0 means staying beats exiting
     lo, hi = 0.0, 1.0  # break-even p3 by bisection (expected loss is increasing in p3)
@@ -107,3 +107,31 @@ def triggers(book):
         "largest_borrower_distance_to_liquidation": 1 - 1 / worst["healthFactor"],
         "largest_borrower_debt_usd": worst["state"]["borrowAssetsUsd"],
     }
+
+
+def market_implied_p3(book):
+    """Tail probability at which expected loss equals the excess yield the market pays.
+
+    It is an upper bound on what the market prices for this risk: the spread also pays
+    for liquidity and smart-contract risk.
+    """
+    carry = (book.implied_apy - book.risk_free) * book.days_to_expiry / 365
+    lo, hi = 0.0, 1.0
+    for _ in range(50):
+        mid = (lo + hi) / 2
+        lo, hi = (mid, hi) if expected_loss(mid) < carry else (lo, mid)
+    return lo
+
+
+def robust_decision(book, size_usd, estimate):
+    """Verdict from data only. STAY or EXIT only if the whole 90% range agrees."""
+    at = {k: decide(book, size_usd, estimate[k]) for k in ("lo", "p", "hi")}
+    verdicts = {v["verdict"] for v in at.values()}
+    if verdicts == {"STAY"}:
+        verdict = "STAY"
+    elif verdicts == {"EXIT"}:
+        verdict = "EXIT"
+    else:
+        verdict = "UNCLEAR"
+    return {"verdict": verdict, "central": at["p"]["verdict"], "at": at,
+            "market_p3": market_implied_p3(book)}

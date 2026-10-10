@@ -9,7 +9,7 @@ from dataclasses import asdict
 from datetime import datetime, timezone
 from pathlib import Path
 
-from . import risk, sources
+from . import cohort, risk, sources
 from .discover import discover
 from .report import build_book
 
@@ -21,6 +21,12 @@ def export(name="sUSDe", expiry="2026-11-26"):
     g = discover(name, expiry)
     book = build_book(name, expiry)
     history = [p for _, p in sources.usde_price_history()]
+    est = cohort.estimate_p3(book.days_to_expiry)
+    prices = cohort.load_prices()
+    tiers = []
+    for label, mc in (("all sizes", 0), ("> $10M", 1e7), ("> $100M", 1e8), ("> $1B", 1e9)):
+        t = cohort.base_rate(prices, 0.03, book.days_to_expiry, lambda m: m != "fiat-backed", mc)
+        tiers.append({"label": label, **{k: t[k] for k in ("coins", "episodes", "p", "lo", "hi")}})
     curve = [[s, book.curve.cost(s)] for s in CURVE_SIZES if s < book.capacity_usd]
     lending = next(n for n in g.nodes.values() if n.kind == "lending")
     oracle = next((n for n in g.nodes.values() if n.kind == "oracle" and "primary" in n.data), None)
@@ -31,8 +37,9 @@ def export(name="sUSDe", expiry="2026-11-26"):
         "capacity": book.capacity_usd,
         "curve": curve,
         "scenarios": [risk.scenario(book, d) for d in risk.SCENARIOS],
-        "params": {"yield_shock": risk.YIELD_SHOCK, "alt_yield": risk.ALT_YIELD,
-                   "tail_alpha": risk.TAIL_ALPHA, "sizes": list(risk.SCENARIOS), "p3": 0.01},
+        "params": {"yield_shock": risk.YIELD_SHOCK, "risk_free": book.risk_free,
+                   "tail_alpha": risk.TAIL_ALPHA, "sizes": list(risk.SCENARIOS)},
+        "estimate": est, "tiers": tiers, "market_p3": risk.market_implied_p3(book),
         "borrowers": sorted(
             ({"hf": p["healthFactor"], "debt": p["state"]["borrowAssetsUsd"],
               "coll": p["state"]["collateralUsd"]} for p in book.positions),

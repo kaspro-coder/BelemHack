@@ -35,6 +35,10 @@ h2 { font-size: 16px; margin: 0 0 4px; }
 .badge { border-radius: 10px; padding: 18px; text-align: center; }
 .badge.stay { background: var(--stay-bg); color: var(--stay); }
 .badge.exit { background: var(--exit-bg); color: var(--exit); }
+.badge.unclear { background: var(--warn-bg); color: var(--warn); }
+.badge .word.sm { font-size: 30px; }
+.rng { width: 100%; margin-top: 14px; font-size: 13px; }
+.rng td, .rng th { padding: 5px 8px; }
 .badge .word { font-size: 40px; font-weight: 700; letter-spacing: .02em; }
 .badge .edge { font-size: 13px; margin-top: 2px; }
 .nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
@@ -81,13 +85,12 @@ ul.lim li { margin: 4px 0; }
           <div class="num"><div class="v" id="n-carry">–</div><div class="l">carry given up by exiting</div></div>
           <div class="num"><div class="v" id="n-loss">–</div><div class="l">expected permanent loss if we stay</div></div>
         </div>
+        <table class="rng" id="rng"></table>
         <div class="sliders">
           <div class="sl"><label>Position size <b id="v-size"></b></label>
             <input id="size" type="range" min="100000" max="4000000" step="50000"><small>Exit cost comes from live Pendle quotes.</small></div>
-          <div class="sl"><label>P(permanent USDe depeg ≥ 3%) <b id="v-p3"></b></label>
-            <input id="p3" type="range" min="0" max="0.05" step="0.001"><small>Judgement, no history behind it.</small></div>
-          <div class="sl"><label>Cash yield if we exit <b id="v-alt"></b></label>
-            <input id="alt" type="range" min="0" max="0.08" step="0.0025"><small>Opportunity cost of leaving the position.</small></div>
+          <div class="sl"><label>What if I disagree? P(depeg ≥ 3%) <b id="v-p3"></b></label>
+            <input id="p3" type="range" min="0" max="0.05" step="0.001"><small id="whatif">Only a what-if. The verdict above does not use it.</small></div>
         </div>
         <div class="flip" id="flip"></div>
       </div>
@@ -161,20 +164,33 @@ function breakeven(carry, cost) {
   return lo;
 }
 
+function decideAt(p3, size) {
+  const T = D.position.days / 365, cost = exitCost(size);
+  const carry = (D.position.implied_apy - D.params.risk_free) * T, loss = expLoss(p3);
+  return { cost, carry, loss, edge: carry - loss + cost };
+}
 function renderVerdict() {
-  const size = +$("size").value, p3 = +$("p3").value, alt = +$("alt").value;
-  const T = D.position.days / 365;
-  const cost = exitCost(size), carry = (D.position.implied_apy - alt) * T, loss = expLoss(p3);
-  const edge = carry - loss + cost, stay = edge > 0;
-  $("v-size").textContent = usd(size); $("v-p3").textContent = pct(p3, 1); $("v-alt").textContent = pct(alt, 2);
-  $("word").textContent = stay ? "STAY" : "EXIT";
-  $("badge").className = "badge " + (stay ? "stay" : "exit");
-  $("edge").textContent = (stay ? "staying is better by " : "exiting is better by ") + pct(Math.abs(edge), 3);
-  $("n-exit").textContent = pct(cost, 3); $("n-carry").textContent = pct(carry, 3); $("n-loss").textContent = pct(loss, 3);
-  const be = breakeven(carry, cost);
-  $("flip").innerHTML = stay
-    ? `Flips to <b>EXIT</b> if you believe the chance of a permanent USDe depeg of 3% or more before expiry is above <b>${pct(be, 1)}</b>.`
-    : `Flips back to <b>STAY</b> if you believe that chance is below <b>${pct(be, 1)}</b>.`;
+  const size = +$("size").value, E = D.estimate;
+  const at = { lo: decideAt(E.lo, size), p: decideAt(E.p, size), hi: decideAt(E.hi, size) };
+  const vs = Object.values(at).map(a => a.edge > 0);
+  const v = vs.every(x => x) ? "STAY" : vs.every(x => !x) ? "EXIT" : "UNCLEAR";
+  $("v-size").textContent = usd(size);
+  $("word").textContent = v; $("word").className = "word" + (v === "UNCLEAR" ? " sm" : "");
+  $("badge").className = "badge " + v.toLowerCase();
+  $("edge").textContent = v === "UNCLEAR" ? "the data range does not agree" : "the whole data range agrees";
+  const c = at.p;
+  $("n-exit").textContent = pct(c.cost, 3); $("n-carry").textContent = pct(c.carry, 3); $("n-loss").textContent = pct(c.loss, 3);
+  let r = "<tr><th>Risk estimate (from data)</th><th>P(depeg ≥ 3%)</th><th>Verdict</th></tr>";
+  [["lo", "Low end"], ["p", "Central"], ["hi", "High end"]].forEach(([k, l]) =>
+    r += `<tr><td>${l}</td><td>${pct(E[k], 2)}</td><td><b style="color:var(--${at[k].edge > 0 ? "stay" : "exit"})">${at[k].edge > 0 ? "STAY" : "EXIT"}</b> (${at[k].edge > 0 ? "+" : ""}${pct(at[k].edge, 3)})</td></tr>`);
+  r += `<tr><td>The market's price of this risk (max)</td><td>${pct(D.market_p3, 2)}</td><td></td></tr>`;
+  $("rng").innerHTML = r;
+  $("flip").innerHTML = v === "UNCLEAR"
+    ? `The data cannot separate STAY from EXIT. Staying is fine at the central estimate but loses at the high end: <b>consider reducing the position</b> rather than choosing all-or-nothing.`
+    : `Risk estimated from ${E.coins} comparable stablecoins (${E.episodes} persistent depegs of 3% or more observed). No human input.`;
+  const w = +$("p3").value; $("v-p3").textContent = pct(w, 1);
+  const wi = decideAt(w, size);
+  $("whatif").textContent = `If you believed ${pct(w, 1)}: ${wi.edge > 0 ? "STAY" : "EXIT"}. Only a what-if; the verdict above does not use it.`;
 }
 
 const COL = { position: 0, amm: 1, asset: 1, lending: 1, chain: 2, issuer: 2, oracle: 2, perp_venue: 3, oes: 3, infra: 3 };
@@ -264,8 +280,9 @@ function renderScen() {
 function renderLimits() {
   const o = D.oracle, L = [
     `The cascade impact uses Pendle quotes taken in calm conditions. In a real stress the pool moves, so it is a minimum.`,
-    `Rate shock (${D.params.yield_shock}× the depeg, annualised), the cash yield and the depeg probability are judgements, not measurements.`,
-    `USDe history is daily: it misses depegs lasting hours on a single venue. It touched -1% in ${pct(D.wobble.d1, 1)} of past ${D.position.days}-day windows and never -3%.`,
+    `The rate shock (${D.params.yield_shock}× the depeg, annualised) and the tail shape are judgements. The depeg probability and the cash yield (T-bill ${pct(D.params.risk_free, 2)}) are measured.`,
+    `Depeg base rate: ${D.estimate.coins} non-fiat stablecoins above $100M today, weekly prices. Size is measured today, so survivors are over-represented and the true risk may be higher. Smaller coins (> $10M) show ${pct(D.tiers[1].p, 1)}.`,
+    `USDe's own price history is a daily sample: it misses depegs lasting hours and shifts by a few tenths of a percent depending on the sampling hour. Do not read much into small dips.`,
     `Only Bybit is confirmed by Ethena's docs as a hedging venue. Binance, OKX and Hyperliquid come from an undated third-party note, and no per-venue split is published.`,
     `Only the USDe depeg scenario is modelled. A frozen perp venue, an oracle failure and a smart-contract exploit are mapped but not yet priced.`,
   ];
@@ -277,8 +294,8 @@ fetch("data.json").then(r => r.json()).then(d => {
   D = d;
   $("title").textContent = `${d.position.name}  ·  expiry ${d.position.expiry}  ·  ${d.position.days} days`;
   $("asof").textContent = "Live data as of " + d.asof.replace("T", " ").slice(0, 16) + " UTC";
-  $("size").value = 1000000; $("p3").value = d.params.p3; $("alt").value = d.params.alt_yield;
-  ["size", "p3", "alt"].forEach(i => $(i).oninput = renderVerdict);
+  $("size").value = 1000000; $("p3").value = Math.min(0.05, d.estimate.p);
+  ["size", "p3"].forEach(i => $(i).oninput = renderVerdict);
   renderVerdict(); renderGraph(); renderCascade(); renderBorrowers(); renderScen(); renderLimits();
 }).catch(e => { document.body.insertAdjacentHTML("afterbegin", "<p style='padding:16px'>Could not load data.json. Run: python -m defi_risk.dashboard, then serve this folder (python -m http.server).</p>"); console.error(e); });
 </script>

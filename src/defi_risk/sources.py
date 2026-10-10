@@ -89,3 +89,12 @@ def usde_price_history(days=1100):
         for p in data["coins"][coin]["prices"]:
             pts[p["timestamp"]] = p["price"]
     return sorted(pts.items())
+
+
+def risk_free_rate():
+    """US 3-month T-bill yield (FRED DTB3), as a fraction. Latest non-empty daily value."""
+    req = urllib.request.Request("https://fred.stlouisfed.org/graph/fredgraph.csv?id=DTB3",
+                                 headers={"User-Agent": "defi-risk/0.1"})
+    with urllib.request.urlopen(req, timeout=60) as r:
+        rows = [l.split(",") for l in r.read().decode().strip().splitlines()[1:]]
+    return float([v for _, v in rows if v not in ("", ".")][-1]) / 100
