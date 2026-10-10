@@ -1,0 +1,47 @@
+{
+ "checked_at": "2026-10-10T21:13:51+00:00",
+ "signals": [
+  {
+   "name": "PT-sUSDe oracle deviation",
+   "level": "green",
+   "value": "0.040% (threshold 0.75%), USDe $0.9996",
+   "meaning": "Primary vs backup oracle. The backup reads Chainlink USDe/USD; the primary does not.",
+   "action": "No action."
+  },
+  {
+   "name": "PT-reUSD issuer share price",
+   "level": "green",
+   "value": "1.106151 (0.000% below the highest seen)",
+   "meaning": "re.xyz's own NAV feed, read by the SY exchange rate and passed to the oracle.",
+   "action": "No action."
+  },
+  {
+   "name": "PT-sUSDS lender concentration",
+   "level": "green",
+   "value": "Smokehouse USDT $4.26M in PT-sUSDS/USDT, utilisation 83.4%",
+   "meaning": "Same vault lends to PT-reUSD: a reUSD loss can trigger a run that drains this market.",
+   "action": "No action."
+  },
+  {
+   "name": "PT-sUSDe/USDC largest borrowers",
+   "level": "amber",
+   "value": "$2.94M debt 0.97% from liquidation",
+   "meaning": "Closest large borrower to liquidation: the first domino of a cascade.",
+   "action": "Small move can start liquidations."
+  },
+  {
+   "name": "PT-reUSD/USDC largest borrowers",
+   "level": "green",
+   "value": "$5.78M debt 2.91% from liquidation",
+   "meaning": "Closest large borrower to liquidation: the first domino of a cascade.",
+   "action": "No action."
+  },
+  {
+   "name": "PT-sUSDS/USDT largest borrowers",
+   "level": "green",
+   "value": "$0.14M debt 3.30% from liquidation",
+   "meaning": "Closest large borrower to liquidation: the first domino of a cascade.",
+   "action": "No action."
+  }
+ ]
+}

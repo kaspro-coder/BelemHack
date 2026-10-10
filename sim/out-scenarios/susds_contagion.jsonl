@@ -1,6 +1,6 @@
-{"step":"before","hours":0,"utilization":834241457905485544,"borrow_apr":42480135684576000,"liquidity":855214937754,"vault_assets":4260320493473,"pt_ln_implied_rate":47696007729584256}
-{"step":"vault_withdraws_all_it_can","hours":0,"utilization":1000000000000000000,"borrow_apr":179592058217088000,"liquidity":0,"vault_assets":3405188228094,"pt_ln_implied_rate":47696007729584256}
-{"step":"no_one_repays","hours":24,"utilization":1000000000000000000,"borrow_apr":205878754655424000,"liquidity":0,"vault_assets":3406984819955,"pt_ln_implied_rate":47696007729584256}
-{"step":"no_one_repays","hours":72,"utilization":1000000000000000000,"borrow_apr":270010624112064000,"liquidity":0,"vault_assets":3411411711811,"pt_ln_implied_rate":47696007729584256}
-{"step":"no_one_repays","hours":168,"utilization":1000000000000000000,"borrow_apr":467301896006976000,"liquidity":0,"vault_assets":3424949112526,"pt_ln_implied_rate":47696007729584256}
-{"step":"no_one_repays","hours":336,"utilization":1000000000000000000,"borrow_apr":1215985237611840000,"liquidity":0,"vault_assets":3477830296103,"pt_ln_implied_rate":47696007729584256}
+{"step":"before","hours":0,"utilization":834241457905485544,"borrow_apr":42474971601504000,"liquidity":855214937754,"vault_assets":4260320493473,"pt_ln_implied_rate":47696007729584256}
+{"step":"vault_withdraws_all_it_can","hours":0,"utilization":1000000000000000000,"borrow_apr":179548373793024000,"liquidity":0,"vault_assets":3405198270925,"pt_ln_implied_rate":47696007729584256}
+{"step":"no_one_repays","hours":24,"utilization":1000000000000000000,"borrow_apr":205828676118144000,"liquidity":0,"vault_assets":3406994430960,"pt_ln_implied_rate":47696007729584256}
+{"step":"no_one_repays","hours":72,"utilization":1000000000000000000,"borrow_apr":269944945977024000,"liquidity":0,"vault_assets":3411420257793,"pt_ln_implied_rate":47696007729584256}
+{"step":"no_one_repays","hours":168,"utilization":1000000000000000000,"borrow_apr":467188228153152000,"liquidity":0,"vault_assets":3424954393016,"pt_ln_implied_rate":47696007729584256}
+{"step":"no_one_repays","hours":336,"utilization":1000000000000000000,"borrow_apr":1215689457809664000,"liquidity":0,"vault_assets":3477822696364,"pt_ln_implied_rate":47696007729584256}

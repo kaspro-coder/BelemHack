@@ -29,7 +29,9 @@ h2 { font-size: 16px; margin: 0 0 4px; }
 h3 { font-size: 14px; margin: 14px 0 6px; }
 .sub, .lead { color: var(--muted); font-size: 13px; }
 .lead { margin: 0 0 14px; }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-top: 16px; }
+.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-top: 16px; overflow-x: auto; }
+@media (max-width: 600px) { .card { padding: 14px; } h1 { font-size: 19px; } }
+#livetable td, #livetable th { text-align: left; }
 .tabs { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
 .tab { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 7px 16px; font: inherit; cursor: pointer; }
 .tab.on { background: var(--accent); border-color: var(--accent); color: #fff; }
@@ -70,6 +72,12 @@ pre { background: var(--bg); border-radius: 8px; padding: 10px 12px; font-size: 
 <div class="wrap">
   <h1>DeFi Risk Dependency: stay or exit, simulated on the real contracts</h1>
   <div class="sub" id="sub"></div>
+
+  <section class="card" id="live" style="display:none">
+    <h2>Live signals on mainnet</h2>
+    <p class="lead" id="livelead"></p>
+    <table id="livetable"></table>
+  </section>
 
   <div class="tabs" id="tabs"></div>
 
@@ -237,7 +245,9 @@ function renderExtra(p) {
   } else {
     h += `<h2>Panic in the PT-reUSD market</h2><p class="lead">The oracle reads a 15-minute TWAP of this very pool, so a dump does reach it. The pool's 96% PT cap bounds how far the TWAP can fall.</p><table><tr><th>PT dumped</th><th>Oracle low</th><th>Fall</th><th>Liquidated</th><th>Implied APY after</th><th>Fund exit</th></tr>`;
     p.pt_panic.forEach(r => h += `<tr><td>${num(r.dump_pt)}</td><td>${r.oracle_low.toFixed(4)}</td><td>${pct(1 - r.oracle_low / r.oracle_start)}</td><td>${r.liquidated}</td><td>${pct(r.apy_after)}</td><td>${r.fund_exit ? usd(r.fund_exit) : "stuck"}</td></tr>`);
-    h += `</table><p class="sub">Market panic alone moves the oracle by at most ~1.5%: borrowers' buffers absorb it. The dangerous path is the issuer's own NAV, above.</p>`;
+    const big = p.pt_panic.filter(r => r.liquidated > 0 && r.fund_exit === 0);
+    h += `</table><p class="sub">The pool cap bounds the TWAP fall to about ${pct(Math.max(...p.pt_panic.map(r => 1 - r.oracle_low / r.oracle_start)), 1)}. ` +
+      (big.length ? `On this block that is enough to liquidate a borrower sitting just above the line: from a ${num(big[0].dump_pt)} PT dump the cascade leaves the fund unable to sell.` : "Borrowers' buffers absorb it; the dangerous path is the issuer's own NAV, above.") + `</p>`;
   }
   $("extra").innerHTML = h;
 }
@@ -298,6 +308,17 @@ function renderContagion() {
   $("crun").innerHTML = t;
 }
 
+function renderLive() {
+  fetch("status.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(st => {
+    if (!st) return;
+    $("live").style.display = "";
+    $("livelead").textContent = `Read-only checks of the signals the simulations identified. Checked ${st.checked_at.replace("T", " ").slice(0, 19)} UTC (python -m defi_risk.watch).`;
+    const col = { green: "stay", amber: "warn", red: "exit", unknown: "muted" };
+    $("livetable").innerHTML = "<tr><th>Signal</th><th>Now</th><th>Action</th></tr>" + st.signals.map(x =>
+      `<tr><td><span class="sw" style="background:var(--${col[x.level]})"></span>${x.name}</td><td>${x.value}</td><td>${x.action}</td></tr>`).join("");
+  }).catch(() => {});
+}
+
 function renderLimits() {
   $("limits").innerHTML = [
     "Liquidators are assumed to liquidate and sell at once into the Pendle pool. A real liquidator that cannot sell would stop: the stuck PT would then show up as bad debt for the lenders rather than as unsold collateral. The risk moves, it does not vanish.",
@@ -316,7 +337,7 @@ fetch("data.json").then(r => r.json()).then(d => {
   $("blk").textContent = d.fork_block;
   $("tabs").innerHTML = d.positions.map((p, i) => `<button class="tab" data-i="${i}">${p.name}</button>`).join("");
   document.querySelectorAll(".tab").forEach(t => t.onclick = () => { cur = +t.dataset.i; renderPosition(); });
-  renderPosition(); renderGraph(); renderContagion(); renderLimits();
+  renderPosition(); renderGraph(); renderContagion(); renderLimits(); renderLive(); setInterval(renderLive, 60000);
 }).catch(e => { document.body.insertAdjacentHTML("afterbegin", "<p style='padding:16px'>Could not load data.json. Run python -m defi_risk.dashboard, then serve this folder.</p>"); console.error(e); });
 </script>
 </body>
