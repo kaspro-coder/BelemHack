@@ -34,7 +34,8 @@ contract ReUsdCascade is ScenarioBase {
         _row(string.concat(
             "{", _kv("oracle_price", oraclePrice(USDC_MARKET)), ",", _kv("unhealthy", countUnhealthy()), ",",
             _kv("ln_implied_rate", lnImpliedRate()), ",", _kv("sy_rate", sy.exchangeRate()), ",",
-            _kv("borrowers_usdc", borrowersOf[USDC_MARKET].length), ",", _kv("borrowers_usdt", borrowersOf[USDT_MARKET].length), "}"
+            _kv("borrowers_usdc", borrowersOf[USDC_MARKET].length), ",", _kv("borrowers_usdt", borrowersOf[USDT_MARKET].length), ",",
+            _kv("timestamp", vm.getBlockTimestamp()), ",", _kv("expiry", PENDLE.expiry()), "}"
         ));
         uint256[6] memory sizes = [uint256(500_000), 1_000_000, 2_000_000, 5_000_000, 10_000_000, 20_000_000];
         for (uint256 i; i < sizes.length; i++) sizes[i] *= ptUnit;
