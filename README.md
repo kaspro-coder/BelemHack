@@ -18,3 +18,17 @@ PT-sUSDe-26NOV2026 (Pendle, Ethereum).
 - Pendle API: https://api-v2.pendle.finance
 - DefiLlama: https://api.llama.fi
 - Morpho GraphQL: https://blue-api.morpho.org/graphql
+
+## Run it
+```
+cd src
+python -m defi_risk                       # dependency graph in the terminal
+python -m defi_risk.report sUSDe 2026-11-26 1000000   # scenarios + stay/exit verdict
+python -m defi_risk.dashboard             # refresh dashboard/data.json from live data
+cd ../dashboard && python -m http.server 8765         # then open http://localhost:8765
+```
+Python 3.10+, standard library only. `dashboard/data.json` is a committed snapshot so the page works offline.
+
+## Honest limits
+Judgement inputs (rate shock, cash yield, tail probability) are marked ASSUMPTION in `src/defi_risk/risk.py`.
+Cascade impact uses calm-market Pendle quotes, so it is a lower bound. Only the USDe depeg scenario is priced.

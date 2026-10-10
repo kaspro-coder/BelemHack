@@ -59,4 +59,5 @@ def main():
           f"{t['largest_borrower_distance_to_liquidation']:.2%} from liquidation")
 
 
-main()
+if __name__ == "__main__":
+    main()
