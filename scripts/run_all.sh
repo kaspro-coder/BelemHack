@@ -11,14 +11,14 @@ if [ "${1:-}" = "--fresh" ]; then
   echo $(( $(cast block-number --rpc-url "$ETH_RPC_URL") - 5 )) > sim/fork_block.txt
   cp sim/fork_block.txt data/fork_block.txt
   python sim/gen_borrowers.py
-  pkill -f "anvil --fork-url" 2>/dev/null || taskkill //IM anvil.exe //F >/dev/null 2>&1 || true
+  taskkill //IM anvil.exe //F >/dev/null 2>&1 || pkill -f "anvil --fork-url" 2>/dev/null || true
   sleep 1
 fi
 BLOCK=${FORK_BLOCK:-$(cat sim/fork_block.txt)}
 
 if ! cast block-number --rpc-url $RPC >/dev/null 2>&1; then
   echo "starting anvil fork at block $BLOCK"
-  anvil --fork-url "$ETH_RPC_URL" --fork-block-number "$BLOCK" --port 8545 --silent --auto-impersonate > data/anvil.log 2>&1 &
+  nohup anvil --fork-url "$ETH_RPC_URL" --fork-block-number "$BLOCK" --port 8545 --silent --auto-impersonate > data/anvil.log 2>&1 &
   for _ in $(seq 1 60); do cast block-number --rpc-url $RPC >/dev/null 2>&1 && break; sleep 1; done
 fi
 echo "fork at block $(cast block-number --rpc-url $RPC)"
