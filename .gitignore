@@ -5,3 +5,8 @@
 data/*.json
 .idea/
 .vscode/
+sim/out/
+sim/cache/
+data/anvil.log
+data/src_oracle/
+data/fork_block.txt

@@ -1,0 +1,4 @@
+{"hours_depegged":6,"switched":false,"liquidated":0,"seized_pt":0,"bad_debt_usdc":0}
+{"hours_depegged":12,"switched":false,"liquidated":0,"seized_pt":0,"bad_debt_usdc":0}
+{"hours_depegged":15,"switched":false,"liquidated":0,"seized_pt":0,"bad_debt_usdc":0}
+{"hours_depegged":24,"switched":true,"liquidated":3,"seized_pt":3293421965495791530813704,"bad_debt_usdc":0}

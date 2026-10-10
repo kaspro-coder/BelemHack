@@ -1,0 +1,12 @@
+[profile.default]
+src = "src"
+test = "test"
+libs = ["lib"]
+solc_version = "0.8.26"
+evm_version = "cancun"
+optimizer = true
+via_ir = true
+fs_permissions = [{ access = "read-write", path = "./out-scenarios" }]
+
+[rpc_endpoints]
+fork = "http://127.0.0.1:8545"
