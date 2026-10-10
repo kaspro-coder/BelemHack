@@ -42,8 +42,7 @@ SEL = {"getDeviation": "89ab3532", "deviationThreshold": "d94ad837", "isChalleng
 
 
 def _call(to, sel):
-    r = sources._request(sources.rpc_url(), {"jsonrpc": "2.0", "id": 1, "method": "eth_call",
-                                             "params": [{"to": to, "data": "0x" + sel}, "latest"]})
+    r = sources.live_call(to, "0x" + sel)
     if "result" not in r:
         raise RuntimeError(f"eth_call {to} {sel}: {r.get('error')}")
     return r["result"]

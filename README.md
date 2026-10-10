@@ -69,7 +69,8 @@ cd src && python -m unittest -v      # 19 tests: base rates, Poisson intervals, 
 ## Reproduce
 
 Requirements: Python 3.10+ (standard library only), Foundry 1.8.x, an Ethereum RPC URL that serves historical
-state (an Alchemy key works) in `.env` as `ETH_RPC_URL=...`.
+state (an Alchemy key works) in `.env` as `ETH_RPC_URL=...`. Only forking uses it; live reads (watcher, discovery)
+go to a public node first. A fresh fork plus a full run costs a lot of RPC credits: avoid repeated `--fresh` runs.
 
 ```bash
 bash scripts/run_all.sh          # fork at sim/fork_block.txt, scenarios, report, dashboard data

@@ -21,6 +21,22 @@ def rpc_url():
     return "https://ethereum-rpc.publicnode.com"
 
 
+PUBLIC_RPC = "https://ethereum-rpc.publicnode.com"
+
+
+def live_call(to, data):
+    """eth_call at the latest block. A public node serves recent state, so the paid RPC
+    (needed for forks of older blocks) is only a fallback here."""
+    body = {"jsonrpc": "2.0", "id": 1, "method": "eth_call", "params": [{"to": to, "data": data}, "latest"]}
+    try:
+        r = _request(PUBLIC_RPC, body)
+        if "result" in r or (r.get("error") or {}).get("code") == 3:  # 3 = the call itself reverted
+            return r
+    except Exception:
+        pass
+    return _request(rpc_url(), body)
+
+
 def _request(url, body=None):
     data = json.dumps(body).encode() if body is not None else None
     headers = {"Content-Type": "application/json", "User-Agent": "defi-risk/0.1"}

@@ -25,8 +25,7 @@ FEEDS = ("BASE_FEED_1", "BASE_FEED_2", "QUOTE_FEED_1", "QUOTE_FEED_2")
 
 
 def _call(to, sel):
-    r = sources._request(sources.rpc_url(), {"jsonrpc": "2.0", "id": 1, "method": "eth_call",
-                                             "params": [{"to": to, "data": "0x" + sel}, "latest"]})
+    r = sources.live_call(to, "0x" + sel)
     return r.get("result")
 
 
