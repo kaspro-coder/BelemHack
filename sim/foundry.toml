@@ -6,6 +6,7 @@ solc_version = "0.8.26"
 evm_version = "cancun"
 optimizer = true
 via_ir = true
+gas_limit = "18446744073709551615"
 fs_permissions = [{ access = "read-write", path = "./out-scenarios" }]
 
 [rpc_endpoints]

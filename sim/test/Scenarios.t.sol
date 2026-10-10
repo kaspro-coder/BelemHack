@@ -7,30 +7,52 @@ import "./ScenarioBase.sol";
 /// Run: forge test --fork-url http://127.0.0.1:8545 -vv
 /// Each test writes out-scenarios/<name>.json for the Python decision layer.
 contract Scenarios is ScenarioBase {
+    bytes32 constant MARKET_ID = 0x5613b170ded221c588b6e9637b910f49e5508680ceede207f44aa72e5c46cb05;
+    IMetaOracle constant ORACLE = IMetaOracle(0xF8b29e7E9c00CE531434775f7923CC9fbCa01b08);
+    address constant USDE_FEED = 0xa569d910839Ae8865Da8F8e70FfFb0cBA869F961;
     uint256 constant FUND_PT = 1_000_000e18; // the fund's position, ~ $0.99M
-    string out; // current output file; rows go straight to disk so state reverts cannot erase them
     uint256 T0;
 
-    function setUp() public override {
-        super.setUp();
+    function setUp() public {
+        setPool(0x47ad2Cd1DD15739A7a035b9d3B7828d916FEF77E);
+        addMarket(MARKET_ID, Borrowers.sUSDe_USDC());
         T0 = vm.getBlockTimestamp();
     }
 
-    function _open(string memory name) internal {
-        out = string.concat("out-scenarios/", name, ".jsonl");
-        vm.writeFile(out, "");
+    /// Current USDe/USD answer of the real Chainlink feed (8 decimals), unless mocked.
+    function usdePrice() internal view returns (uint256) {
+        (, int256 answer,,,) = IAggregator(USDE_FEED).latestRoundData();
+        return uint256(answer);
     }
 
-    function _row(string memory r) internal {
-        vm.writeLine(out, r);
+    /// Makes the Chainlink USDe/USD feed report `price8` (8 decimals).
+    function setUsdePrice(uint256 price8) internal {
+        vm.mockCall(
+            USDE_FEED,
+            abi.encodeWithSelector(IAggregator.latestRoundData.selector),
+            abi.encode(uint80(1), int256(price8), vm.getBlockTimestamp(), vm.getBlockTimestamp(), uint80(1))
+        );
     }
 
-    function _kv(string memory k, uint256 v) internal pure returns (string memory) {
-        return string.concat('"', k, '":', vm.toString(v));
+    /// Runs the permissionless challenge and, after the timelock, accepts it.
+    function challengeAndSwitch() internal returns (bool switched) {
+        if (!ORACLE.isPrimary() || !ORACLE.isDeviant()) return false;
+        ORACLE.challenge();
+        vm.warp(vm.getBlockTimestamp() + ORACLE.challengeTimelockDuration() + 1);
+        try ORACLE.acceptChallenge() {
+            switched = true;
+        } catch {}
     }
 
-    function _kb(string memory k, bool v) internal pure returns (string memory) {
-        return string.concat('"', k, '":', v ? "true" : "false");
+    /// USD value (6 decimals) of `syAmount` SY, at the current USDe/USD price.
+    function syToUsd(uint256 syAmount) internal view returns (uint256) {
+        return syAmount * sy.exchangeRate() / WAD * usdePrice() / 1e8 / 1e12;
+    }
+
+    /// What the fund would actually receive (USD, 6 decimals) for selling `ptAmount` now.
+    function exitValue(uint256 ptAmount) internal returns (uint256 usd, uint256 unsold) {
+        (uint256 syOut, uint256 u) = exitSy(ptAmount);
+        return (syToUsd(syOut), u);
     }
 
     /// Calm market: oracle state and the real cost of exiting at several sizes.
@@ -80,7 +102,7 @@ contract Scenarios is ScenarioBase {
                 _kv("oracle_t0", priceT0), ",", _kv("oracle_t1", priceT1), ",",
                 _kv("unhealthy_t0", unhealthyT0), ",", _kv("unhealthy_t1", unhealthyT1), ",",
                 _kv("liquidated", L.count), ",", _kv("liq_failed", L.failed), ",", _kv("seized_pt", L.seizedPt), ",",
-                _kv("repaid_usdc", L.repaidUsdc), ",", _kv("bad_debt_usdc", L.badDebtUsdc), ",",
+                _kv("repaid_usdc", L.repaid), ",", _kv("bad_debt_usdc", L.badDebt), ",",
                 _kv("sold_pt", s.soldPt), ",", _kv("unsold_pt", s.unsoldPt), ",",
                 _kv("ln_implied_rate_after", lnImpliedRate()), ",",
                 _kv("fund_exit_calm", calmExit), ",", _kv("fund_exit_t0", exitT0), ",",
@@ -112,7 +134,7 @@ contract Scenarios is ScenarioBase {
             Liquidations memory L = switched ? liquidateAll() : Liquidations(0, 0, 0, 0, 0);
             _row(string.concat(
                 "{", _kv("hours_depegged", hoursDown[i]), ",", _kb("switched", switched), ",",
-                _kv("liquidated", L.count), ",", _kv("seized_pt", L.seizedPt), ",", _kv("bad_debt_usdc", L.badDebtUsdc), "}"
+                _kv("liquidated", L.count), ",", _kv("seized_pt", L.seizedPt), ",", _kv("bad_debt_usdc", L.badDebt), "}"
             ));
             vm.revertToState(snap);
             vm.clearMockedCalls();
@@ -159,8 +181,8 @@ contract Scenarios is ScenarioBase {
             (uint256 exitAfter,) = exitValue(FUND_PT);
             _row(string.concat(
                 "{", _kv("wrong_price", wrong[i]), ",", _kb("switched", switched), ",", _kv("liquidated", L.count), ",",
-                _kv("seized_pt", L.seizedPt), ",", _kv("repaid_usdc", L.repaidUsdc), ",",
-                _kv("bad_debt_usdc", L.badDebtUsdc), ",", _kv("sold_pt", s.soldPt), ",",
+                _kv("seized_pt", L.seizedPt), ",", _kv("repaid_usdc", L.repaid), ",",
+                _kv("bad_debt_usdc", L.badDebt), ",", _kv("sold_pt", s.soldPt), ",",
                 _kv("unsold_pt", s.unsoldPt), ",", _kv("fund_exit_after", exitAfter), "}"
             ));
             vm.revertToState(snap);
