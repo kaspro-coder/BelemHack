@@ -78,16 +78,20 @@ def _poisson_cdf(k, lam):
 
 
 def poisson_ci(k, alpha=0.1):
-    """Exact (Garwood) interval for a Poisson count, 90% by default."""
-    def solve(target, increasing):
+    """Exact (Garwood) interval for a Poisson count, 90% by default.
+
+    Lower bound: P(X >= k | lo) = alpha/2, i.e. cdf(k-1, lo) = 1 - alpha/2.
+    Upper bound: P(X <= k | hi) = alpha/2, i.e. cdf(k, hi) = alpha/2.
+    """
+    def solve(target, increasing, k=k):
         lo, hi = 0.0, k + 10 * math.sqrt(k + 1) + 20
         for _ in range(80):
             mid = (lo + hi) / 2
             v = _poisson_cdf(k, mid)
             (lo, hi) = (mid, hi) if (v > target) == increasing else (lo, mid)
         return lo
-    low = 0.0 if k == 0 else solve(1 - alpha / 2, True)
-    high = solve(alpha / 2, True)
+    low = 0.0 if k == 0 else solve(1 - alpha / 2, True, k - 1)
+    high = solve(alpha / 2, True, k)
     return low, high
 
 
@@ -97,6 +101,8 @@ def base_rate(cohort, d, window_days, mechanism_filter=None, min_circulating=0):
              and c.get("circulating", 0) >= min_circulating]
     n_ep = sum(episodes(c["prices"], d) for c in coins)
     exposure = sum(len(c["prices"]) for c in coins) * PERIOD_DAYS / window_days  # independent windows
+    if exposure == 0:
+        return {"coins": len(coins), "episodes": 0, "windows": 0, "p": 0.0, "lo": 0.0, "hi": float("nan")}
     lo, hi = poisson_ci(n_ep)
     return {"coins": len(coins), "episodes": n_ep, "windows": exposure,
             "p": n_ep / exposure, "lo": lo / exposure, "hi": hi / exposure}

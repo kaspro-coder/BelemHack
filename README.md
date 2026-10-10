@@ -15,7 +15,7 @@ and turns the measured impact into a **stay / exit / unclear** verdict with an a
 | Exit window once the signal fires | **16 h** | **15 min** (must be automated) | **16 h** |
 | Verdict for 1M PT | UNCLEAR (probability range straddles the threshold) | STAY (carry dominates across the range) | UNCLEAR |
 
-Book of 1M PT in each pocket: **8.5%** chance at least one pocket becomes unsellable before expiry (range 5.2% to 14.9%),
+Book of 1M PT in each pocket: **8.5%** chance at least one pocket becomes unsellable before expiry (range 4.4% to 14.9%),
 with one contagion path where two pockets that share no issuer fall together.
 
 Other results replayed on the fork:
@@ -51,6 +51,12 @@ src/defi_risk/
   portfolio.py            book view: which event hits which pocket, with contagion
   watch.py                live signals from mainnet (oracle deviation, issuer share price, vault, whales)
 dashboard/index.html      the demo page
+```
+
+## Tests
+
+```bash
+cd src && python -m unittest -v      # 19 tests: base rates, Poisson intervals, expected loss, decision, graph walks, fork outputs
 ```
 
 ## Reproduce
