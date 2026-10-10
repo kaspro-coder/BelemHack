@@ -80,8 +80,8 @@
    ]
   },
   {
-   "node": "apxUSD",
-   "kind": "stablecoin",
+   "node": "APXUSD / USD Exchange Rate",
+   "kind": "price_feed",
    "positions": 2,
    "collateral_behind_usd": 19557960.115483373,
    "names": [
@@ -90,8 +90,8 @@
    ]
   },
   {
-   "node": "APXUSD / USD Exchange Rate",
-   "kind": "price_feed",
+   "node": "apxUSD",
+   "kind": "stablecoin",
    "positions": 2,
    "collateral_behind_usd": 19557960.115483373,
    "names": [
