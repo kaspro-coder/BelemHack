@@ -16,6 +16,8 @@ class Edge:
     target: str  # what it depends on
     relation: str
     exposure_usd: float | None = None
+    confidence: str = "measured"  # measured (live data) | documented (official docs) | unverified
+    evidence: str = ""
 
 
 @dataclass
@@ -26,8 +28,8 @@ class Graph:
     def add_node(self, node):
         self.nodes.setdefault(node.id, node)
 
-    def add_edge(self, source, target, relation, exposure_usd=None):
-        self.edges.append(Edge(source, target, relation, exposure_usd))
+    def add_edge(self, source, target, relation, exposure_usd=None, confidence="measured", src=""):
+        self.edges.append(Edge(source, target, relation, exposure_usd, confidence, src))
 
     def dependencies_of(self, node_id):
         return [e for e in self.edges if e.source == node_id]

@@ -22,6 +22,34 @@ def find_market(name, expiry_prefix=None, chain_id=1):
     return max(candidates, key=lambda m: m["details"]["liquidity"])
 
 
+DOCS = "docs.ethena.fi hedging-system/managing-risk-from-dependencies"
+# Ethena names Bybit as an example CeFi venue. Binance/OKX come from a third-party
+# research note of unknown date, so they are kept at lower confidence. No per-venue
+# split is published, so we do not invent exposure numbers.
+HEDGE_VENUES = {"Bybit": "documented", "Binance": "unverified", "OKX": "unverified",
+                "Hyperliquid": "unverified"}
+DOCUMENTED_INFRA = [
+    ("oes:copper", "oes", "Copper (off-exchange settlement)"),
+    ("feed:pyth", "oracle", "Pyth (Ethena hedging price feed)"),
+    ("feed:redstone", "oracle", "Redstone (Ethena hedging price feed)"),
+    ("infra:aws", "infra", "AWS (hedging system hosting)"),
+]
+
+
+def _add_ethena_hedge(g, issuer):
+    supply = sources.usde_supply_usd()
+    funding = sources.eth_funding_annualized()
+    g.nodes[issuer].data["usde_supply_usd"] = supply
+    for venue, conf in HEDGE_VENUES.items():
+        vid = f"venue:{venue.lower()}"
+        g.add_node(Node(vid, "perp_venue", venue, {"eth_funding_annualized": funding.get(venue)}))
+        g.add_edge(issuer, vid, "hedges_short_perps_on", confidence=conf,
+                   src=DOCS if conf == "documented" else "third-party note (4pillars), undated")
+    for nid, kind, label in DOCUMENTED_INFRA:
+        g.add_node(Node(nid, kind, label))
+        g.add_edge(issuer, nid, "depends_on", confidence="documented", src=DOCS)
+
+
 def discover(name, expiry_prefix=None, chain_id=1):
     market = find_market(name, expiry_prefix, chain_id)
     data = sources.pendle_market_data(market["address"], chain_id)
@@ -57,8 +85,10 @@ def discover(name, expiry_prefix=None, chain_id=1):
         g.add_node(Node(issuer, "issuer", label, {
             "tvl_by_chain": proto.get("currentChainTvls", {}),
         }))
-        g.add_edge(asset, issuer, "issued_by")
-        g.add_edge(issuer, chain, "settles_on")
+        g.add_edge(asset, issuer, "issued_by", src="manual mapping + DefiLlama")
+        g.add_edge(issuer, chain, "settles_on", src="DefiLlama")
+        if slug == "ethena":
+            _add_ethena_hedge(g, issuer)
 
     for m in sources.morpho_markets_by_collateral(pt, chain_id):
         lend = f"lending:morpho:{m['marketId']}"

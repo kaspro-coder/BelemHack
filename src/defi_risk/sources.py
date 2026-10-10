@@ -31,6 +31,28 @@ def llama_hacks():
     return _request(f"{LLAMA}/hacks")
 
 
+def usde_supply_usd():
+    for a in _request("https://stablecoins.llama.fi/stablecoins?includePrices=true")["peggedAssets"]:
+        if a["symbol"] == "USDe":
+            return a["circulating"]["peggedUSD"]
+
+
+def eth_funding_annualized():
+    """Current ETH perp funding per venue, annualized (positive = longs pay shorts)."""
+    out = {}
+    hl = _request("https://api.hyperliquid.xyz/info", {"type": "metaAndAssetCtxs"})
+    for u, c in zip(hl[0]["universe"], hl[1]):
+        if u["name"] == "ETH":
+            out["Hyperliquid"] = float(c["funding"]) * 24 * 365
+    r = _request("https://api.bybit.com/v5/market/funding/history?category=linear&symbol=ETHUSDT&limit=1")
+    out["Bybit"] = float(r["result"]["list"][0]["fundingRate"]) * 3 * 365
+    r = _request("https://www.okx.com/api/v5/public/funding-rate?instId=ETH-USDT-SWAP")
+    out["OKX"] = float(r["data"][0]["fundingRate"]) * 3 * 365
+    r = _request("https://fapi.binance.com/fapi/v1/premiumIndex?symbol=ETHUSDT")
+    out["Binance"] = float(r["lastFundingRate"]) * 3 * 365
+    return out
+
+
 def morpho_markets_by_collateral(token_address, chain_id=1):
     query = (
         '{ markets(first: 50, where: { collateralAssetAddress_in: ["%s"], chainId_in: [%d] }) '

@@ -17,7 +17,7 @@ def main():
     print()
     for e in g.edges:
         exp = f"  (${e.exposure_usd:,.0f})" if e.exposure_usd else ""
-        print(f"{g.nodes[e.source].label}  --{e.relation}-->  {g.nodes[e.target].label}{exp}")
+        print(f"{g.nodes[e.source].label}  --{e.relation}-->  {g.nodes[e.target].label}{exp}  [{e.confidence}]")
 
 
 main()
