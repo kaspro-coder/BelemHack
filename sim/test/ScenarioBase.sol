@@ -103,11 +103,13 @@ abstract contract ScenarioBase is Test {
         uint256 repaid; // loan-token units, all loan tokens here have 6 decimals
         uint256 badDebt;
         uint256 failed;
+        uint256[] badDebtByMarket; // same order as marketIds
     }
 
     /// Liquidates every unhealthy borrower in every market: full repayment when the collateral
     /// covers it, otherwise seizes all collateral and lets Morpho realise the bad debt.
     function liquidateAll() internal returns (Liquidations memory L) {
+        L.badDebtByMarket = new uint256[](marketIds.length);
         for (uint256 m; m < marketIds.length; m++) {
             bytes32 id = marketIds[m];
             MarketParams memory p = paramsOf[id];
@@ -116,7 +118,9 @@ abstract contract ScenarioBase is Test {
             address[] storage bs = borrowersOf[id];
             for (uint256 i; i < bs.length; i++) {
                 if (healthFactor(id, bs[i]) >= WAD) continue;
+                uint256 before = L.badDebt;
                 _liquidate(id, p, bs[i], lif, L);
+                L.badDebtByMarket[m] += L.badDebt - before;
             }
         }
     }

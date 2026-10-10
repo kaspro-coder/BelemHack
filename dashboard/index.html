@@ -123,6 +123,21 @@ pre { background: var(--bg); border-radius: 8px; padding: 10px 12px; font-size: 
   </section>
 
   <section class="card">
+    <h2>Contagion between tokens that share nothing directly</h2>
+    <p class="lead" id="clead"></p>
+    <div class="two">
+      <div>
+        <h3>The path</h3>
+        <ol class="lim" id="cpath" style="color:var(--ink)"></ol>
+      </div>
+      <div>
+        <h3>Vault run replayed on the PT-sUSDS/USDT market</h3>
+        <table id="crun"></table>
+      </div>
+    </div>
+  </section>
+
+  <section class="card">
     <h2>How this was produced</h2>
     <p class="lead">An Anvil fork of Ethereum mainnet, pinned at one block. Each scenario starts from the real state, forces one event with Foundry cheatcodes (mocked feed, issuer write-down, whale dump, time warp), lets the real Morpho, Pendle and oracle contracts react, measures, then reverts.</p>
     <pre>anvil --fork-url $ETH_RPC_URL --fork-block-number <span id="blk"></span>
@@ -264,6 +279,25 @@ function showNode(id) {
   $("detail").innerHTML = `<b>${n.label}</b> (${n.kind})${sh}<br>${kv.join(" · ")}${out.length ? "<br>" + out.join("<br>") : ""}`;
 }
 
+function renderContagion() {
+  const c = D.contagion, path = c.paths[0];
+  if (!path) { $("clead").textContent = "No vault lends to two of the positions."; return; }
+  const re = path.legs.find(l => l.position.startsWith("PT-reUSD")), su = path.legs.find(l => l.position.startsWith("PT-sUSDS"));
+  const bd = c.reusd_bad_debt["0.2"], run = c.vault_run, before = run[0], after = run[1], week = run.find(r => r.hours === 168);
+  const loss = bd.usdt * re.share_of_market_supply;
+  $("clead").textContent = `${path.vault} (${usd(path.total_assets_usd)}) lends to both PT-reUSD and PT-sUSDS markets. Found by the dependency map, then replayed on the fork.`;
+  $("cpath").innerHTML = [
+    `re.xyz writes reUSD down 20%. On the fork, the PT-reUSD/USDT market ends with <b>${usd(bd.usdt)}</b> of bad debt.`,
+    `${path.vault} supplies <b>${pct(re.share_of_market_supply, 1)}</b> of that market, so it absorbs about <b>${usd(loss)}</b> (${pct(loss / path.total_assets_usd, 2)} of the vault).`,
+    `Depositors run. The vault pulls its ${usd(su.usd)} out of PT-sUSDS/USDT, where it is <b>${pct(su.share_of_market_supply, 1)}</b> of the lenders.`,
+    `Only ${usd(before.liquidity)} is available: <b>${usd(after.vault_locked)}</b> stays locked and utilisation hits ${pct(after.utilization, 0)}.`,
+    `PT-sUSDS borrowers earn ${pct(before.pt_apy)} on their PT but now pay <b>${pct(after.borrow_apr, 1)}</b>, then ${pct(week.borrow_apr, 1)} a week later. They have to sell PT-sUSDS.`,
+  ].map(x => `<li>${x}</li>`).join("");
+  let t = "<tr><th>Moment</th><th>Utilisation</th><th>Borrow APR</th><th>Vault funds locked</th></tr>";
+  run.forEach(r => t += `<tr class="${r.utilization > 0.99 ? "bad" : ""}"><td>${r.step === "before" ? "before" : r.hours ? "+" + r.hours + " h, no repayment" : "vault withdraws"}</td><td>${pct(r.utilization, 0)}</td><td>${pct(r.borrow_apr, 1)}</td><td>${r.step === "before" ? "-" : usd(r.vault_locked)}</td></tr>`);
+  $("crun").innerHTML = t;
+}
+
 function renderLimits() {
   $("limits").innerHTML = [
     "Liquidators are assumed to liquidate and sell at once into the Pendle pool. A real liquidator that cannot sell would stop: the stuck PT would then show up as bad debt for the lenders rather than as unsold collateral. The risk moves, it does not vanish.",
@@ -271,7 +305,8 @@ function renderLimits() {
     "The pool is simulated without Pendle's off-chain limit orders (they cannot exist on a fork). Live quotes use them and look cheaper; in a crisis market makers can pull them.",
     "Probabilities come from 17 non-fiat stablecoins above $100M (2 persistent depegs of 3%+). For PT-reUSD the same cohort is a proxy for an issuer write-down. Size is measured today, so survivors are over-represented.",
     "Borrower lists come from Morpho's API at generation time and the fork is pinned a few hours earlier: a borrower who opened in between is missing.",
-    "PT-sUSDS is mapped but not simulated.",
+    "PT-sUSDS is simulated only through the contagion path (vault run); its own depeg and market scenarios are not.",
+    "The vault run assumes depositors withdraw everything the market lets them. Borrowers who repay or get liquidated would reduce the rate spike over time.",
   ].map(x => `<li>${x}</li>`).join("");
 }
 
@@ -281,7 +316,7 @@ fetch("data.json").then(r => r.json()).then(d => {
   $("blk").textContent = d.fork_block;
   $("tabs").innerHTML = d.positions.map((p, i) => `<button class="tab" data-i="${i}">${p.name}</button>`).join("");
   document.querySelectorAll(".tab").forEach(t => t.onclick = () => { cur = +t.dataset.i; renderPosition(); });
-  renderPosition(); renderGraph(); renderLimits();
+  renderPosition(); renderGraph(); renderContagion(); renderLimits();
 }).catch(e => { document.body.insertAdjacentHTML("afterbegin", "<p style='padding:16px'>Could not load data.json. Run python -m defi_risk.dashboard, then serve this folder.</p>"); console.error(e); });
 </script>
 </body>

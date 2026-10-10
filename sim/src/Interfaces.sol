@@ -75,3 +75,21 @@ interface IPendleMarket {
 interface ISY {
     function exchangeRate() external view returns (uint256);
 }
+
+struct Market {
+    uint128 totalSupplyAssets;
+    uint128 totalSupplyShares;
+    uint128 totalBorrowAssets;
+    uint128 totalBorrowShares;
+    uint128 lastUpdate;
+    uint128 fee;
+}
+
+interface IIrm {
+    function borrowRateView(MarketParams memory params, Market memory market) external view returns (uint256);
+}
+
+interface IMorphoWithdraw {
+    function withdraw(MarketParams memory params, uint256 assets, uint256 shares, address onBehalf, address receiver)
+        external returns (uint256, uint256);
+}

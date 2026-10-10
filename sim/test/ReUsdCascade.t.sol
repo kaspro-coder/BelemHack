@@ -57,7 +57,7 @@ contract ReUsdCascade is ScenarioBase {
             address whale = address(uint160(0xD0D0 + i));
             deal(address(PT), whale, shocks[i]);
             Sale memory first = sellPt(whale, shocks[i]);
-            _round(shocks[i], 0, first.soldPt, first.unsoldPt, Liquidations(0, 0, 0, 0, 0), calmSy);
+            _round(shocks[i], 0, first.soldPt, first.unsoldPt, _noLiq(), calmSy);
             for (uint256 r = 1; r <= MAX_ROUNDS; r++) {
                 vm.warp(vm.getBlockTimestamp() + TWAP_WAIT);
                 Liquidations memory L = liquidateAll();
@@ -90,7 +90,7 @@ contract ReUsdCascade is ScenarioBase {
         for (uint256 i; i < cuts.length; i++) {
             uint256 snap = vm.snapshotState();
             _writeDown(cuts[i]);
-            _round(cuts[i], 0, 0, 0, Liquidations(0, 0, 0, 0, 0), calmSy);
+            _round(cuts[i], 0, 0, 0, _noLiq(), calmSy);
             for (uint256 r = 1; r <= MAX_ROUNDS; r++) {
                 vm.warp(vm.getBlockTimestamp() + TWAP_WAIT);
                 Liquidations memory L = liquidateAll();
@@ -105,6 +105,10 @@ contract ReUsdCascade is ScenarioBase {
         }
     }
 
+    function _noLiq() internal view returns (Liquidations memory L) {
+        L.badDebtByMarket = new uint256[](marketIds.length);
+    }
+
     function _round(uint256 shock, uint256 round, uint256 sold, uint256 unsold, Liquidations memory L, uint256 calmSy) internal {
         (uint256 fundSy, uint256 fundUnsold) = exitSy(_fundPt());
         _row(string.concat(
@@ -112,6 +116,7 @@ contract ReUsdCascade is ScenarioBase {
             _kv("oracle_price", oraclePrice(USDC_MARKET)), ",", _kv("unhealthy_after", countUnhealthy()), ",",
             _kv("liquidated", L.count), ",", _kv("liq_failed", L.failed), ",", _kv("seized_pt", L.seizedPt), ",",
             _kv("repaid", L.repaid), ",", _kv("bad_debt", L.badDebt), ",",
+            _kv("bad_debt_usdc_mkt", L.badDebtByMarket[0]), ",", _kv("bad_debt_usdt_mkt", L.badDebtByMarket[1]), ",",
             _kv("sold_pt", sold), ",", _kv("unsold_pt", unsold), ",", _kv("ln_implied_rate", lnImpliedRate()), ",",
             _kv("fund_exit_calm", _assetValue(calmSy)), ",", _kv("fund_exit", _assetValue(fundSy)), ",",
             _kv("fund_unsold", fundUnsold), "}"

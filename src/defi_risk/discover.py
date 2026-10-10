@@ -100,10 +100,24 @@ def _add_lending(g, m, pos, amm):
     g.add_node(Node(loan, "stablecoin", m["loanAsset"]["symbol"]))
     g.add_edge(lend, loan, "lends")
 
+    # Morpho lists every vault allowed to supply; keep only those with money actually in.
+    market_supply = st["supplyAssetsUsd"] or 0
     for v in m.get("supplyingVaults") or []:
+        vault = sources.morpho_vault(v["address"])
+        alloc = next((a["supplyAssetsUsd"] or 0 for a in vault["state"]["allocation"]
+                      if a["market"]["marketId"] == m["marketId"]), 0)
+        if alloc < 10_000:
+            continue
         vid = f"vault:{v['address'].lower()}"
-        g.add_node(Node(vid, "vault", v["name"]))
-        g.add_edge(vid, lend, "lends_into")
+        if vid not in g.nodes:
+            g.add_node(Node(vid, "vault", v["name"], {"total_assets_usd": vault["state"]["totalAssetsUsd"],
+                                                      "allocations": {}}))
+        g.nodes[vid].data["allocations"][m["marketId"]] = {
+            "market": g.nodes[lend].label, "usd": alloc,
+            "share_of_vault": alloc / (vault["state"]["totalAssetsUsd"] or 1),
+            "share_of_market_supply": alloc / market_supply if market_supply else None,
+        }
+        g.add_edge(vid, lend, "lends_into", alloc, src="Morpho vault allocation")
 
     oid = f"oracle:{m['oracle']['address'].lower()}"
     if oid not in g.nodes:
@@ -188,6 +202,22 @@ def reach(g, start):
                 seen.add(nxt)
                 todo.append(nxt)
     return seen - {start}
+
+
+def contagion_paths(g):
+    """Vaults that lend into the lending markets of two or more positions.
+
+    A loss in one market hits the vault's depositors; if they withdraw, the vault pulls
+    its supply from the other markets, which can drain their liquidity.
+    """
+    owner = {e.source: e.target for e in g.edges if e.relation == "holds_as_collateral"}
+    out = []
+    for v in (n for n in g.nodes.values() if n.kind == "vault"):
+        legs = [{"market_id": mid, "position": g.nodes[owner[f"lending:morpho:{mid}"]].label, **a}
+                for mid, a in v.data["allocations"].items() if f"lending:morpho:{mid}" in owner]
+        if len({l["position"] for l in legs}) > 1:
+            out.append({"vault": v.label, "total_assets_usd": v.data["total_assets_usd"], "legs": legs})
+    return out
 
 
 def shared_dependencies(g):

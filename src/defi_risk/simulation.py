@@ -107,6 +107,23 @@ def reusd():
     }
 
 
+def contagion():
+    """Smokehouse USDT run on the PT-sUSDS/USDT market (sim/test/SusdsContagion.t.sol)."""
+    return [{"step": r["step"], "hours": r["hours"], "utilization": r["utilization"] / 1e18,
+             "borrow_apr": r["borrow_apr"] / 1e18, "liquidity": r["liquidity"] / 1e6,
+             "vault_locked": r["vault_assets"] / 1e6, "pt_apy": _apy(r["pt_ln_implied_rate"])}
+            for r in load("susds_contagion")]
+
+
+def reusd_bad_debt_by_market():
+    out = {}
+    for bps, rounds in groupby(load("reusd_writedown"), key=lambda r: r["shock_pt"]):
+        rounds = list(rounds)
+        out[bps / 1e4] = {"usdc": sum(r["bad_debt_usdc_mkt"] for r in rounds) / 1e6,
+                          "usdt": sum(r["bad_debt_usdt_mkt"] for r in rounds) / 1e6}
+    return out
+
+
 def probabilities(days):
     """P(persistent depeg >= d within the holding window) per severity, with 90% ranges."""
     prices = cohort.load_prices()

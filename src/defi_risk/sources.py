@@ -41,6 +41,18 @@ def llama_protocol(slug):
     return _request(f"{LLAMA}/protocol/{slug}")
 
 
+_VAULTS = {}
+
+
+def morpho_vault(address, chain_id=1):
+    """A MetaMorpho vault's total assets and its current allocation per market (cached)."""
+    if address not in _VAULTS:
+        q = ('{ vaultByAddress(address: "%s", chainId: %d) { name state { totalAssetsUsd '
+             'allocation { supplyAssetsUsd market { marketId } } } } }') % (address, chain_id)
+        _VAULTS[address] = _request(MORPHO, {"query": q})["data"]["vaultByAddress"]
+    return _VAULTS[address]
+
+
 def pendle_market_info(market, chain_id=1):
     return _request(f"{PENDLE}/core/v1/{chain_id}/markets/{market}")
 

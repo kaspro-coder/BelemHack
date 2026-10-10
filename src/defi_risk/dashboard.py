@@ -11,7 +11,7 @@ from datetime import datetime, timezone
 from pathlib import Path
 
 from . import simulation, venues
-from .discover import discover_many, shared_dependencies
+from .discover import contagion_paths, discover_many, shared_dependencies
 
 ROOT = Path(__file__).resolve().parents[2]
 OUT = ROOT / "dashboard" / "data.json"
@@ -33,6 +33,8 @@ def export():
         "positions": positions,
         "graph": {"nodes": [asdict(n) for n in g.nodes.values()], "edges": [asdict(e) for e in g.edges]},
         "shared": shared,
+        "contagion": {"paths": contagion_paths(g), "vault_run": simulation.contagion(),
+                      "reusd_bad_debt": {f"{k:g}": v for k, v in simulation.reusd_bad_debt_by_market().items()}},
         "exchange_hacks": {k: hack[k] for k in ("incidents", "exchange_years", "per_year", "lo", "hi")},
     }
 

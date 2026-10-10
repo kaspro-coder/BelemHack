@@ -55,6 +55,10 @@ contract Scenarios is ScenarioBase {
         return (syToUsd(syOut), u);
     }
 
+    function _noLiq() internal view returns (Liquidations memory L) {
+        L.badDebtByMarket = new uint256[](marketIds.length);
+    }
+
     /// Calm market: oracle state and the real cost of exiting at several sizes.
     function test_baseline() public {
         _open("baseline");
@@ -131,7 +135,7 @@ contract Scenarios is ScenarioBase {
             try ORACLE.acceptChallenge() {
                 switched = true;
             } catch {}
-            Liquidations memory L = switched ? liquidateAll() : Liquidations(0, 0, 0, 0, 0);
+            Liquidations memory L = switched ? liquidateAll() : _noLiq();
             _row(string.concat(
                 "{", _kv("hours_depegged", hoursDown[i]), ",", _kb("switched", switched), ",",
                 _kv("liquidated", L.count), ",", _kv("seized_pt", L.seizedPt), ",", _kv("bad_debt_usdc", L.badDebt), "}"

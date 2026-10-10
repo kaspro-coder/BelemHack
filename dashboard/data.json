@@ -1,5 +1,5 @@
 {
- "asof": "2026-10-10T20:57+00:00",
+ "asof": "2026-10-10T21:02+00:00",
  "fork_block": 26164460,
  "fund_pt": 1000000,
  "positions": [
@@ -673,11 +673,11 @@
     "kind": "amm",
     "label": "Pendle pool PT-sUSDe",
     "data": {
-     "liquidity_usd": 3820216.535709728,
+     "liquidity_usd": 3820178.2975778836,
      "total_pt": 971271.206194636,
      "total_sy": 2282035.210152903,
-     "pt_discount": 0.006160115251368281,
-     "implied_apy": 0.05011036183614048,
+     "pt_discount": 0.006159652980463726,
+     "implied_apy": 0.050110361848748175,
      "volume_24h_usd": 24825.257592986363
     }
    },
@@ -698,7 +698,7 @@
     "kind": "asset",
     "label": "sUSDe",
     "data": {
-     "underlying_apy": 0.049453086541446645
+     "underlying_apy": 0.04945266872056853
     }
    },
    {
@@ -727,7 +727,7 @@
     "kind": "perp_venue",
     "label": "Binance",
     "data": {
-     "eth_funding_annualized": -0.08401935
+     "eth_funding_annualized": -0.08666925
     }
    },
    {
@@ -735,7 +735,7 @@
     "kind": "perp_venue",
     "label": "OKX",
     "data": {
-     "eth_funding_annualized": -0.019228445419503
+     "eth_funding_annualized": -0.020498642356788
     }
    },
    {
@@ -743,7 +743,7 @@
     "kind": "perp_venue",
     "label": "Hyperliquid",
     "data": {
-     "eth_funding_annualized": -0.00646488
+     "eth_funding_annualized": -0.183825972
     }
    },
    {
@@ -777,7 +777,7 @@
     "data": {
      "lltv": 0.915,
      "collateral_usd": 7928071.030568014,
-     "borrow_usd": 6992158.683550345,
+     "borrow_usd": 6992177.882267708,
      "utilization": 0.9014638924910489,
      "market_id": "0x5613b170ded221c588b6e9637b910f49e5508680ceede207f44aa72e5c46cb05"
     }
@@ -806,9 +806,9 @@
      "backup": "0xe2f4cfe07aecd7fd8fb0d293a22cde7d08175465",
      "active": "primary",
      "challenged": false,
-     "price": 0.9924174866818873,
-     "primary_price": 0.9924174866818873,
-     "backup_price": 0.9920173637996069,
+     "price": 0.9924181259512938,
+     "primary_price": 0.9924181259512938,
+     "backup_price": 0.9920180028112727,
      "deviation": 0.000403342619677401,
      "threshold": 0.0075,
      "timelock_hours": 16.0,
@@ -861,11 +861,11 @@
     "kind": "amm",
     "label": "Pendle pool PT-reUSD",
     "data": {
-     "liquidity_usd": 12413497.097106474,
+     "liquidity_usd": 12413388.337256188,
      "total_pt": 5486330.506571,
      "total_sy": 6350029.110724229,
-     "pt_discount": 0.01817722219597706,
-     "implied_apy": 0.11779677699962243,
+     "pt_discount": 0.01817618209741456,
+     "implied_apy": 0.11779677701761249,
      "volume_24h_usd": 3747160.6116350563
     }
    },
@@ -893,7 +893,7 @@
     "data": {
      "lltv": 0.915,
      "collateral_usd": 9921377.41264954,
-     "borrow_usd": 8379207.149247675,
+     "borrow_usd": 8379229.951956615,
      "utilization": 0.7392494148892805,
      "market_id": "0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca"
     }
@@ -908,7 +908,23 @@
     "id": "vault:0xa0804346780b4c2e3be118ac957d1db82f9d7484",
     "kind": "vault",
     "label": "Smokehouse USDT",
-    "data": {}
+    "data": {
+     "total_assets_usd": 21619974.673303552,
+     "allocations": {
+      "0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca": {
+       "market": "Morpho PT-reUSD-10DEC2026/USDT",
+       "usd": 4324237.36576186,
+       "share_of_vault": 0.20001121329255991,
+       "share_of_market_supply": 0.3815016368819628
+      },
+      "0x0367161b7cb23dfd03747dd3815d1c445b0437b648a6d50346249c6e7b92ff1b": {
+       "market": "Morpho PT-sUSDS-26NOV2026/USDT",
+       "usd": 4257076.448241772,
+       "share_of_vault": 0.1969047842363308,
+       "share_of_market_supply": 0.8257420657762695
+      }
+     }
+    }
    },
    {
     "id": "oracle:0x217d6ddcdb95112c51657f6270e8c079cfdb51f0",
@@ -918,7 +934,7 @@
      "address": "0x217d6DdCDB95112C51657F6270e8C079CFDB51f0",
      "morpho_type": "ChainlinkOracleV2",
      "pattern": "MorphoChainlinkOracleV2",
-     "price": 0.9818228610118673,
+     "price": 0.9818240259224303,
      "market_sensitive": true,
      "reads": [
       "Ojo PT Feed Pendle Chainlink-compatible Oracle"
@@ -942,22 +958,26 @@
     "data": {
      "lltv": 0.915,
      "collateral_usd": 136133913.96051887,
-     "borrow_usd": 106835881.16553,
-     "utilization": 0.8867327942943339,
+     "borrow_usd": 106841277.14061703,
+     "utilization": 0.886774379609855,
      "market_id": "0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64"
     }
-   },
-   {
-    "id": "vault:0x62fe596d59fb077c2df736df212e0affb522dc78",
-    "kind": "vault",
-    "label": "Clearstar USDC Reactor",
-    "data": {}
    },
    {
     "id": "vault:0xbeefff209270748ddd194831b3fa287a5386f5bc",
     "kind": "vault",
     "label": "Smokehouse USDC",
-    "data": {}
+    "data": {
+     "total_assets_usd": 12745998.120885758,
+     "allocations": {
+      "0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64": {
+       "market": "Morpho PT-reUSD-10DEC2026/USDC",
+       "usd": 3186526.5202759304,
+       "share_of_vault": 0.25000211753165463,
+       "share_of_market_supply": 0.02644792493830834
+      }
+     }
+    }
    },
    {
     "id": "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094",
@@ -973,11 +993,11 @@
     "kind": "amm",
     "label": "Pendle pool PT-sUSDS",
     "data": {
-     "liquidity_usd": 4769948.1121171275,
+     "liquidity_usd": 4769902.156564385,
      "total_pt": 1041762.9048571691,
      "total_sy": 3357490.6810856718,
-     "pt_discount": 0.006009500145989555,
-     "implied_apy": 0.04885192720868137,
+     "pt_discount": 0.006009049143427481,
+     "implied_apy": 0.04885192722096532,
      "volume_24h_usd": 2095382.544424371
     }
    },
@@ -986,7 +1006,7 @@
     "kind": "asset",
     "label": "sUSDS",
     "data": {
-     "underlying_apy": 0.036903159718435274
+     "underlying_apy": 0.036904151690002385
     }
    },
    {
@@ -1027,7 +1047,7 @@
      "address": "0xda5901EF31ecAFa6561B2e56B4997FAdd3dB4646",
      "morpho_type": "ChainlinkOracleV2",
      "pattern": "MorphoChainlinkOracleV2",
-     "price": 0.9873624778031456,
+     "price": 0.9873635432521563,
      "market_sensitive": false,
      "reads": [
       "Linear discount 10.0%/yr to maturity (ignores the market)"
@@ -1053,7 +1073,7 @@
     "data": {
      "lltv": 0.915,
      "collateral_usd": 14921069.974330045,
-     "borrow_usd": 12680772.762870353,
+     "borrow_usd": 12680807.581097918,
      "utilization": 0.8895133494575413,
      "market_id": "0x22fe4c688161863c73571a2b8db65cc11a4a6bceee4f0dea4aa83e4b784f1bd9"
     }
@@ -1070,9 +1090,9 @@
      "backup": "0x77ae9b629096d0ae0206878b163cca232276c88e",
      "active": "primary",
      "challenged": false,
-     "price": 0.9835712211440893,
-     "primary_price": 0.9835712211440893,
-     "backup_price": 0.983451333647944,
+     "price": 0.9835726062278032,
+     "primary_price": 0.9835726062278032,
+     "backup_price": 0.98345271856283,
      "deviation": 0.000121904858983261,
      "threshold": 0.0075,
      "timelock_hours": 16.0,
@@ -1116,7 +1136,7 @@
     "data": {
      "lltv": 0.915,
      "collateral_usd": 5091401.046213252,
-     "borrow_usd": 4300897.802709099,
+     "borrow_usd": 4300909.506933499,
      "utilization": 0.8342443327365794,
      "market_id": "0x0367161b7cb23dfd03747dd3815d1c445b0437b648a6d50346249c6e7b92ff1b"
     }
@@ -1135,7 +1155,7 @@
     "source": "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
     "target": "amm:0x47ad2cd1dd15739a7a035b9d3b7828d916fef77e",
     "relation": "exits_through",
-    "exposure_usd": 3820216.535709728,
+    "exposure_usd": 3820178.2975778836,
     "confidence": "measured",
     "evidence": ""
    },
@@ -1319,7 +1339,7 @@
     "source": "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
     "target": "amm:0x13285bcbc27f92b47b4edb99d744c07b48c977c0",
     "relation": "exits_through",
-    "exposure_usd": 12413497.097106474,
+    "exposure_usd": 12413388.337256188,
     "confidence": "measured",
     "evidence": ""
    },
@@ -1399,9 +1419,9 @@
     "source": "vault:0xa0804346780b4c2e3be118ac957d1db82f9d7484",
     "target": "lending:morpho:0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca",
     "relation": "lends_into",
-    "exposure_usd": null,
+    "exposure_usd": 4324237.36576186,
     "confidence": "measured",
-    "evidence": ""
+    "evidence": "Morpho vault allocation"
    },
    {
     "source": "oracle:0x217d6ddcdb95112c51657f6270e8c079cfdb51f0",
@@ -1452,20 +1472,12 @@
     "evidence": ""
    },
    {
-    "source": "vault:0x62fe596d59fb077c2df736df212e0affb522dc78",
-    "target": "lending:morpho:0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64",
-    "relation": "lends_into",
-    "exposure_usd": null,
-    "confidence": "measured",
-    "evidence": ""
-   },
-   {
     "source": "vault:0xbeefff209270748ddd194831b3fa287a5386f5bc",
     "target": "lending:morpho:0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64",
     "relation": "lends_into",
-    "exposure_usd": null,
+    "exposure_usd": 3186526.5202759304,
     "confidence": "measured",
-    "evidence": ""
+    "evidence": "Morpho vault allocation"
    },
    {
     "source": "lending:morpho:0x1e9d614631a7df0ec07fb05b2c8cb2491575fd1a63a33bf187a6afb295a4fc64",
@@ -1487,7 +1499,7 @@
     "source": "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094",
     "target": "amm:0x9c560ebaf78e596cbcc27411d633a74d628dd7dc",
     "relation": "exits_through",
-    "exposure_usd": 4769948.1121171275,
+    "exposure_usd": 4769902.156564385,
     "confidence": "measured",
     "evidence": ""
    },
@@ -1612,14 +1624,6 @@
     "evidence": ""
    },
    {
-    "source": "vault:0xbeefff209270748ddd194831b3fa287a5386f5bc",
-    "target": "lending:morpho:0x22fe4c688161863c73571a2b8db65cc11a4a6bceee4f0dea4aa83e4b784f1bd9",
-    "relation": "lends_into",
-    "exposure_usd": null,
-    "confidence": "measured",
-    "evidence": ""
-   },
-   {
     "source": "oracle:0x3464a61a68c486241fe07201c913f055bdce35bf",
     "target": "feed:0x16bdf4c1a1fbd0d3a181dcee4141bb106e22b002",
     "relation": "primary_reads",
@@ -1687,9 +1691,9 @@
     "source": "vault:0xa0804346780b4c2e3be118ac957d1db82f9d7484",
     "target": "lending:morpho:0x0367161b7cb23dfd03747dd3815d1c445b0437b648a6d50346249c6e7b92ff1b",
     "relation": "lends_into",
-    "exposure_usd": null,
+    "exposure_usd": 4257076.448241772,
     "confidence": "measured",
-    "evidence": ""
+    "evidence": "Morpho vault allocation"
    },
    {
     "source": "lending:morpho:0x0367161b7cb23dfd03747dd3815d1c445b0437b648a6d50346249c6e7b92ff1b",
@@ -1702,12 +1706,7 @@
   ]
  },
  "shared": {
-  "protocol:pendle": [
-   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
-   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
-   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
-  ],
-  "stable:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": [
+  "protocol:morpho-blue": [
    "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
@@ -1717,12 +1716,17 @@
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
   ],
-  "chain:1": [
+  "stable:0xa0b86991c6218b36c1d19d4a2e9eb0ce3606eb48": [
    "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
   ],
-  "protocol:morpho-blue": [
+  "protocol:pendle": [
+   "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
+   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
+   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
+  ],
+  "chain:1": [
    "pt:0xb195b618ea52b77cb2a58846f452f59f8dfa9390",
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
@@ -1734,11 +1738,119 @@
   "stable:0xdac17f958d2ee523a2206206994597c13d831ec7": [
    "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
    "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
-  ],
-  "vault:0xbeefff209270748ddd194831b3fa287a5386f5bc": [
-   "pt:0xecfafdc7741323a945a163ed068b5a3c43483957",
-   "pt:0xdc169abe56461a2e0c034da431ac2a3ebf596094"
   ]
+ },
+ "contagion": {
+  "paths": [
+   {
+    "vault": "Smokehouse USDT",
+    "total_assets_usd": 21619974.673303552,
+    "legs": [
+     {
+      "market_id": "0x6acd18854e43f93f5a90446004c35c72a68af1ad99f08cb247782ce6457914ca",
+      "position": "PT-reUSD (2026-12-10)",
+      "market": "Morpho PT-reUSD-10DEC2026/USDT",
+      "usd": 4324237.36576186,
+      "share_of_vault": 0.20001121329255991,
+      "share_of_market_supply": 0.3815016368819628
+     },
+     {
+      "market_id": "0x0367161b7cb23dfd03747dd3815d1c445b0437b648a6d50346249c6e7b92ff1b",
+      "position": "PT-sUSDS (2026-11-26)",
+      "market": "Morpho PT-sUSDS-26NOV2026/USDT",
+      "usd": 4257076.448241772,
+      "share_of_vault": 0.1969047842363308,
+      "share_of_market_supply": 0.8257420657762695
+     }
+    ]
+   }
+  ],
+  "vault_run": [
+   {
+    "step": "before",
+    "hours": 0,
+    "utilization": 0.8342414579054855,
+    "borrow_apr": 0.042480135684576,
+    "liquidity": 855214.937754,
+    "vault_locked": 4260320.493473,
+    "pt_apy": 0.04885176402760538
+   },
+   {
+    "step": "vault_withdraws_all_it_can",
+    "hours": 0,
+    "utilization": 1.0,
+    "borrow_apr": 0.179592058217088,
+    "liquidity": 0.0,
+    "vault_locked": 3405188.228094,
+    "pt_apy": 0.04885176402760538
+   },
+   {
+    "step": "no_one_repays",
+    "hours": 24,
+    "utilization": 1.0,
+    "borrow_apr": 0.205878754655424,
+    "liquidity": 0.0,
+    "vault_locked": 3406984.819955,
+    "pt_apy": 0.04885176402760538
+   },
+   {
+    "step": "no_one_repays",
+    "hours": 72,
+    "utilization": 1.0,
+    "borrow_apr": 0.270010624112064,
+    "liquidity": 0.0,
+    "vault_locked": 3411411.711811,
+    "pt_apy": 0.04885176402760538
+   },
+   {
+    "step": "no_one_repays",
+    "hours": 168,
+    "utilization": 1.0,
+    "borrow_apr": 0.467301896006976,
+    "liquidity": 0.0,
+    "vault_locked": 3424949.112526,
+    "pt_apy": 0.04885176402760538
+   },
+   {
+    "step": "no_one_repays",
+    "hours": 336,
+    "utilization": 1.0,
+    "borrow_apr": 1.21598523761184,
+    "liquidity": 0.0,
+    "vault_locked": 3477830.296103,
+    "pt_apy": 0.04885176402760538
+   }
+  ],
+  "reusd_bad_debt": {
+   "0.01": {
+    "usdc": 0.0,
+    "usdt": 0.0
+   },
+   "0.02": {
+    "usdc": 0.0,
+    "usdt": 0.0
+   },
+   "0.03": {
+    "usdc": 0.0,
+    "usdt": 0.0
+   },
+   "0.05": {
+    "usdc": 0.0,
+    "usdt": 0.0
+   },
+   "0.07": {
+    "usdc": 54.83101,
+    "usdt": 0.0
+   },
+   "0.1": {
+    "usdc": 346203.285485,
+    "usdt": 11501.364852
+   },
+   "0.2": {
+    "usdc": 8071942.812952,
+    "usdt": 718149.356411
+   }
+  }
  },
  "exchange_hacks": {
   "incidents": 9,
