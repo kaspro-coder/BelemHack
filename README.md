@@ -74,6 +74,41 @@ dashboard/index.html      the demo page
 cd src && python -m unittest -v      # 19 tests: base rates, Poisson intervals, expected loss, decision, graph walks, fork outputs
 ```
 
+## Map any PT live
+
+The same discovery runs on a PT nobody prepared, in about 5 seconds, printed along the brief's five layers.
+In a PowerShell terminal:
+
+```powershell
+cd C:\Users\Abdel\defi-risk\src
+```
+
+```powershell
+python -m defi_risk.map USD3 2026-12-17
+```
+
+What appears (abridged):
+
+```
+PT-USD3 (2026-12-17): 13 dependencies and 14 links found in 4.2 s
+
+Layer 4 · PT market (where you exit)
+   - Pendle pool PT-USD3  (liquidity $7.2M, implied APY 15.05%)
+Layer 2 · Yield source & issuer
+   - 3Jane  (TVL $12.8M)
+Layer 5 · Lending markets (hold the PT, can force-sell it)
+   - Morpho PT-USD3-17DEC2026/USDC  (collateral $31.3M, borrowed $23.5M, utilisation 84%)
+   - Yearn OG USDC  (lends 13% of Morpho PT-USD3-17DEC2026/USDC)
+Layer 3 · Oracles ...
+Layer 1 · Settlement ...
+
+Shared with the book: Ethereum, Pendle, Pendle limit orders, Morpho Blue, USDC
+```
+
+The name must be Pendle's market name, with its expiry. The command needs internet access (Pendle, Morpho and
+DefiLlama APIs, a public Ethereum node): run it once before a demo. Live figures change with the market. When an
+oracle's feed has no readable label, the output says its market sensitivity is not confirmed instead of guessing.
+
 ## Reproduce
 
 Requirements: Python 3.10+ (standard library only), Foundry 1.8.x, an Ethereum RPC URL that serves historical
