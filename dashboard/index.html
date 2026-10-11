@@ -42,6 +42,8 @@ input, select { border: 1px solid var(--ink) !important; background: var(--card)
 .badge { padding: 18px; text-align: center; border: 1px solid var(--ink); }
 .badge .word { font-size: 34px; font-weight: 800; letter-spacing: .04em; }
 .badge .small { font-size: 12px; margin-top: 4px; }
+.badge .edge { font-size: 26px; font-weight: 800; margin-top: 6px; }
+.badge .edgel { font-size: 11.5px; }
 .badge.stay { background: var(--green); color: #fff; border-color: var(--green); }
 .badge.exit { background: var(--red); color: #fff; border-color: var(--red); }
 .badge.unclear { background: var(--amber); color: #fff; border: 2px dashed var(--ink); }
@@ -111,7 +113,7 @@ a { color: var(--ink); }
     <div class="tabs" id="tabs"></div>
 
     <div class="grid" style="margin-top:16px">
-      <div class="badge" id="badge"><div class="word" id="word"></div><div class="small" id="wsmall"></div></div>
+      <div class="badge" id="badge"><div class="word" id="word"></div><div class="edge" id="edge"></div><div class="edgel" id="edgel"></div><div class="small" id="wsmall"></div></div>
       <div>
         <div class="nums" id="nums"></div>
         <div id="why" style="margin:12px 0 0"></div>
@@ -240,7 +242,12 @@ function renderPosition() {
   document.querySelectorAll(".tab").forEach((t, i) => t.classList.toggle("on", i === cur));
   $("word").textContent = d.verdict;
   $("badge").className = "badge " + d.verdict.toLowerCase();
-  $("wsmall").textContent = { STAY: "whole range agrees", EXIT: "whole range agrees", UNCLEAR: "reduce: range straddles break-even" }[d.verdict];
+  // the one number: what staying beats exiting by (yield kept + exit cost saved − expected loss), > 0 = stay
+  const sg = v => (v > 0 ? "+" : "") + pct(v, 2), size = p.calm_exit || 1e6 * p.mark;
+  const ev = Math.abs(at.p.edge * size);
+  $("edge").textContent = sg(at.p.edge) + " · " + (at.p.edge > 0 ? "+" : "−") + (ev < 1e4 ? "$" + (ev / 1e3).toFixed(1) + "k" : usd(ev));
+  $("edgel").textContent = `staying vs exiting, 1M PT (range ${sg(at.hi.edge)} to ${sg(at.lo.edge)})`;
+  $("wsmall").textContent = { STAY: "whole range > 0", EXIT: "whole range < 0", UNCLEAR: "range crosses 0: reduce" }[d.verdict];
   const n = (v, l) => `<div class="num"><div class="v">${v}</div><div class="l">${l}</div></div>`;
   $("nums").innerHTML =
     n(pct(d.exit_cost, 2), "exit cost now (measured)") +
@@ -250,7 +257,10 @@ function renderPosition() {
   const verdict = { STAY: '<span class="g">Stay</span>, prepare the exit', EXIT: '<span class="r">Exit</span>', UNCLEAR: '<span class="a">Hold less</span>: data cannot tell' }[d.verdict];
   const cmp = v => v < keep ? "g" : "r"; // cheaper than exiting = green
   $("why").innerHTML = `<ul class="lim" style="color:var(--ink)"><li>Exiting: ${pct(d.exit_cost, 2)} + ${pct(d.carry, 2)} = <b>${pct(keep, 2)}</b></li>` +
-    `<li>Staying: <span class="${cmp(at.p.expected_loss)}">${pct(at.p.expected_loss, 2)}</span> (up to <span class="${cmp(at.hi.expected_loss)}">${pct(at.hi.expected_loss, 2)}</span>)</li><li>→ ${verdict}</li></ul>`;
+    `<li>Staying: <span class="${cmp(at.p.expected_loss)}">${pct(at.p.expected_loss, 2)}</span> (up to <span class="${cmp(at.hi.expected_loss)}">${pct(at.hi.expected_loss, 2)}</span>)</li><li>→ ${verdict}</li></ul>` +
+    `<p class="sub" style="margin:6px 0 0">In the number: ${d.priced || p.driver.split(" (")[0]}. Simulated but not priced: ` +
+    incidentRows(p).filter(r => r[3].includes("not priced")).map(r => r[0].startsWith("Whale") ? "PT market panic" : r[0].split(":")[0].split(" (")[0].replace(/ \$[\d.]+.*$/, "")).join(", ") + "." +
+    (p.name === "PT-sUSDS" && D.book.contagion ? ` Smokehouse contagion (${pct(D.book.contagion.p, 1)}): left out, it blocks the exit but the PT still repays 1 USDS at expiry, so no permanent loss for an unlevered fund.` : "") + "</p>";
   const fast = t => ["15 min", "immediate", "instant"].includes(t) ? `<span class="r">${t}</span>` : t;
   $("incidents").innerHTML = "<tr><th>Incident</th><th>Effect on 1M PT</th><th>Time to act</th><th>Chance</th></tr>" +
     incidentRows(p).map(r => `<tr><td>${r[0]}</td><td>${r[1].replace(/<b>(stuck|nothing)<\/b>/g, '<b class="r">$1</b>')}</td><td>${fast(r[2])}</td><td>${r[3]}</td></tr>`).join("");

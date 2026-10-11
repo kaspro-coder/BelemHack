@@ -72,7 +72,9 @@ def main():
         total += r["usd"]
         L = r["loss"]
         stuck = f" + {r['calm_stuck']:,.0f} PT unsellable" if r["calm_stuck"] else ""
-        print(f"{p['name']:<9} {float(qty):>12,.0f} PT (${r['usd']:,.0f})   ->  {r['word']}")
+        e = {k: r["carry"] - L[k]["expected_loss"] + r["exit_cost"] for k in ("lo", "p", "hi")}
+        print(f"{p['name']:<9} {float(qty):>12,.0f} PT (${r['usd']:,.0f})   ->  {r['word']}   "
+              f"staying vs exiting {e['p']:+.2%} = ${e['p'] * r['usd']:+,.0f} (range {e['hi']:+.2%} to {e['lo']:+.2%})")
         print(f"   exit cost now {r['exit_cost']:.2%}{stuck} | expected loss if we stay {L['p']['expected_loss']:.2%} "
               f"(range {L['lo']['expected_loss']:.2%}-{L['hi']['expected_loss']:.2%}) | yield given up {r['carry']:.2%}")
         print(f"   {r['why']}")

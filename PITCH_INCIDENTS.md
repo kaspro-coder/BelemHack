@@ -42,12 +42,12 @@ même couche cache trois oracles différents : c'est ce qui décide de tout le r
 
 ## 2 · Rester ou sortir ? (40 s) [Décision, 25 %]
 
-*« La question du risk manager, en trois chiffres. Pour sUSDe : sortir coûte 0,22 %, mesuré en vendant vraiment un
-million de PT dans le pool, plus 0,12 % de rendement abandonné. Rester coûte en moyenne 0,16 %, mais jusqu'à 0,43 %.
-Les données ne tranchent pas : on réduit la position. Les probabilités viennent de l'historique de 17 stablecoins
-comparables. »*
+*« Toute cette carte se résume en un chiffre : ce que rester rapporte de plus que sortir. Pour sUSDe, plus 0,18 %. Il
+vient de trois mesures : sortir coûte 0,22 %, mesuré en vendant vraiment un million de PT dans le pool, plus 0,12 % de
+rendement abandonné ; rester coûte en moyenne 0,16 %. Mais la fourchette va de moins 0,09 à plus 0,27 % : elle passe par
+zéro, donc on réduit la position. Les probabilités viennent de l'historique de 17 stablecoins comparables. »*
 
-**À l'écran** : badge UNCLEAR orange, les 3 puces « Exiting… / Staying… / → Hold less ».
+**À l'écran** : le badge UNCLEAR orange avec « +0.18% · +$1.8k » en grand et sa fourchette ; les 3 puces en dessous.
 
 ## 3 · L'incident en direct (1 min 45) [Impact, 30 % · Démo, 15 %]
 
@@ -114,6 +114,10 @@ Tout est déjà sur la page : le tableau des incidents et le graphique « USDe d
 montrent les mêmes chiffres (barre verte à 981k à 1 %, barre rouge à 0). Continue dessus sans t'arrêter.
 
 ## Questions probables, réponses courtes
+- **« Votre chiffre inclut quoi ? »** La perte de parité du stablecoin (ou la dépréciation de reUSD), probabilisée sur
+  l'historique. La panne d'oracle, la panique sur le pool et la pause Pendle sont simulées mais pas probabilisées : la
+  page le dit sous le chiffre. La contagion Smokehouse est laissée dehors exprès : elle bloque la sortie, mais le PT
+  rembourse quand même 1 USDS à l'échéance, donc pas de perte définitive pour un fonds sans levier.
 - **« Pourquoi UNCLEAR et pas un verdict net ? »** La fourchette de probabilité traverse le point d'équilibre. Forcer un
   verdict serait inventer de la précision. On recommande de réduire.
 - **« D'où viennent les probabilités ? »** Taux observé de décrochages durables sur 17 stablecoins comparables, avec un
