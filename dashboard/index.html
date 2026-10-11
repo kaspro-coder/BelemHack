@@ -126,9 +126,10 @@ a { color: var(--ink); }
       <details class="more"><summary>What the market is doing (oracle, borrowers, pool)</summary><table id="forktable"></table></details>
     </div>
 
-    <h3>What the fund gets for its 1M PT, by size of the shock</h3>
-    <svg id="exitchart" viewBox="0 0 520 260"></svg>
-    <div class="legend"><span><i class="sw" style="background:var(--stay)"></i>selling inside the exit window</span><span><i class="sw" style="background:var(--exit)"></i>selling after the cascade (0 = the pool refuses)</span></div>
+    <h3 id="exittitle">What the fund gets for its 1M PT, by size of the shock</h3>
+    <ul class="lim" id="exitkey" style="color:var(--ink)"></ul>
+    <svg id="exitchart" viewBox="0 0 520 290"></svg>
+    <div class="legend"><span><i class="sw" style="background:var(--stay)"></i>sold in time</span><span><i class="sw" style="background:var(--exit)"></i>sold after the cascade (0 = stuck)</span></div>
 
     <details class="more"><summary>And with a different position size?</summary>
       <div class="sliders">
@@ -144,7 +145,7 @@ a { color: var(--ink); }
 
     <details class="more"><summary>All scenario results for this position</summary>
       <h3 id="ctitle">Cascade</h3>
-      <svg id="cascade" viewBox="0 0 520 260"></svg>
+      <svg id="cascade" viewBox="0 0 520 290"></svg>
       <div class="legend"><span><i class="sw" style="background:var(--accent)"></i>seized and sold</span><span><i class="sw" style="background:var(--exit)"></i>stuck (pool saturated)</span></div>
       <h3>Probability range</h3><table id="range"></table>
       <h3>Scenario table</h3><p class="lead" id="slead"></p><table id="events"></table>
@@ -282,6 +283,13 @@ function renderCascade(p) {
     [{ key: "sold", color: "var(--accent)", stack: true }, { key: "stuck", color: "var(--exit)", stack: true }], v => num(v) + " PT");
 }
 function renderExit(p) {
+  const driver = p.driver.split(" (")[0];
+  $("exittitle").textContent = `${driver}: what the fund gets for its 1M PT`;
+  $("exitkey").innerHTML = [
+    "x axis: size of the shock · y axis: dollars received",
+    `<span style="color:var(--stay)">green</span>: sold within ${p.window}, before liquidations`,
+    `<span style="color:var(--exit)">red</span> at 0: pool full, <b>stuck</b>` + (p.stuck_from ? ` (from ${sev(p.stuck_from)})` : ""),
+  ].map(x => `<li>${x}</li>`).join("");
   bars("exitchart", p.events.map(e => ({ severity: e.severity, win: e.exit_in_window, after: e.fund_stuck ? 0 : e.exit_after })),
     [{ key: "win", color: "var(--stay)" }, { key: "after", color: "var(--exit)" }], v => usd(v));
 }
