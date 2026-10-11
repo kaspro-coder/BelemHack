@@ -99,6 +99,23 @@ The automated scenarios (`forge test`) run in a throw-away copy and never change
 **Anvil itself** with `cast`, watch the page react, then **reset** the chain. Every command below was run on the fork
 before being written here. Commands are for **Windows PowerShell**.
 
+### The demo, in order (about 5 minutes)
+
+1. **The question** (top of the page, summary): three PTs that look alike react in opposite ways.
+2. **The book before** (orange panel, "Your book, right now"): three pockets `normal`, about $2.96M in total.
+3. **Incident 1, live**, from window 4, one step at a time, pointing at the book table after each:
+   - 1a USDe at $0.99: `exit still possible`, about $981k, **16 h left**. "Noticing is easy; what matters is the 16 hours."
+   - 1b challenge: the clock starts, "16.0 h before the oracle switches".
+   - 1c sixteen hours later: oracle on backup, the whale is liquidatable, window **closed**.
+   - 1d-1e liquidation and dump: the pocket turns **`partly stuck`, 900k PT stuck**.
+4. **Reset** (two commands): the book is back to `normal`. "Same chain, same contracts, reproducible."
+5. **Incident 6** (optional, 30 s): Pendle pauses the SY, PT-sUSDS is stuck instantly. A different layer, no delay at all.
+6. **Why it matters for sizing** (calculator): change the size and the crowd ahead, show `REDUCE`.
+7. **The other pockets and layers** from precomputed results: reUSD's 15-minute window, contagion through Smokehouse
+   USDT, the book's 8.5% chance of a stuck pocket, then the limits.
+
+Keep the precomputed page as a fallback: if the live part fails, every number is already on it.
+
 ### What acts on what
 
 | Contract / tool | Acts on | Real addresses touched |
@@ -171,13 +188,21 @@ $PT_S = "0xdC169AbE56461A2E0c034Da431Ac2a3ebf596094"
 $MP_S = "($USDC,$PT_S,$ORACLE_S,$IRM,915000000000000000)"
 ```
 
-Deploy the PT seller and give gas money to the actors, **then** take the baseline snapshot (so resets keep them):
+Deploy the PT seller, give gas money to the actors, give **the fund its book** (1M PT in each pocket, approved for
+the seller), **then** take the baseline snapshot so every reset keeps all of it:
 ```powershell
 $SELLER = ((forge create src/DemoTools.sol:DemoSeller --rpc-url $R --unlocked --from $DEV --broadcast) | Select-String "Deployed to").ToString().Split(" ")[-1]
 foreach ($a in $LIQ, $FUND, $WHALEPANIC) { cast rpc anvil_setBalance $a 0x56BC75E2D63100000 --rpc-url $R }
+cast rpc anvil_setStorageAt $PT_E (cast index address $FUND 0) (cast to-uint256 1000000000000000000000000) --rpc-url $R
+cast rpc anvil_setStorageAt $PT_R (cast index address $FUND 0) (cast to-uint256 1000000000000) --rpc-url $R
+cast rpc anvil_setStorageAt $PT_S (cast index address $FUND 0) (cast to-uint256 1000000000000000000000000) --rpc-url $R
+foreach ($t in $PT_E, $PT_R, $PT_S) { cast send $t "approve(address,uint256)" $SELLER $MAX --from $FUND --unlocked --rpc-url $R | Select-String "status" }
 $SNAP = (cast rpc evm_snapshot --rpc-url $R).Trim('"')
 $SELLER; $SNAP
 ```
+`$SELLER` should print `0x17d9d652E2FD969cDfdb4eC7a71137BDd9aada95` on a fresh Anvil. If it prints anything else,
+restart window 3 with `python -m defi_risk.forkwatch --loop 3 --seller <that address>`.
+The orange panel's **"Your book, right now"** table now shows the three pockets as `normal`, about $2.96M in total.
 
 ### Reset the market after any incident
 ```powershell
@@ -236,13 +261,13 @@ cast send $SELLER "sell(address,uint256)" $POOL_E 573238000000000000000000 --fro
 The first sale (2.5M PT) passes, *page:* pool implied APY jumps from 5% to ~11%. The second **reverts**
 (`custom error 0xfc68d09e` = `MarketProportionTooHigh`): the pool is full, the rest of the PT is stuck.
 
-**1f. The fund tries to sell its 1M PT:**
+**1f. The fund's pocket.** The book table already shows it: PT-sUSDe went from `normal` ($990k) to
+`exit still possible` ($981k, 16 h left) at 1a, and is now **`partly stuck`: about 100k PT sellable, 900k PT stuck**.
+To prove it by hand, try selling the whole pocket:
 ```powershell
-cast rpc anvil_setStorageAt $PT_E (cast index address $FUND 0) (cast to-uint256 1000000000000000000000000) --rpc-url $R
-cast send $PT_E "approve(address,uint256)" $SELLER $MAX --from $FUND --unlocked --rpc-url $R
 cast send $SELLER "sell(address,uint256)" $POOL_E 1000000000000000000000000 --from $FUND --unlocked --rpc-url $R
 ```
-**Reverts**: the position is unsellable. Same commands at step 1a would have passed: that is the 16 h window.
+**Reverts**: the position is unsellable. The same command at step 1a would have passed: that is the 16 h window.
 Then **reset**.
 
 ### Incident 2: a short dip does nothing (PT-sUSDe)
@@ -297,8 +322,34 @@ cast send $MORPHO "accrueInterest((address,address,address,address,uint256))" $M
 ```
 *Page:* oracle on backup, **3 unhealthy borrowers, $4.8M of debt** on PT-sUSDS/USDC. Then **reset**.
 
+### Incident 6: Pendle freezes the SY behind a PT (settlement layer)
+
+Every PT is backed by an SY contract that Pendle's governance can pause. The three SYs simulated here share the same
+owner, so this is one switch behind all three pockets. Freeze the PT-sUSDS one:
+```powershell
+$SY_S = "0xBe3d4ec488A0a042BB86F9176C24f8CD54018BA7"; $PENDLE_OWNER = "0x2aD631F72fB16d91c4953A7f4260A97C2fE2f31e"
+cast rpc anvil_setBalance $PENDLE_OWNER 0x56BC75E2D63100000 --rpc-url $R
+cast send $SY_S "pause()" --from $PENDLE_OWNER --unlocked --rpc-url $R
+```
+*Page:* the PT-sUSDS pocket turns **`stuck`** at once, "Pendle paused the SY, no exit until it is unpaused". No
+oracle, no price move, no delay: an operational dependency, not a market one. Then **reset**.
+
+### Incident coverage by dependency layer
+
+| Layer (brief) | Incident | How it is replayed | Result for the pocket |
+|---|---|---|---|
+| 1. Settlement | Pendle pauses the SY | Incident 6, by hand | stuck at once, whatever the market |
+| 2. Yield source & issuer | USDe / USDS depeg, reUSD NAV write-down | Incidents 1, 3, 5 and the automated sweeps | unsellable from 1% (sUSDe, reUSD) or 2% (sUSDS) |
+| 2. Issuer's hedge venues | perp exchange hack | historical base rate + its ~4% USDe dip replayed as a depeg | see layer 2 |
+| 3. Oracle | wrong Chainlink print for 16 h; short dip filtered by the timelock | automated `test_feedFailure`, incident 2 | wrongful liquidations, $823k bad debt at $0.80 |
+| 4. PT market | whale dump; crowded exit; limit orders gone | incident 4, automated `test_ptPanic`, crowded-exit runs | sUSDe oracle blind, reUSD oracle follows; exit is a queue |
+| 5. Lending | liquidation cascade; lender vault run | incident 1d-1e, automated cascades, `SusdsContagion` | pool saturated; PT-sUSDS borrow rate 4% to 18% |
+
+Not replayed: an Ethereum outage or a bug inside Morpho or Pendle themselves.
+
 ### If something goes wrong
 - `custom error 0xfc68d09e`: the Pendle pool refused the sale, it is full (`MarketProportionTooHigh`). Expected in 1e/1f.
+- A pocket shows `not set up`: the fund has no PT there or did not approve the seller; rerun the end of step 0.
 - `MODT: ...` messages come from the oracle's challenge rules (deviation not met, timelock not passed, resolved).
 - A command fails with "insufficient funds": the sender has no ETH for gas, rerun the `anvil_setBalance` line.
 - The panel does not move: check window 3 (forkwatch) is running and that you opened http://localhost:8765.
