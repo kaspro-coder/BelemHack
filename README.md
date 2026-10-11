@@ -21,6 +21,11 @@ with one contagion path where two pockets that share no issuer fall together.
 Ecosystem scan (every PT with $1M+ on Morpho): 9 PTs, $248M of collateral, 13 lending oracles of which 3 ignore
 the PT market entirely; Smokehouse USDT is the only vault lending to two of them; APYX issues the asset behind two PTs.
 
+**Position calculator** (on the page): pick a PT, a size and how many PT others sell ahead of you in a crisis; it
+returns the exit cost at that size, how much would be stuck, the largest size that still exits fully, and the verdict.
+Rule used: the fund exits fully if PT sold ahead + its size <= the pool's capacity measured on the fork; it matches all
+18 crowded-exit runs (e.g. PT-sUSDe, 1M behind 2M: 266k stuck predicted, 265,625 measured).
+
 Other results replayed on the fork:
 - **The exit is a queue, not a price**: inside the window the fund gets ~fair value as long as less than ~1.5M
   (PT-sUSDe), ~4M (PT-reUSD) or ~2M (PT-sUSDS) PT were sold ahead of it; past that, part of it is stuck.

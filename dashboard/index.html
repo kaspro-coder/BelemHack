@@ -31,6 +31,11 @@ h3 { font-size: 14px; margin: 14px 0 6px; }
 .lead { margin: 0 0 14px; }
 .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-top: 16px; overflow-x: auto; }
 @media (max-width: 600px) { .card { padding: 14px; } h1 { font-size: 19px; } }
+.sliders { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 14px; }
+.sl label { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; margin-bottom: 4px; }
+.sl label b { font-variant-numeric: tabular-nums; }
+.sl input[type=range] { width: 100%; accent-color: var(--accent); }
+.sl small { display: block; color: var(--muted); font-size: 11.5px; margin-top: 2px; }
 #livetable td, #livetable th, #forktable td, #forktable th { text-align: left; }
 .tabs { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
 .tab { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 7px 16px; font: inherit; cursor: pointer; }
@@ -96,6 +101,24 @@ pre { background: var(--bg); border-radius: 8px; padding: 10px 12px; font-size: 
     <div class="nums" id="booknums"></div>
     <table id="booktable" style="margin-top:12px"></table>
     <p class="sub" id="booknote"></p>
+  </section>
+
+  <section class="card" id="calc">
+    <h2>Position calculator</h2>
+    <p class="lead">Pick a position and a size. Everything below is recomputed from what the fork measured: exit costs at each size, the pool's capacity, and the probability range.</p>
+    <div class="sliders" style="margin-top:0">
+      <div class="sl"><label>Position <b></b></label><select id="c-token" style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit"></select></div>
+      <div class="sl"><label>Position size (PT) <b id="c-size-usd"></b></label><input id="c-size" type="number" min="10000" step="100000" value="1000000" style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit"></div>
+      <div class="sl"><label>PT sold ahead of you in a crisis <b id="c-crowd-v"></b></label><input id="c-crowd" type="range" min="0" max="6000000" step="100000" value="1000000"><small>Other holders and liquidators who reach the pool first.</small></div>
+    </div>
+    <div class="grid" style="margin-top:14px">
+      <div class="badge" id="c-badge"><div class="word" id="c-word" style="font-size:30px"></div><div class="small" id="c-why"></div></div>
+      <div>
+        <div class="nums" id="c-nums"></div>
+        <table id="c-range" style="margin-top:12px"></table>
+        <p class="sub" id="c-note" style="margin-top:10px"></p>
+      </div>
+    </div>
   </section>
 
   <div class="tabs" id="tabs"></div>
@@ -419,6 +442,58 @@ function renderSummary() {
   $("summary").innerHTML = items.map(x => `<li>${x}</li>`).join("");
 }
 
+// ---------- position calculator ----------
+function calcModel(p) {
+  // pool capacity: the most PT a single sale got through on the fork, calm market
+  const capacity = Math.max(...p.exit_curve.map(([pt, , unsold]) => pt - unsold));
+  const sold = p.exit_curve.filter(([, , unsold]) => unsold === 0).map(([pt, usd]) => [pt, usd / pt]);
+  const priceAt = size => { // average price per PT for a sale of `size`, interpolated between measured sizes
+    if (size <= sold[0][0]) return sold[0][1];
+    for (let i = 1; i < sold.length; i++) if (size <= sold[i][0]) {
+      const [x0, y0] = sold[i - 1], [x1, y1] = sold[i];
+      return y0 + (y1 - y0) * (size - x0) / (x1 - x0);
+    }
+    return sold[sold.length - 1][1];
+  };
+  return { capacity, priceAt };
+}
+function renderCalc() {
+  const p = D.positions[+$("c-token").value], d = p.decision, m = calcModel(p);
+  const size = Math.max(0, +$("c-size").value || 0), crowd = +$("c-crowd").value;
+  $("c-size-usd").textContent = "≈ " + usd(size * p.mark);
+  $("c-crowd-v").textContent = num(crowd) + " PT";
+  const calmSellable = Math.min(size, m.capacity), calmStuck = size - calmSellable;
+  const exitCost = size ? 1 - m.priceAt(calmSellable) / p.mark : 0;
+  const room = Math.max(0, m.capacity - crowd), crisisStuck = Math.max(0, size - room);
+  const at = Object.fromEntries(["lo", "p", "hi"].map(k => [k, d.carry - d.at[k].expected_loss + exitCost]));
+  const vs = Object.values(at).map(e => e > 0);
+  let word, cls, why;
+  if (calmStuck > 0) { word = "REDUCE"; cls = "exit"; why = `the pool cannot take ${num(size)} PT even in a calm market`; }
+  else if (crisisStuck > 0) { word = "REDUCE"; cls = "unclear"; why = `in a crisis with ${num(crowd)} PT ahead, ${num(crisisStuck)} PT would be stuck`; }
+  else if (vs.every(x => x)) { word = "STAY"; cls = "stay"; why = "the whole probability range favours staying, and the position fits in the exit queue"; }
+  else if (vs.every(x => !x)) { word = "EXIT"; cls = "exit"; why = "the whole probability range favours exiting"; }
+  else { word = "UNCLEAR"; cls = "unclear"; why = "the probability range straddles break-even: hold less rather than all-or-nothing"; }
+  $("c-word").textContent = word; $("c-badge").className = "badge " + cls; $("c-why").textContent = why;
+  const n = (v, l) => `<div class="num"><div class="v">${v}</div><div class="l">${l}</div></div>`;
+  $("c-nums").innerHTML =
+    n(calmStuck ? `${pct(exitCost, 2)} + ${num(calmStuck)} stuck` : pct(exitCost, 3), "cost of exiting now (pool only, calm market)") +
+    n(num(m.capacity) + " PT", "pool capacity: the largest single sale it accepted on the fork") +
+    n(crisisStuck ? num(crisisStuck) + " PT" : "0", "stuck if you exit in a crisis behind that crowd") +
+    n(num(room) + " PT", `largest position that still exits fully with ${num(crowd)} ahead (≈ ${usd(room * p.mark)})`);
+  let t = "<tr><th>Probability estimate</th><th>Carry given up</th><th>Expected loss</th><th>Exit cost</th><th>Staying vs exiting</th></tr>";
+  [["lo", "Low end"], ["p", "Central"], ["hi", "High end"]].forEach(([k, l]) => t +=
+    `<tr><td>${l}</td><td>${pct(d.carry, 3)}</td><td>${pct(d.at[k].expected_loss, 3)}</td><td>${pct(exitCost, 3)}</td><td><b style="color:var(--${at[k] > 0 ? "stay" : "exit"})">${at[k] > 0 ? "stay" : "exit"}</b> (${at[k] > 0 ? "+" : ""}${pct(at[k], 3)})</td></tr>`);
+  $("c-range").innerHTML = t;
+  $("c-note").textContent = `${p.name}: implied APY ${pct(p.implied_apy, 2)}, ${Math.round(p.days)} days to expiry, exit window ${p.window} once ${p.driver.split(" (")[0].toLowerCase()} starts. ` +
+    `A bigger position costs more to exit, which makes staying look better on paper, but it also needs more room in the queue: size is limited by the pool, not by the yield. ` +
+    `Capacity is the largest single sale the pool accepted on the fork; the crisis rule (fund exits fully if crowd + size ≤ capacity) matches all 18 crowded-exit runs.`;
+}
+function setupCalc() {
+  $("c-token").innerHTML = D.positions.map((p, i) => `<option value="${i}">${p.name}</option>`).join("");
+  ["c-token", "c-size", "c-crowd"].forEach(id => $(id).addEventListener("input", renderCalc));
+  renderCalc();
+}
+
 function renderBook() {
   const b = D.book, n = (v, l) => `<div class="num"><div class="v">${v}</div><div class="l">${l}</div></div>`, c = b.book;
   $("booklead").textContent = `${b.fund_pt.toLocaleString("en")} PT in each of ${b.pockets.join(", ")}. Each row is an event replayed on the fork; probabilities come from the stablecoin cohort.`;
@@ -481,7 +556,7 @@ fetch("data.json").then(r => r.json()).then(d => {
   $("blk").textContent = d.fork_block;
   $("tabs").innerHTML = d.positions.map((p, i) => `<button class="tab" data-i="${i}">${p.name}</button>`).join("");
   document.querySelectorAll(".tab").forEach(t => t.onclick = () => { cur = +t.dataset.i; renderPosition(); });
-  renderSummary(); renderBook(); renderPosition(); renderGraph(); renderContagion(); renderLimits(); renderLive(); renderEco(); renderFork(); setInterval(renderFork, 3000); setInterval(renderLive, 60000);
+  renderSummary(); renderBook(); setupCalc(); renderPosition(); renderGraph(); renderContagion(); renderLimits(); renderLive(); renderEco(); renderFork(); setInterval(renderFork, 3000); setInterval(renderLive, 60000);
 }).catch(e => { document.body.insertAdjacentHTML("afterbegin", "<p style='padding:16px'>Could not load data.json. Run python -m defi_risk.dashboard, then serve this folder.</p>"); console.error(e); });
 </script>
 </body>
