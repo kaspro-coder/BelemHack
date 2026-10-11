@@ -41,6 +41,7 @@ Other results replayed on the fork:
 
 ```
 sim/                    Foundry project: the controlled scenarios
+  src/DemoTools.sol       mocks and PT seller for manual demo incidents
   test/ScenarioBase.sol   building blocks: liquidate, sell into the pool, measure exit value, revert
   test/Scenarios.t.sol    PT-sUSDe: USDe depeg, short dip, PT panic, feed failure, baseline
   test/ReUsdCascade.t.sol PT-reUSD: reflexive market cascade, issuer write-down, baseline
@@ -56,6 +57,7 @@ src/defi_risk/
   sim_report.py           text report;  dashboard.py: exports dashboard/data.json
   ecosystem.py            scan of every Pendle PT used as Morpho collateral, shared dependencies ranked
   portfolio.py            book view: which event hits which pocket, with contagion
+  forkwatch.py            live state of the local fork during a manual demo -> dashboard/fork_status.json
   watch.py                live signals from mainnet (oracle deviation, issuer share price, vault, whales)
 dashboard/index.html      the demo page
 ```
@@ -85,6 +87,211 @@ anvil --fork-url $ETH_RPC_URL --fork-block-number $(cat sim/fork_block.txt) --au
 cd sim && forge test --fork-url http://127.0.0.1:8545
 cd ../src && python -m defi_risk.sim_report && python -m defi_risk.dashboard
 ```
+
+## Live demo: trigger incidents by hand on the local chain
+
+The automated scenarios (`forge test`) run in a throw-away copy and never change Anvil. For a live demo you act on
+**Anvil itself** with `cast`, watch the page react, then **reset** the chain. Every command below was run on the fork
+before being written here. Commands are for **Windows PowerShell**.
+
+### What acts on what
+
+| Contract / tool | Acts on | Real addresses touched |
+|---|---|---|
+| `sim/test/Scenarios.t.sol` | **PT-sUSDe-26NOV2026** | Pendle pool `0x47ad…f77e`, Morpho PT-sUSDe/USDC `0x5613…cb05`, oracle `0xF8b2…1b08`, Chainlink USDe/USD `0xa569…F961` |
+| `sim/test/ReUsdCascade.t.sol` | **PT-reUSD-10DEC2026** | pool `0x1328…77c0`, Morpho PT-reUSD/USDC `0x1e9d…fc64` and /USDT `0x6acd…14ca`, oracle `0x217d…51f0`, re.xyz share price `0xd1D1…05B8` |
+| `sim/test/SusdsScenarios.t.sol` | **PT-sUSDS-26NOV2026** | pool `0x9C56…d7dC`, Morpho PT-sUSDS/USDC, /USDT, /USDS, oracle `0x3464…35BF`, Chainlink USDS/USD `0xff30…19b1` |
+| `sim/test/SusdsContagion.t.sol` | Smokehouse USDT vault → PT-sUSDS/USDT | vault `0xA080…7484`, market `0x0367…ff1b` |
+| `sim/src/DemoTools.sol` | the feeds you replace in a demo | `MockAggregator` (USDe/USD, USDS/USD), `MockSharePrice` (re.xyz), `DemoSeller` (sells PT into a pool) |
+
+No new token is created: the scenarios act on the real deployed contracts. Only price feeds are replaced, and a
+reset puts the real code back.
+
+### 0. Set up (once)
+
+Four PowerShell windows.
+
+**Window 1, the local chain** (skip if Anvil is already running):
+```powershell
+cd C:\Users\Abdel\defi-risk
+$env:Path += ";C:\Users\Abdel\.foundry\bin"
+$env:ETH_RPC_URL = ((Get-Content .env | Select-String "ETH_RPC_URL=").ToString().Split("=", 2)[1])
+anvil --fork-url $env:ETH_RPC_URL --fork-block-number (Get-Content sim\fork_block.txt) --auto-impersonate --compute-units-per-second 250
+```
+
+**Window 2, the page:**
+```powershell
+cd C:\Users\Abdel\defi-risk\dashboard
+python -m http.server 8765
+```
+Open **http://localhost:8765** (not the file). The orange panel "Local chain (Anvil fork)" is the one that moves.
+
+**Window 3, the fork monitor** (reads Anvil every 3 s and feeds that panel):
+```powershell
+cd C:\Users\Abdel\defi-risk\src
+python -m defi_risk.forkwatch --loop 3
+```
+
+**Window 4, your commands.** Paste this block once; it defines the addresses used below:
+```powershell
+cd C:\Users\Abdel\defi-risk\sim
+$env:Path += ";C:\Users\Abdel\.foundry\bin"
+$R = "http://127.0.0.1:8545"
+$DEV = "0xf39Fd6e51aad88F6F4ce6aB8827279cffFb92266"   # Anvil's funded dev account
+$LIQ = "0x000000000000000000000000000000000011C0DA"   # our liquidator
+$FUND = "0x00000000000000000000000000000000000BE1E3"  # the fund
+$WHALEPANIC = "0x000000000000000000000000000000000000D0D0"
+$MAX = "115792089237316195423570985008687907853269984665640564039457584007913129639935"
+$MORPHO = "0xBBBBBbbBBb9cC5e90e3b3Af64bdAF62C37EEFFCb"
+$IRM = "0x870aC11D48B15DB9a138Cf899d20F13F79Ba00BC"
+$USDC = "0xA0b86991c6218b36c1d19D4a2e9Eb0cE3606eB48"
+# PT-sUSDe
+$PT_E = "0xB195B618EA52b77CB2a58846F452f59f8dFa9390"; $POOL_E = "0x47ad2CD1dD15739a7A035B9D3b7828d916fEF77E"
+$ORACLE_E = "0xF8b29e7E9c00CE531434775f7923CC9fbCa01b08"; $FEED_USDE = "0xa569d910839Ae8865Da8F8e70FfFb0cBA869F961"
+$ID_E = "0x5613b170ded221c588b6e9637b910f49e5508680ceede207f44aa72e5c46cb05"
+$WHALE_E = "0x5C430FF6F374da12218b380d2040299Ae5B6d40E"   # largest PT-sUSDe borrower, 0.97% from liquidation
+$MP_E = "($USDC,$PT_E,$ORACLE_E,$IRM,915000000000000000)"
+# PT-reUSD
+$PT_R = "0xeCfaFdC7741323a945A163ed068B5a3C43483957"; $POOL_R = "0x13285bCbc27F92b47B4EDB99D744C07B48C977c0"
+$SHARE_PRICE = "0xd1D104a7515989ac82F1AFDa15a23650411b05B8"
+# PT-sUSDS
+$ORACLE_S = "0x3464a61A68C486241FE07201C913F055Bdce35BF"; $FEED_USDS = "0xff30586cd0F29eD462364C7e81375FC0C71219b1"
+$PT_S = "0xdC169AbE56461A2E0c034Da431Ac2a3ebf596094"
+$MP_S = "($USDC,$PT_S,$ORACLE_S,$IRM,915000000000000000)"
+```
+
+Deploy the PT seller and give gas money to the actors, **then** take the baseline snapshot (so resets keep them):
+```powershell
+$SELLER = ((forge create src/DemoTools.sol:DemoSeller --rpc-url $R --unlocked --from $DEV --broadcast) | Select-String "Deployed to").ToString().Split(" ")[-1]
+foreach ($a in $LIQ, $FUND, $WHALEPANIC) { cast rpc anvil_setBalance $a 0x56BC75E2D63100000 --rpc-url $R }
+$SNAP = (cast rpc evm_snapshot --rpc-url $R).Trim('"')
+$SELLER; $SNAP
+```
+
+### Reset the market after any incident
+```powershell
+cast rpc evm_revert $SNAP --rpc-url $R
+$SNAP = (cast rpc evm_snapshot --rpc-url $R).Trim('"')
+```
+`evm_revert` puts back every price, oracle, position, pool and the real feed code, and rewinds the clock.
+A snapshot can be used only once, hence the new one right after. Within 3 s the page panel is back to normal.
+
+**Reset before running the automated scenarios** (`forge test`, `run_all.sh`): they start from Anvil's current state.
+
+---
+
+### Incident 1: USDe depegs 1% for more than 16 h (PT-sUSDe)
+
+**1a. USDe drops to $0.99.** Replace the Chainlink feed by the mock and set the price:
+```powershell
+cast rpc anvil_setCode $FEED_USDE (forge inspect MockAggregator deployedBytecode) --rpc-url $R
+cast send $FEED_USDE "setAnswer(int256)" 99000000 --from $DEV --unlocked --rpc-url $R
+```
+*Page:* USDe/USD 0.9900, deviation 1.01% above the 0.75% threshold. Unhealthy borrowers: still 0, because the
+primary oracle does not read USDe. **The exit window is open: the fund can still sell now.**
+
+**1b. Anyone starts the challenge:**
+```powershell
+cast send $ORACLE_E "challenge()" --from $DEV --unlocked --rpc-url $R
+```
+*Page:* "challenged, 16.0 h left".
+
+**1c. Sixteen hours pass:**
+```powershell
+cast rpc evm_increaseTime 57601 --rpc-url $R
+cast rpc evm_mine --rpc-url $R
+cast send $ORACLE_E "acceptChallenge()" --from $DEV --unlocked --rpc-url $R
+cast send $MORPHO "accrueInterest((address,address,address,address,uint256))" $MP_E --from $DEV --unlocked --rpc-url $R
+```
+*Page:* oracle on **backup**, PT price about 1% lower, **1 unhealthy borrower** (the $2.94M whale). The window is
+closed. `accrueInterest` books the 16 h of interest Morpho only records when someone touches the market.
+
+**1d. A liquidator takes the whale's collateral.** Fund it with 10M USDC, approve Morpho, repay all the whale's debt:
+```powershell
+cast rpc anvil_setStorageAt $USDC (cast index address $LIQ 9) (cast to-uint256 10000000000000) --rpc-url $R
+cast send $USDC "approve(address,uint256)" $MORPHO $MAX --from $LIQ --unlocked --rpc-url $R
+$SHARES = ((cast call $MORPHO "position(bytes32,address)(uint256,uint128,uint128)" $ID_E $WHALE_E --rpc-url $R)[1] -split " ")[0]
+cast send $MORPHO "liquidate((address,address,address,address,uint256),address,uint256,uint256,bytes)" $MP_E $WHALE_E 0 $SHARES 0x --from $LIQ --unlocked --rpc-url $R
+cast call $PT_E "balanceOf(address)(uint256)" $LIQ --rpc-url $R
+```
+The liquidator now holds ~3.07M PT (the whale's debt plus a 2.6% bonus). *Page:* 0 unhealthy.
+
+**1e. The liquidator dumps into the pool:**
+```powershell
+cast send $PT_E "approve(address,uint256)" $SELLER $MAX --from $LIQ --unlocked --rpc-url $R
+cast send $SELLER "sell(address,uint256)" $POOL_E 2500000000000000000000000 --from $LIQ --unlocked --rpc-url $R
+cast send $SELLER "sell(address,uint256)" $POOL_E 573238000000000000000000 --from $LIQ --unlocked --rpc-url $R
+```
+The first sale (2.5M PT) passes, *page:* pool implied APY jumps from 5% to ~11%. The second **reverts**
+(`custom error 0xfc68d09e` = `MarketProportionTooHigh`): the pool is full, the rest of the PT is stuck.
+
+**1f. The fund tries to sell its 1M PT:**
+```powershell
+cast rpc anvil_setStorageAt $PT_E (cast index address $FUND 0) (cast to-uint256 1000000000000000000000000) --rpc-url $R
+cast send $PT_E "approve(address,uint256)" $SELLER $MAX --from $FUND --unlocked --rpc-url $R
+cast send $SELLER "sell(address,uint256)" $POOL_E 1000000000000000000000000 --from $FUND --unlocked --rpc-url $R
+```
+**Reverts**: the position is unsellable. Same commands at step 1a would have passed: that is the 16 h window.
+Then **reset**.
+
+### Incident 2: a short dip does nothing (PT-sUSDe)
+
+USDe at $0.96 for 12 h, then back, the Bybit-hack pattern:
+```powershell
+cast rpc anvil_setCode $FEED_USDE (forge inspect MockAggregator deployedBytecode) --rpc-url $R
+cast send $FEED_USDE "setAnswer(int256)" 96000000 --from $DEV --unlocked --rpc-url $R
+cast send $ORACLE_E "challenge()" --from $DEV --unlocked --rpc-url $R
+cast rpc evm_increaseTime 43200 --rpc-url $R; cast rpc evm_mine --rpc-url $R
+cast send $FEED_USDE "setAnswer(int256)" 99960000 --from $DEV --unlocked --rpc-url $R
+cast rpc evm_increaseTime 14401 --rpc-url $R; cast rpc evm_mine --rpc-url $R
+cast send $ORACLE_E "acceptChallenge()" --from $DEV --unlocked --rpc-url $R
+```
+The last command **reverts with `MODT: Deviation resolved`**: the oracle never switches, nobody is liquidated.
+*Page:* challenged during the dip, back to normal after. The 16 h timelock filters short dips. Then **reset**.
+
+### Incident 3: re.xyz writes reUSD down 2% (PT-reUSD)
+
+```powershell
+$CUR = ((cast call $SHARE_PRICE "getSharePrice()(uint256)" --rpc-url $R) -split " ")[0]
+$NEW = [bigint]::Divide([bigint]::Parse($CUR) * 98, 100).ToString()
+cast rpc anvil_setCode $SHARE_PRICE (forge inspect MockSharePrice deployedBytecode) --rpc-url $R
+cast send $SHARE_PRICE "setSharePrice(uint256)" $NEW --from $DEV --unlocked --rpc-url $R
+cast rpc evm_increaseTime 960 --rpc-url $R; cast rpc evm_mine --rpc-url $R
+```
+*Page:* share price 1.1062 → 1.0840. After the 16 minutes (the oracle averages the last 15) the oracle falls from
+0.9818 to 0.9622 and **6 borrowers ($14.2M of debt) are unhealthy** on PT-reUSD/USDC. No challenge, no delay:
+the exit window is one TWAP period. Then **reset**.
+
+### Incident 4: panic in the PT-reUSD market
+
+A whale dumps 4M PT-reUSD (this PT has 6 decimals), then 16 minutes pass:
+```powershell
+cast rpc anvil_setStorageAt $PT_R (cast index address $WHALEPANIC 0) (cast to-uint256 4000000000000) --rpc-url $R
+cast send $PT_R "approve(address,uint256)" $SELLER $MAX --from $WHALEPANIC --unlocked --rpc-url $R
+cast send $SELLER "sell(address,uint256)" $POOL_R 4000000000000 --from $WHALEPANIC --unlocked --rpc-url $R
+cast rpc evm_increaseTime 960 --rpc-url $R; cast rpc evm_mine --rpc-url $R
+```
+*Page:* pool APY 11.8% → 16.0% right after the dump; 16 minutes later the oracle has followed (0.9818 → 0.9759)
+and **1 borrower** is unhealthy. Compare with PT-sUSDe, whose oracle would not have moved at all. Then **reset**.
+
+### Incident 5: USDS depegs 3% for more than 16 h (PT-sUSDS)
+
+```powershell
+cast rpc anvil_setCode $FEED_USDS (forge inspect MockAggregator deployedBytecode) --rpc-url $R
+cast send $FEED_USDS "setAnswer(int256)" 97000000 --from $DEV --unlocked --rpc-url $R
+cast send $ORACLE_S "challenge()" --from $DEV --unlocked --rpc-url $R
+cast rpc evm_increaseTime 57601 --rpc-url $R; cast rpc evm_mine --rpc-url $R
+cast send $ORACLE_S "acceptChallenge()" --from $DEV --unlocked --rpc-url $R
+cast send $MORPHO "accrueInterest((address,address,address,address,uint256))" $MP_S --from $DEV --unlocked --rpc-url $R
+```
+*Page:* oracle on backup, **3 unhealthy borrowers, $4.8M of debt** on PT-sUSDS/USDC. Then **reset**.
+
+### If something goes wrong
+- `custom error 0xfc68d09e`: the Pendle pool refused the sale, it is full (`MarketProportionTooHigh`). Expected in 1e/1f.
+- `MODT: ...` messages come from the oracle's challenge rules (deviation not met, timelock not passed, resolved).
+- A command fails with "insufficient funds": the sender has no ETH for gas, rerun the `anvil_setBalance` line.
+- The panel does not move: check window 3 (forkwatch) is running and that you opened http://localhost:8765.
+- Anvil was restarted: the snapshot and `$SELLER` are gone, redo step 0.
 
 ## Method
 

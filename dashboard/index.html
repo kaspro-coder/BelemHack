@@ -31,7 +31,7 @@ h3 { font-size: 14px; margin: 14px 0 6px; }
 .lead { margin: 0 0 14px; }
 .card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-top: 16px; overflow-x: auto; }
 @media (max-width: 600px) { .card { padding: 14px; } h1 { font-size: 19px; } }
-#livetable td, #livetable th { text-align: left; }
+#livetable td, #livetable th, #forktable td, #forktable th { text-align: left; }
 .tabs { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
 .tab { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 7px 16px; font: inherit; cursor: pointer; }
 .tab.on { background: var(--accent); border-color: var(--accent); color: #fff; }
@@ -76,6 +76,12 @@ pre { background: var(--bg); border-radius: 8px; padding: 10px 12px; font-size: 
   <section class="card" style="border-left:4px solid var(--accent)">
     <h2>What a portfolio manager should take away</h2>
     <ol class="lim" id="summary" style="color:var(--ink); font-size:14px"></ol>
+  </section>
+
+  <section class="card" id="forklive" style="display:none; border-left:4px solid var(--warn)">
+    <h2>Local chain (Anvil fork): live during a demo</h2>
+    <p class="lead" id="forklead"></p>
+    <table id="forktable"></table>
   </section>
 
   <section class="card" id="live" style="display:none">
@@ -440,6 +446,23 @@ function renderEco() {
   }).catch(() => {});
 }
 
+function renderFork() {
+  fetch("fork_status.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(f => {
+    if (!f) return;
+    $("forklive").style.display = "";
+    $("forklead").textContent = `What the local fork looks like right now, refreshed every 3 s by python -m defi_risk.forkwatch --loop 3. Block ${f.block}, chain clock ${f.hours_since_fork >= 0 ? "+" : ""}${f.hours_since_fork.toFixed(1)} h after the pinned block. Read at ${f.read_at}.`;
+    let t = "<tr><th>Position</th><th>Price input</th><th>Oracle</th><th>Lending markets: unhealthy / borrowers, debt at risk</th><th>Pool implied APY</th></tr>";
+    f.tokens.forEach(k => {
+      if (k.error) { t += `<tr><td>${k.name}</td><td colspan="4">read failed: ${k.error}</td></tr>`; return; }
+      const o = k.oracle;
+      const orc = o ? `${o.active}${o.challenged ? ` · <b style="color:var(--exit)">challenged, ${o.challenge_hours_left.toFixed(1)} h left</b>` : ""} · deviation ${pct(o.deviation, 2)} / ${pct(o.threshold, 2)}` : `TWAP of the pool (${Object.values(k.markets)[0].oracle_price / 1e36 > 1e-6 ? (Object.values(k.markets)[0].oracle_price / 1e36).toFixed(4) : "-"})`;
+      const mk = Object.entries(k.markets).map(([loan, m]) => `<span style="color:var(--${m.unhealthy ? "exit" : "muted"})">${loan}: ${m.unhealthy}/${m.borrowers}${m.unhealthy ? ", " + usd(m.debt_at_risk_usd) : ""}</span>`).join(" · ");
+      t += `<tr class="${Object.values(k.markets).some(m => m.unhealthy) ? "bad" : ""}"><td>${k.name}</td><td>${k.feed.label} ${k.feed.value.toFixed(4)}</td><td>${orc}</td><td>${mk}</td><td>${pct(k.pool.implied_apy, 2)}</td></tr>`;
+    });
+    $("forktable").innerHTML = t;
+  }).catch(() => {});
+}
+
 function renderLimits() {
   $("limits").innerHTML = [
     "Liquidator behaviour is bracketed by two runs: liquidators who seize everything and dump it, and flash-loan liquidators who stop when the pool is full. Real behaviour sits in between.",
@@ -458,7 +481,7 @@ fetch("data.json").then(r => r.json()).then(d => {
   $("blk").textContent = d.fork_block;
   $("tabs").innerHTML = d.positions.map((p, i) => `<button class="tab" data-i="${i}">${p.name}</button>`).join("");
   document.querySelectorAll(".tab").forEach(t => t.onclick = () => { cur = +t.dataset.i; renderPosition(); });
-  renderSummary(); renderBook(); renderPosition(); renderGraph(); renderContagion(); renderLimits(); renderLive(); renderEco(); setInterval(renderLive, 60000);
+  renderSummary(); renderBook(); renderPosition(); renderGraph(); renderContagion(); renderLimits(); renderLive(); renderEco(); renderFork(); setInterval(renderFork, 3000); setInterval(renderLive, 60000);
 }).catch(e => { document.body.insertAdjacentHTML("afterbegin", "<p style='padding:16px'>Could not load data.json. Run python -m defi_risk.dashboard, then serve this folder.</p>"); console.error(e); });
 </script>
 </body>
