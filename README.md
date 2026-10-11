@@ -106,7 +106,7 @@ before being written here. Commands are for **Windows PowerShell**.
 3. **Incident 1, live**, from window 4, one step at a time, pointing at the book table after each:
    - 1a USDe at $0.99: `exit still possible`, about $981k, **16 h left**. "Noticing is easy; what matters is the 16 hours."
    - 1b challenge: the clock starts, "16.0 h before the oracle switches".
-   - 1c sixteen hours later: oracle on backup, the whale is liquidatable, window **closed**.
+   - 1c sixteen hours later: oracle on backup, the whale is liquidatable: **`last moment`**, seconds before bots act.
    - 1d-1e liquidation and dump: the pocket turns **`partly stuck`, 900k PT stuck**.
 4. **Reset** (two commands): the book is back to `normal`. "Same chain, same contracts, reproducible."
 5. **Incident 6** (optional, 30 s): Pendle pauses the SY, PT-sUSDS is stuck instantly. A different layer, no delay at all.
@@ -321,7 +321,9 @@ cast rpc evm_increaseTime 57601 --rpc-url $R; cast rpc evm_mine --rpc-url $R
 cast send $ORACLE_S "acceptChallenge()" --from $DEV --unlocked --rpc-url $R
 cast send $MORPHO "accrueInterest((address,address,address,address,uint256))" $MP_S --from $DEV --unlocked --rpc-url $R
 ```
-*Page:* oracle on backup, **3 unhealthy borrowers, $4.8M of debt** on PT-sUSDS/USDC. Then **reset**.
+*Page:* oracle on backup, **3 unhealthy borrowers, $4.8M of debt** on PT-sUSDS/USDC. The PT-sUSDS pocket shows
+**`last moment`**: still sellable (about 3% lower, the USDS depeg itself) only because nobody has liquidated yet. In
+reality bots liquidate within blocks and dump into the pool, which is what steps 1d-1e show for PT-sUSDe. Then **reset**.
 
 ### Incident 6: Pendle freezes the SY behind a PT (settlement layer)
 

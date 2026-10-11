@@ -168,7 +168,11 @@ def _book(t, tok, reference):
     elif o:
         incident = o["deviation"] > o["threshold"] or o["challenged"] or o["active"] == "backup"
         if o["active"] == "backup":
-            left = "closed: oracle switched, liquidations are live"
+            pending = sum(m["unhealthy"] for m in tok["markets"].values())
+            debt = sum(m["debt_at_risk_usd"] for m in tok["markets"].values())
+            left = (f"seconds: oracle switched, {pending} borrowers (${debt / 1e6:.1f}M) can be liquidated now; "
+                    f"bots dump their PT into this pool within blocks" if pending
+                    else "closed: oracle switched, liquidations are live")
         elif o["challenged"]:
             left = f"{o['challenge_hours_left']:.1f} h before the oracle switches"
         elif incident:
@@ -180,6 +184,8 @@ def _book(t, tok, reference):
         left = "at most 15 min: the oracle's TWAP catches up, then liquidations" if incident else "-"
     if sellable == FUND_PT and not incident:
         status = "normal"
+    elif sellable == FUND_PT and o and o["active"] == "backup" and any(m["unhealthy"] for m in tok["markets"].values()):
+        status = "last moment"  # sellable only until liquidators dump into the pool
     elif sellable == FUND_PT:
         status = "exit still possible"
     elif sellable > 0:

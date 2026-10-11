@@ -538,7 +538,7 @@ function renderFork() {
       t += `<tr class="${Object.values(k.markets).some(m => m.unhealthy) ? "bad" : ""}"><td>${k.name}</td><td>${k.feed.label} ${k.feed.value.toFixed(4)}</td><td>${orc}</td><td>${mk}</td><td>${pct(k.pool.implied_apy, 2)}</td></tr>`;
     });
     $("forktable").innerHTML = t;
-    const col = { normal: "stay", "exit still possible": "warn", "partly stuck": "exit", stuck: "exit" };
+    const col = { normal: "stay", "exit still possible": "warn", "last moment": "exit", "partly stuck": "exit", stuck: "exit" };
     let b = "<tr><th>Pocket</th><th>Status</th><th>Sell now</th><th>Price vs calm</th><th>Stuck</th><th>Time left to exit</th></tr>", tot = 0, ref = 0, stuck = 0;
     f.tokens.forEach(k => {
       const x = k.book;
