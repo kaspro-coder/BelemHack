@@ -64,6 +64,8 @@ src/defi_risk/
   ecosystem.py            scan of every Pendle PT used as Morpho collateral, shared dependencies ranked
   portfolio.py            book view: which event hits which pocket, with contagion
   forkwatch.py            live state of the local fork during a manual demo -> dashboard/fork_status.json
+  autoexit.py             auto-exit robot on the local fork: sells the fund's PT before the exit window closes
+  decide.py               stay / exit verdict for the quantities you hold
   watch.py                live signals from mainnet (oracle deviation, issuer share price, vault, whales)
 dashboard/index.html      the demo page
 ```
@@ -322,6 +324,39 @@ cast send $SELLER "sell(address,uint256)" $POOL_E 1000000000000000000000000 --fr
 ```
 **Reverts**: the position is unsellable. The same command at step 1a would have passed: that is the 16 h window.
 Then **reset**.
+
+### Incident 1 again, with the auto-exit robot (PT-sUSDe)
+
+Same incident, but the fund is protected by a robot that sells its PT for real when the exit window is about to
+close. **Reset first**, then in a **window 5**:
+```powershell
+cd C:\Users\Abdel\defi-risk\src
+python -m defi_risk.autoexit --loop 2
+```
+It prints `auto-exit armed`. Its first pass takes up to a minute (it reads every borrower), so start it before 1a.
+Rules: PT-sUSDe and PT-sUSDS are sold when the stablecoin is still off its peg **and** the oracle challenge has less
+than 2 h left (`--margin 2`); PT-reUSD as soon as its share price falls (15 min window); after a switch it still tries,
+last chance. A short dip that recovers before the switch never triggers a sale (incident 2 with the robot on: no sale).
+
+Then in window 4: run **1a** and **1b** as above. *Page:* `exit still possible`, the robot waits (16 h left).
+Replace 1c by two time jumps, so the robot sees the window closing:
+```powershell
+cast rpc evm_increaseTime 52200 --rpc-url $R; cast rpc evm_mine --rpc-url $R
+```
+14.5 h later, 1.5 h before the switch: window 5 prints
+`PT-sUSDe: still off peg, oracle switches in 1.5 h -> sold 1,000,000 PT for about $981,041`.
+*Page:* the pocket turns **`exited`** (green), $981k, "sold by the auto-exit … 1.5 h before the oracle switch".
+Finish the incident as before:
+```powershell
+cast rpc evm_increaseTime 5401 --rpc-url $R; cast rpc evm_mine --rpc-url $R
+cast send $ORACLE_E "acceptChallenge()" --from $DEV --unlocked --rpc-url $R
+cast send $MORPHO "accrueInterest((address,address,address,address,uint256))" $MP_E --from $DEV --unlocked --rpc-url $R
+```
+then **1d** and **1e**. The pool fills exactly as before, but the pocket stays `exited` with $981k: **without the
+robot, 900k PT stuck; with it, $981k in hand.** Stop the robot (Ctrl+C) and **reset**.
+
+For PT-reUSD (incident 3), the robot sells within seconds of the write-down (tested: about $969k for a 1% write-down; incident 3 uses 2%), inside
+the 15-minute window no human can hold.
 
 ### Incident 2: a short dip does nothing (PT-sUSDe)
 

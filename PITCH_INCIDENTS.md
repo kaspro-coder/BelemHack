@@ -92,6 +92,13 @@ rouge, l'oracle « challenged » en rouge, puis l'emprunteur liquidable en rouge
 4. **1d-1e, liquidation et ventes** : *« Le liquidateur saisit 3,07 millions de PT et les revend. Le pool est plein. Notre
    poche : 900 000 PT bloqués. Le même ordre de vente, 16 heures plus tôt, passait. »*
 
+*(Optionnel, 30 s, si le temps le permet : rejouer avec le robot, README « Incident 1 again, with the auto-exit
+robot »)* *« Même incident, mais cette fois un robot surveille la poche. Il ne vend pas au premier signal : un creux
+court ne le fait pas bouger. Il vend quand il reste moins de 2 heures avant que l'oracle bascule. »* Fenêtre 5 :
+`sold 1,000,000 PT for about $981,041`, la poche passe en `exited` en vert. *« Le pool se remplit exactement comme
+avant, mais nous sommes déjà dehors. Sans robot : 900 000 PT bloqués. Avec : 981 000 dollars. Et pour reUSD, où la
+fenêtre est de 15 minutes, c'est la seule façon de sortir. »*
+
 *« Tout ça s'exécute sur les vrais contrats : la liquidation à la main donne 3 073 266 PT, la simulation automatique
 3 073 270. Les chiffres sont reproductibles. »*
 

@@ -145,6 +145,15 @@ def _book(t, tok, reference):
     fund_word, seller_word = FUND[2:].lower().rjust(64, "0"), SELLER[2:].lower().rjust(64, "0")
     held = _words(_call(pt, "0x" + SEL["balanceOf"] + fund_word))[0]
     allowed = _words(_call(pt, "0x" + SEL["allowance"] + fund_word + seller_word))[0]
+    sold = _exits().get(t["name"])
+    if sold and held < FUND_PT * unit:  # the auto-exit robot sold this pocket (autoexit.py)
+        left_pt = held / unit
+        when = f"{sold['hours_before_switch']:.1f} h before the oracle switch" if sold.get("hours_before_switch") else "inside the window"
+        return {"status": "exited", "time_left": f"sold by the auto-exit at block {sold['block']}, {when}",
+                "sell_now_usd": sold["proceeds_usd"], "sellable_pt": sold["sold_pt"], "stuck_pt": left_pt,
+                "position_pt": FUND_PT, "reference_usd": reference,
+                "price_vs_reference": (sold["proceeds_usd"] / sold["sold_pt"]) / (reference / FUND_PT) - 1 if reference else None,
+                "incident": True, "sy_paused": False}
     if held < FUND_PT * unit or allowed < FUND_PT * unit:
         return {"status": "not set up", "time_left": "give the fund its PT and approve the seller (step 0)",
                 "position_pt": FUND_PT, "sellable_pt": 0, "stuck_pt": 0, "reference_usd": reference}
@@ -199,6 +208,14 @@ def _book(t, tok, reference):
             "reference_usd": reference,
             "price_vs_reference": (per_pt_now / per_pt_ref - 1) if per_pt_now and per_pt_ref else None,
             "status": status, "time_left": left, "incident": incident, "sy_paused": paused}
+
+
+def _exits():
+    """Sales made by the auto-exit robot (dashboard/autoexit.json), if it runs."""
+    try:
+        return json.loads((ROOT / "dashboard" / "autoexit.json").read_text())
+    except Exception:
+        return {}
 
 
 def _references():
