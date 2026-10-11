@@ -79,14 +79,18 @@ a { color: var(--ink); }
 </head>
 <body>
 <div class="wrap">
-  <h1>Stay or exit? DeFi positions, their dependencies, and what an incident does to the book</h1>
+  <h1>Stay or exit? DeFi dependencies and incidents</h1>
   <div class="sub" id="sub"></div>
 
   <!-- PART 1 · the brief's challenge: identify the dependencies of a position -->
   <section class="card part">
     <div class="kicker">1 · Identify the dependencies</div>
     <h2>An on-chain position is a stack of dependencies</h2>
-    <p class="lead">A PT is one line in the book. Underneath it: the chain, the issuer behind its yield, the oracle that prices it, the pool where it is sold, and the lending markets that hold it as collateral. Mapped automatically for three PTs along the brief's five layers. On the far left, the settlement layer everything runs on; then, left to right, the order an incident travels: a shock at the issuer reaches the oracle, the lending markets liquidate, their PT floods the pool, and the fund's position is stuck. Click a node.</p>
+    <ul class="lim" style="color:var(--ink)">
+      <li>3 PTs, 5 layers, mapped automatically</li>
+      <li>Left → right: how an incident reaches the fund</li>
+      <li>Click a node for details</li>
+    </ul>
     <svg id="graph" role="img" aria-label="Dependency graph"></svg>
     <div class="legend"><span><i class="sw" style="background:var(--n-other)"></i>settlement, stablecoin</span><span><i class="sw" style="background:var(--n-issuer)"></i>issuer, asset</span><span><i class="sw" style="background:var(--n-venue)"></i>perp venue</span><span><i class="sw" style="background:var(--n-oracle)"></i>oracle, feed</span><span><i class="sw" style="background:var(--n-lend)"></i>lending market</span><span><i class="sw" style="background:var(--n-vault)"></i>lending vault</span><span><i class="sw" style="background:var(--n-amm)"></i>PT market</span><span><i class="sw" style="border:3px solid var(--muted);background:transparent"></i>shared by two or more positions</span><span>— measured</span><span>- - documented</span><span>··· unverified</span></div>
     <div class="detail" id="detail">Select a node.</div>
@@ -101,14 +105,13 @@ a { color: var(--ink); }
   <section class="card part">
     <div class="kicker">2 · Estimate the impact, decide</div>
     <h2>Should we stay, or is the expected loss high enough to justify exiting despite execution costs?</h2>
-    <p class="lead">For each position: what exiting costs now, what staying is expected to cost, and what each incident does to the fund's 1M PT, and how fast.</p>
     <div class="tabs" id="tabs"></div>
 
     <div class="grid" style="margin-top:16px">
       <div class="badge" id="badge"><div class="word" id="word"></div><div class="small" id="wsmall"></div></div>
       <div>
         <div class="nums" id="nums"></div>
-        <p id="why" style="margin:12px 0 0"></p>
+        <div id="why" style="margin:12px 0 0"></div>
       </div>
     </div>
 
@@ -130,13 +133,13 @@ a { color: var(--ink); }
     <details class="more"><summary>And with a different position size?</summary>
       <div class="sliders">
         <div class="sl"><label>Position size (PT) <b id="c-size-usd"></b></label><input id="c-size" type="number" min="10000" step="100000" value="1000000" style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit"></div>
-        <div class="sl"><label>PT sold ahead of you in a crisis <b id="c-crowd-v"></b></label><input id="c-crowd" type="range" min="0" max="6000000" step="100000" value="1000000"><small>Other holders and liquidators who reach the pool first.</small></div>
+        <div class="sl"><label>PT sold ahead of you in a crisis <b id="c-crowd-v"></b></label><input id="c-crowd" type="range" min="0" max="6000000" step="100000" value="1000000"><small>holders and liquidators who sell first</small></div>
       </div>
       <div class="grid" style="margin-top:14px">
         <div class="badge" id="c-badge"><div class="word" id="c-word" style="font-size:28px"></div><div class="small" id="c-why"></div></div>
         <div class="nums" id="c-nums"></div>
       </div>
-      <p class="sub" style="margin-top:10px">Size is limited by the pool, not by the yield: the fund exits fully only if the PT sold ahead of it plus its own size fit in the pool's capacity measured on the fork (this rule matches all 18 crowded-exit runs).</p>
+      <p class="sub" style="margin-top:10px">Rule: full exit only if crowd + size ≤ pool capacity (matches 18/18 fork runs).</p>
     </details>
 
     <details class="more"><summary>All scenario results for this position</summary>
@@ -154,7 +157,7 @@ a { color: var(--ink); }
   <section class="card part">
     <div class="kicker">3 · The book</div>
     <h2>Which incident hits which pocket</h2>
-    <p class="lead" id="booklead"></p>
+    <div id="booklead"></div>
     <table id="booktable"></table>
     <p class="sub" id="booknote"></p>
     <details class="more"><summary>Contagion: how PT-reUSD can drag PT-sUSDS down</summary>
@@ -195,37 +198,34 @@ function incidentRows(p) {
   const d = p.decision, rows = [], calm = p.calm_exit;
   const driver = p.driver.split(" (")[0];
   const hit = p.events.find(e => e.severity === p.stuck_from);
-  if (hit) rows.push([`${driver} of ${sev(p.stuck_from)} or more${p.window_hours >= 1 ? ", lasting more than " + p.window : ""}`,
-    `${usd(hit.exit_in_window)} if sold inside the window, then <b>unsellable</b>: ${hit.liquidated} borrower${hit.liquidated === 1 ? "" : "s"} liquidated, ${num(hit.stuck_pt)} PT stuck in the pool`,
+  if (hit) rows.push([`${driver} ≥ ${sev(p.stuck_from)}${p.window_hours >= 1 ? ", > " + p.window : ""}`,
+    `${usd(hit.exit_in_window)} if sold in time, then <b>stuck</b> (${hit.liquidated} liquidated, ${num(hit.stuck_pt)} PT in pool)`,
     p.window, chance(d.p_stuck)]);
   if (p.name === "PT-sUSDe") {
     const dip = p.short_dip.filter(r => !r.switched).map(r => r.hours_depegged);
-    rows.push([`Short dip: USDe at $0.96 for up to ${Math.max(...dip)} h (the Bybit-hack pattern)`,
-      "nothing: the oracle never switches, nobody is liquidated", "-", '<span class="sub">frequent, harmless</span>']);
+    rows.push([`Short dip: USDe $0.96, ≤ ${Math.max(...dip)} h`, "nothing (oracle holds)", "-", '<span class="sub">frequent</span>']);
     const x = D.exchange_hacks;
-    rows.push(["A perp exchange behind USDe's hedge is hacked",
-      "USDe dipped below $0.96 for about a day after Bybit's hack: harmless if under 16 h, otherwise the row above",
-      "16 h", `${pct(x.per_year, 1)} per venue per year`]);
+    rows.push(["Perp exchange hacked (USDe hedge)", "harmless if dip < 16 h, else row 1", "16 h", `${pct(x.per_year, 1)} / venue / yr`]);
     const ff = p.feed_failure.find(r => r.wrong_price === 80000000) || p.feed_failure[p.feed_failure.length - 1];
-    rows.push([`The Chainlink USDe/USD feed prints $${(ff.wrong_price / 1e8).toFixed(2)} for 16 h (USDe really at $1)`,
-      `${ff.liquidated} borrowers wrongly liquidated, ${usd(ff.bad_debt_usdc / 1e6)} bad debt, pool full: <b>unsellable</b>`, "16 h", '<span class="sub">not priced</span>']);
+    rows.push([`Chainlink USDe feed wrong ($${(ff.wrong_price / 1e8).toFixed(2)}), 16 h`,
+      `${ff.liquidated} liquidated, ${usd(ff.bad_debt_usdc / 1e6)} bad debt, <b>stuck</b>`, "16 h", '<span class="sub">not priced</span>']);
     const pan = p.pt_panic.find(r => r.dump_pt / 1e18 >= 2e6) || p.pt_panic[p.pt_panic.length - 1];
-    rows.push([`Panic in the PT market: a whale dumps ${num(pan.dump_pt / 1e18)} PT`,
-      `nobody liquidated (the oracle ignores the market), but the pool fills: the fund gets ${pan.fund_exit_after ? usd(pan.fund_exit_after / 1e6) : "nothing"}`,
+    rows.push([`Whale dumps ${num(pan.dump_pt / 1e18)} PT`,
+      `no liquidation, pool full: fund gets ${pan.fund_exit_after ? usd(pan.fund_exit_after / 1e6) : "<b>nothing</b>"}`,
       "immediate", '<span class="sub">not priced</span>']);
   } else {
     const pan = p.pt_panic.find(r => !r.fund_exit && r.liquidated) || p.pt_panic.find(r => !r.fund_exit) || p.pt_panic[p.pt_panic.length - 1];
     const fall = Math.max(0, 1 - pan.oracle_low / pan.oracle_start);
-    rows.push([`Panic in the PT market: a whale dumps ${num(pan.dump_pt)} PT`,
-      `oracle ${fall > 0.001 ? "falls " + pct(fall, 1) : "barely moves (floor)"}, ${pan.liquidated} liquidated, pool full: the fund gets ${pan.fund_exit ? usd(pan.fund_exit) : "nothing"}`,
+    rows.push([`Whale dumps ${num(pan.dump_pt)} PT`,
+      `oracle ${fall > 0.001 ? "−" + pct(fall, 1) : "flat (floor)"}, ${pan.liquidated} liquidated, fund gets ${pan.fund_exit ? usd(pan.fund_exit) : "<b>nothing</b>"}`,
       p.name === "PT-reUSD" ? "15 min" : "immediate", '<span class="sub">not priced</span>']);
   }
   const k = D.book.contagion;
   if (p.name === "PT-sUSDS" && k)
-    rows.push(["Contagion: a reUSD write-down makes Smokehouse USDT's depositors run",
-      `the vault pulls out: ${usd(k.locked)} locked, borrow rate ${pct(k.rate_before, 1)} → ${pct(k.rate_after, 1)}, borrowers must sell PT-sUSDS`,
+    rows.push(["reUSD loss → Smokehouse USDT run",
+      `${usd(k.locked)} locked, rate ${pct(k.rate_before, 1)} → ${pct(k.rate_after, 1)}, forced PT sales`,
       "days", chance(k)]);
-  rows.push(["Pendle's governance pauses the SY behind the PT (settlement layer)", "<b>unsellable at once</b>, until it is unpaused", "instant", '<span class="sub">not priced</span>']);
+  rows.push(["Pendle pauses the SY", "<b>stuck</b> until unpaused", "instant", '<span class="sub">not priced</span>']);
   return rows;
 }
 
@@ -234,22 +234,20 @@ function renderPosition() {
   document.querySelectorAll(".tab").forEach((t, i) => t.classList.toggle("on", i === cur));
   $("word").textContent = d.verdict;
   $("badge").className = "badge " + d.verdict.toLowerCase();
-  $("wsmall").textContent = { STAY: "stay: the whole probability range agrees", EXIT: "exit: the whole probability range agrees", UNCLEAR: "reduce: the probability range straddles break-even" }[d.verdict];
+  $("wsmall").textContent = { STAY: "whole range agrees", EXIT: "whole range agrees", UNCLEAR: "reduce: range straddles break-even" }[d.verdict];
   const n = (v, l) => `<div class="num"><div class="v">${v}</div><div class="l">${l}</div></div>`;
   $("nums").innerHTML =
-    n(pct(d.exit_cost, 2), "execution cost of exiting now (1M PT, measured on the pool)") +
-    n(pct(at.p.expected_loss, 2), `expected loss if we stay (range ${pct(at.lo.expected_loss, 2)}-${pct(at.hi.expected_loss, 2)})`) +
-    n(pct(d.carry, 2), `yield given up by exiting (${pct(p.implied_apy, 1)} vs ${pct(d.risk_free, 1)} T-bill, ${Math.round(p.days)} days)`);
+    n(pct(d.exit_cost, 2), "exit cost now (measured)") +
+    n(pct(at.p.expected_loss, 2), `expected loss if we stay (${pct(at.lo.expected_loss, 2)}-${pct(at.hi.expected_loss, 2)})`) +
+    n(pct(d.carry, 2), `yield given up (${pct(p.implied_apy, 1)} vs ${pct(d.risk_free, 1)} T-bill)`);
   const keep = d.exit_cost + d.carry;
-  $("why").innerHTML = d.verdict === "STAY"
-    ? `Exiting costs ${pct(d.exit_cost, 2)} plus ${pct(d.carry, 2)} of yield given up (${pct(keep, 2)}); the expected loss stays below that even at the high end (${pct(at.hi.expected_loss, 2)}). <b>Stay</b>, and prepare the exit for the incidents below.`
-    : d.verdict === "EXIT"
-    ? `The expected loss exceeds the ${pct(keep, 2)} that exiting costs, across the whole range. <b>Exit</b>.`
-    : `Exiting costs ${pct(d.exit_cost, 2)} plus ${pct(d.carry, 2)} of yield given up (${pct(keep, 2)}). The expected loss is lower at the centre (${pct(at.p.expected_loss, 2)}) but higher at the high end (${pct(at.hi.expected_loss, 2)}): the data cannot tell. <b>Hold less</b> rather than all-or-nothing.`;
-  $("incidents").innerHTML = "<tr><th>Incident</th><th>What it does to the fund's 1M PT</th><th>Time to act</th><th>Chance before expiry</th></tr>" +
+  const verdict = { STAY: "<b>Stay</b>, prepare the exit", EXIT: "<b>Exit</b>", UNCLEAR: "<b>Hold less</b>: data cannot tell" }[d.verdict];
+  $("why").innerHTML = `<ul class="lim" style="color:var(--ink)"><li>Exiting: ${pct(d.exit_cost, 2)} + ${pct(d.carry, 2)} = <b>${pct(keep, 2)}</b></li>` +
+    `<li>Staying: <b>${pct(at.p.expected_loss, 2)}</b> (up to ${pct(at.hi.expected_loss, 2)})</li><li>→ ${verdict}</li></ul>`;
+  $("incidents").innerHTML = "<tr><th>Incident</th><th>Effect on 1M PT</th><th>Time to act</th><th>Chance</th></tr>" +
     incidentRows(p).map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("");
-  $("trigger").textContent = `Watch ${p.trigger}. Once it fires, the fund has ${p.window} to exit before liquidations fill the pool.` +
-    (p.window_hours < 1 ? " Too short for a human: the exit has to be automated." : "");
+  $("trigger").textContent = `Watch ${p.trigger.split(":")[0].replace(/ \(.*\)$/, "")} → ${p.window} to exit` +
+    (p.window_hours < 1 ? " → automate it" : "");
   let r = "<tr><th>Probability estimate</th><th>Expected loss</th><th>Staying vs exiting</th></tr>";
   [["lo", "Low end of 90% range"], ["p", "Central"], ["hi", "High end"]].forEach(([k, l]) =>
     r += `<tr><td>${l}</td><td>${pct(at[k].expected_loss, 3)}</td><td><b style="color:var(--${at[k].verdict === "STAY" ? "stay" : "exit"})">${at[k].verdict.toLowerCase()}</b> (${at[k].edge > 0 ? "+" : ""}${pct(at[k].edge, 3)})</td></tr>`);
@@ -485,13 +483,13 @@ function setupCalc() {
 
 function renderBook() {
   const b = D.book, n = (v, l) => `<div class="num"><div class="v">${v}</div><div class="l">${l}</div></div>`, c = b.book;
-  $("booklead").innerHTML = `${b.fund_pt.toLocaleString("en")} PT in each pocket. Chance that at least one pocket becomes unsellable before expiry: <b>${pct(c.p.any_stuck, 1)}</b> (range ${pct(c.lo.any_stuck, 1)} to ${pct(c.hi.any_stuck, 1)}).`;
+  $("booklead").innerHTML = `<ul class="lim" style="color:var(--ink)"><li>${num(b.fund_pt)} PT per pocket</li><li>Chance ≥ 1 pocket gets stuck before expiry: <b>${pct(c.p.any_stuck, 1)}</b> (${pct(c.lo.any_stuck, 1)}-${pct(c.hi.any_stuck, 1)})</li></ul>`;
   let t = `<tr><th>Event</th><th>Chance before expiry</th><th>Exit window</th>${b.pockets.map(p => `<th>${p}</th>`).join("")}</tr>`;
   b.rows.forEach(r => t += `<tr><td>${r.event}</td><td>${pct(r.p, 2)} <span class="sub">(${pct(r.lo, 1)}-${pct(r.hi, 1)})</span></td><td>${r.window}</td>` +
     b.pockets.map(p => { const h = r.hits[p]; return `<td style="color:var(--${h === "-" ? "muted" : "exit"})">${h === "stuck if the vault run happens" ? "stuck*" : h}</td>`; }).join("") + "</tr>");
   $("booktable").innerHTML = t;
   const k = b.contagion;
-  $("booknote").innerHTML = k ? `* Contagion, assuming Smokehouse USDT's depositors run after its loss: on the fork the run locks ${usd(k.locked)} in PT-sUSDS/USDT and lifts its borrow rate from ${pct(k.rate_before, 1)} to ${pct(k.rate_after, 1)}; a forced sale of ${num(k.saturating_dump_pt)} PT-sUSDS saturates its pool. Two pockets that share no issuer fall together. Shared protocols (Pendle, Morpho, Ethereum) would hit all three at once; they are mapped, not priced.` : "";
+  $("booknote").innerHTML = k ? `* if Smokehouse USDT's depositors run: ${usd(k.locked)} locked, rate ${pct(k.rate_before, 1)} → ${pct(k.rate_after, 1)}. Pendle, Morpho, Ethereum: mapped, not priced.` : "";
 }
 
 function renderEco() {
@@ -512,7 +510,7 @@ function renderFork() {
   fetch("fork_status.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(f => {
     if (!f) return;
     $("forklive").style.display = "";
-    $("forklead").textContent = `Each pocket priced every 3 s by asking the real Pendle pool what it would pay for the fund's PT (simulated, nothing executed). Block ${f.block}, chain clock ${f.hours_since_fork >= 0 ? "+" : ""}${f.hours_since_fork.toFixed(1)} h, read at ${f.read_at}.`;
+    $("forklead").textContent = `Priced every 3 s on the real pool (nothing executed) · block ${f.block} · clock ${f.hours_since_fork >= 0 ? "+" : ""}${f.hours_since_fork.toFixed(1)} h · ${f.read_at}`;
     let t = "<tr><th>Position</th><th>Price input</th><th>Oracle</th><th>Lending markets: unhealthy / borrowers, debt at risk</th><th>Pool implied APY</th></tr>";
     f.tokens.forEach(k => {
       if (k.error) { t += `<tr><td>${k.name}</td><td colspan="4">read failed: ${k.error}</td></tr>`; return; }
@@ -546,12 +544,12 @@ function renderFork() {
 function renderSharedKey() {
   const items = [], c = D.contagion.paths[0];
   if (c) {
-    const legs = c.legs.map(l => `${l.position.split(" ")[0]} (${pct(l.share_of_market_supply, 0)} of its market's lenders)`).join(" and ");
-    items.push(`<b>One lender behind two issuers.</b> ${c.vault} lends to ${legs}: a loss on one can drain the other, although they share no issuer.`);
+    const legs = c.legs.map(l => `${pct(l.share_of_market_supply, 0)} of ${l.position.split(" ")[0]}`).join(", ");
+    items.push(`<b>One lender, two issuers:</b> ${c.vault} funds ${legs} lenders`);
   }
-  items.push(`<b>One switch behind all three.</b> The SY contract under each PT can be paused by Pendle's governance, and the three have the same owner (read on-chain).`);
-  items.push(`<b>Same infrastructure.</b> All three run on Pendle and Morpho Blue on Ethereum, borrow USDC, and get part of their exit liquidity from off-chain limit orders that market makers can pull.`);
-  items.push(`<b>Same layer, three different oracles.</b> sUSDe's lending oracle ignores the market (linear discount), reUSD's follows the pool's 15-minute average, sUSDS's follows it above a floor. This is what makes the same incident hit them differently below.`);
+  items.push(`<b>One pause switch:</b> Pendle can pause all three SYs (same owner)`);
+  items.push(`<b>Same rails:</b> Ethereum, Pendle, Morpho, USDC`);
+  items.push(`<b>Three oracles:</b> sUSDe ignores the market · reUSD follows it (15 min) · sUSDS follows it above a floor`);
   $("sharedkey").innerHTML = items.map(x => `<li>${x}</li>`).join("");
 }
 
