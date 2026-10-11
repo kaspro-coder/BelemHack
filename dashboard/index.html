@@ -10,8 +10,10 @@
   --bg: #ffffff; --card: #ffffff; --ink: #000000; --muted: #555555; --line: #cfcfcf;
   --stay: #8c8c8c; --stay-bg: #ffffff; --exit: #111111; --exit-bg: #111111;
   --warn: #333333; --warn-bg: #f2f2f2; --accent: #111111; --accent-bg: #f2f2f2;
-  --n-pos: #111111; --n-amm: #555555; --n-asset: #777777; --n-issuer: #333333;
-  --n-lend: #222222; --n-oracle: #555555; --n-venue: #888888; --n-vault: #333333; --n-other: #9a9a9a;
+  /* colour only where it carries meaning: the dependency kinds, and the live state on the local chain */
+  --n-pos: #000000; --n-amm: #2563eb; --n-asset: #7c3aed; --n-issuer: #7c3aed;
+  --n-lend: #ea580c; --n-oracle: #0d9488; --n-venue: #db2777; --n-vault: #b45309; --n-other: #8a8a8a;
+  --green: #15803d; --amber: #c27c0e; --red: #dc2626;
 }
 html { color-scheme: light; }
 * { box-sizing: border-box; border-radius: 0 !important; }
@@ -86,7 +88,7 @@ a { color: var(--ink); }
     <h2>An on-chain position is a stack of dependencies</h2>
     <p class="lead">A PT is one line in the book. Underneath it: the chain, the issuer behind its yield, the oracle that prices it, the pool where it is sold, and the lending markets that hold it as collateral. Mapped automatically for three PTs along the brief's five layers. On the far left, the settlement layer everything runs on; then, left to right, the order an incident travels: a shock at the issuer reaches the oracle, the lending markets liquidate, their PT floods the pool, and the fund's position is stuck. Click a node.</p>
     <svg id="graph" role="img" aria-label="Dependency graph"></svg>
-    <div class="legend"><span><i class="sw" style="border:3px solid var(--muted);background:transparent"></i>shared by two or more positions</span><span>— measured</span><span>- - documented</span><span>··· unverified</span></div>
+    <div class="legend"><span><i class="sw" style="background:var(--n-other)"></i>settlement, stablecoin</span><span><i class="sw" style="background:var(--n-issuer)"></i>issuer, asset</span><span><i class="sw" style="background:var(--n-venue)"></i>perp venue</span><span><i class="sw" style="background:var(--n-oracle)"></i>oracle, feed</span><span><i class="sw" style="background:var(--n-lend)"></i>lending market</span><span><i class="sw" style="background:var(--n-vault)"></i>lending vault</span><span><i class="sw" style="background:var(--n-amm)"></i>PT market</span><span><i class="sw" style="border:3px solid var(--muted);background:transparent"></i>shared by two or more positions</span><span>— measured</span><span>- - documented</span><span>··· unverified</span></div>
     <div class="detail" id="detail">Select a node.</div>
     <h3>What the three positions share</h3>
     <ul class="lim" id="sharedkey" style="color:var(--ink)"></ul>
@@ -514,13 +516,16 @@ function renderFork() {
     let t = "<tr><th>Position</th><th>Price input</th><th>Oracle</th><th>Lending markets: unhealthy / borrowers, debt at risk</th><th>Pool implied APY</th></tr>";
     f.tokens.forEach(k => {
       if (k.error) { t += `<tr><td>${k.name}</td><td colspan="4">read failed: ${k.error}</td></tr>`; return; }
-      const o = k.oracle;
-      const orc = o ? `${o.active}${o.challenged ? ` · <b style="color:var(--exit)">challenged, ${o.challenge_hours_left.toFixed(1)} h left</b>` : ""} · deviation ${pct(o.deviation, 2)} / ${pct(o.threshold, 2)}` : `TWAP of the pool (${Object.values(k.markets)[0].oracle_price / 1e36 > 1e-6 ? (Object.values(k.markets)[0].oracle_price / 1e36).toFixed(4) : "-"})`;
-      const mk = Object.entries(k.markets).map(([loan, m]) => `<span style="color:var(--${m.unhealthy ? "exit" : "muted"})">${loan}: ${m.unhealthy}/${m.borrowers}${m.unhealthy ? ", " + usd(m.debt_at_risk_usd) : ""}</span>`).join(" · ");
-      t += `<tr class="${Object.values(k.markets).some(m => m.unhealthy) ? "bad" : ""}"><td>${k.name}</td><td>${k.feed.label} ${k.feed.value.toFixed(4)}</td><td>${orc}</td><td>${mk}</td><td>${pct(k.pool.implied_apy, 2)}</td></tr>`;
+      const o = k.oracle, c = v => `style="color:var(--${v})"`;
+      // green = calm, amber = moving towards a trigger, red = trigger hit
+      const feedCol = o ? (o.deviation >= o.threshold ? "red" : o.deviation >= o.threshold / 3 ? "amber" : "green") : (k.book && k.book.incident ? "red" : "green");
+      const orc = o ? `<span ${c(o.active === "primary" && !o.challenged ? "green" : "red")}>${o.active}${o.challenged ? ` · <b>challenged, ${o.challenge_hours_left.toFixed(1)} h left</b>` : ""}</span> · deviation <span ${c(feedCol)}>${pct(o.deviation, 2)}</span> / ${pct(o.threshold, 2)}` : `TWAP of the pool (${Object.values(k.markets)[0].oracle_price / 1e36 > 1e-6 ? (Object.values(k.markets)[0].oracle_price / 1e36).toFixed(4) : "-"})`;
+      const mk = Object.entries(k.markets).map(([loan, m]) => `<span ${c(m.unhealthy ? "red" : "green")}>${loan}: ${m.unhealthy}/${m.borrowers}${m.unhealthy ? ", " + usd(m.debt_at_risk_usd) : ""}</span>`).join(" · ");
+      const paused = k.book && k.book.sy_paused;
+      t += `<tr class="${Object.values(k.markets).some(m => m.unhealthy) ? "bad" : ""}"><td>${k.name}</td><td ${c(feedCol)}>${k.feed.label} ${k.feed.value.toFixed(4)}</td><td>${orc}</td><td>${mk}</td><td${paused ? ` ${c("red")}` : ""}>${pct(k.pool.implied_apy, 2)}${paused ? " · SY paused" : ""}</td></tr>`;
     });
     $("forktable").innerHTML = t;
-    const col = { normal: "stay", "exit still possible": "warn", "last moment": "exit", "partly stuck": "exit", stuck: "exit" };
+    const col = { normal: "green", "exit still possible": "amber", "last moment": "red", "partly stuck": "red", stuck: "red" };
     let b = "<tr><th>Pocket</th><th>Status</th><th>Sell now</th><th>Price vs calm</th><th>Stuck</th><th>Time left to exit</th></tr>", tot = 0, ref = 0, stuck = 0;
     f.tokens.forEach(k => {
       const x = k.book;
@@ -529,8 +534,8 @@ function renderFork() {
       tot += x.sell_now_usd || 0; ref += x.reference_usd || 0; stuck += x.stuck_pt || 0;
       b += `<tr><td>${k.name} (${num(x.position_pt)} PT)</td><td><b style="color:var(--${col[x.status] || "muted"})">${x.status}</b></td>` +
         `<td>${x.sell_now_usd ? usd(x.sell_now_usd) + (x.sellable_pt < x.position_pt ? ` for ${num(x.sellable_pt)} PT` : "") : "nothing"}</td>` +
-        `<td>${x.price_vs_reference != null ? (x.price_vs_reference >= 0 ? "+" : "") + pct(x.price_vs_reference, 2) : "-"}</td>` +
-        `<td>${x.stuck_pt ? num(x.stuck_pt) + " PT" : "0"}</td><td>${x.time_left}</td></tr>`;
+        `<td style="color:var(--${x.price_vs_reference == null ? "muted" : x.price_vs_reference < -0.005 ? "red" : x.price_vs_reference < -0.001 ? "amber" : "green"})">${x.price_vs_reference != null ? (x.price_vs_reference >= 0 ? "+" : "") + pct(x.price_vs_reference, 2) : "-"}</td>` +
+        `<td style="color:var(--${x.stuck_pt ? "red" : "green"})">${x.stuck_pt ? num(x.stuck_pt) + " PT" : "0"}</td><td style="color:var(--${col[x.status] || "ink"})">${x.time_left}</td></tr>`;
     });
     if (ref) b += `<tr><td><b>Book</b></td><td></td><td><b>${usd(tot)}</b> of ${usd(ref)} in calm</td><td></td><td><b>${stuck ? num(stuck) + " PT" : "0"}</b></td><td></td></tr>`;
     $("booknow").innerHTML = b;
