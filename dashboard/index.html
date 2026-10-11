@@ -140,7 +140,7 @@ pre { background: var(--bg); border-radius: 8px; padding: 10px 12px; font-size: 
 
   <section class="card">
     <h2>Three tokens, mapped together: what they share</h2>
-    <p class="lead">Discovered automatically from Pendle, Morpho, DefiLlama and on-chain reads. Outlined nodes are dependencies shared by two or more positions. Click a node.</p>
+    <p class="lead">Discovered automatically from Pendle, Morpho, DefiLlama and on-chain reads, and laid out along the brief's five layers. Left of the lending column is what each PT is made of; from it rightwards, what holds the PT and can force-sell it. Thick outlines are dependencies shared by two or more positions. Click a node.</p>
     <svg id="graph" role="img" aria-label="Dependency graph"></svg>
     <div class="detail" id="detail">Select a node.</div>
     <h3>Shared dependencies</h3>
@@ -286,26 +286,71 @@ function renderExtra(p) {
   $("extra").innerHTML = h;
 }
 
-const COL = { position: 0, amm: 1, asset: 1, offchain: 1, lending: 2, issuer: 3, oracle: 3, vault: 3, stablecoin: 3, protocol: 3, chain: 4, price_feed: 4, perp_venue: 4, oes: 4, infra: 4 };
+// Columns follow the brief's five layers. Left of the position's own column: what the PT is made of
+// (exit market, yield source). Right: what holds the PT and can force-sell it (lending, its oracle),
+// then the settlement layer everything runs on.
+const LAYERS = [
+  { key: "pos", title: "Positions", sub: "the fund's PTs" },
+  { key: "L4", title: "Layer 4 · PT market", sub: "where the fund exits" },
+  { key: "L2", title: "Layer 2 · Yield source & issuer", sub: "what the PT is worth at expiry" },
+  { key: "L5", title: "Layer 5 · Lending markets", sub: "hold the PT, can force-sell it" },
+  { key: "L3", title: "Layer 3 · Oracle", sub: "decides when liquidations start" },
+  { key: "L1", title: "Layer 1 · Settlement", sub: "chain and protocols" },
+];
+function layerOf(n, fromIssuer) {
+  if (n.kind === "position") return "pos";
+  if (["chain", "protocol"].includes(n.kind)) return "L1";
+  if (["amm", "offchain"].includes(n.kind)) return "L4";
+  if (["asset", "issuer", "perp_venue", "oes", "infra"].includes(n.kind) || fromIssuer.has(n.id)) return "L2";
+  if (["lending", "vault", "stablecoin"].includes(n.kind)) return "L5";
+  if (["oracle", "price_feed"].includes(n.kind)) return "L3";
+  return "L1";
+}
+function shortLabel(n) {
+  return n.label
+    .replace(/^Morpho PT-(\w+)-\d+\w{3}\d{4}\//i, "Morpho PT-$1 / ")
+    .replace(/^Oracle: primary\/backup \+ challenge$/, "Oracle: primary/backup")
+    .replace(/^Oracle: Morpho Chainlink V2$/, "Oracle: Chainlink V2")
+    .replace(/^Ojo PT Feed Pendle Chainlink-compatible Oracle$/, "Ojo PT feed (pool TWAP)")
+    .replace(/^Linear discount ([\d.]+)%\/yr.*$/, "Linear discount $1%/yr")
+    .replace(/ \((off-exchange settlement|Ethena hedging price feed|hedging system hosting)\)$/, "")
+    .replace(/^Pendle limit orders \(off-chain makers\)$/, "Pendle limit orders");
+}
+const ORDER = ["position", "amm", "offchain", "asset", "issuer", "perp_venue", "oes", "infra", "price_feed", "lending", "vault", "stablecoin", "oracle", "chain", "protocol"];
 const COLOR = { position: "--n-pos", amm: "--n-amm", asset: "--n-asset", offchain: "--n-amm", issuer: "--n-issuer", lending: "--n-lend",
   oracle: "--n-oracle", price_feed: "--n-oracle", perp_venue: "--n-venue", vault: "--n-vault", stablecoin: "--n-other", protocol: "--n-other", chain: "--n-other", oes: "--n-other", infra: "--n-other" };
 function renderGraph() {
-  const nodes = D.graph.nodes, edges = D.graph.edges, cols = [[], [], [], [], []];
-  nodes.forEach(n => cols[COL[n.kind] ?? 4].push(n));
-  cols.forEach(c => c.sort((a, b) => a.kind.localeCompare(b.kind) || a.label.localeCompare(b.label)));
-  const bw = 196, bh = 26, gap = 32, W = 1120, xs = [6, 236, 466, 696, 924];
-  const H = Math.max(...cols.map(c => c.length)) * gap + 16;
+  const nodes = D.graph.nodes, edges = D.graph.edges;
+  const issuers = new Set(nodes.filter(n => n.kind === "issuer").map(n => n.id));
+  const fromIssuer = new Set(edges.filter(e => issuers.has(e.source)).map(e => e.target));
+  const cols = LAYERS.map(() => []);
+  nodes.forEach(n => cols[LAYERS.findIndex(l => l.key === layerOf(n, fromIssuer))].push(n));
+  cols.forEach(c => c.sort((a, b) => ORDER.indexOf(a.kind) - ORDER.indexOf(b.kind) || a.label.localeCompare(b.label)));
+  const bw = 166, bh = 26, gap = 31, W = 1140, top = 46, step = (W - bw - 8) / (LAYERS.length - 1);
+  const xs = LAYERS.map((_, i) => 4 + i * step);
+  const H = top + Math.max(...cols.map(c => c.length)) * gap + 10;
   $("graph").setAttribute("viewBox", `0 0 ${W} ${H}`);
   const pos = {};
-  cols.forEach((c, ci) => { const off = (H - c.length * gap) / 2; c.forEach((n, i) => pos[n.id] = { x: xs[ci], y: off + i * gap }); });
+  cols.forEach((c, ci) => { const off = top + (H - top - c.length * gap) / 2; c.forEach((n, i) => pos[n.id] = { x: xs[ci], y: off + i * gap }); });
   const dash = { measured: "", documented: "6 4", unverified: "2 4" };
   let s = "";
+  LAYERS.forEach((l, i) => {
+    s += `<rect x="${xs[i] - 3}" y="2" width="${bw + 6}" height="${H - 4}" rx="8" fill="var(--bg)" opacity="${l.key === "pos" ? 0 : .55}"/>`;
+    s += `<text x="${xs[i] + 2}" y="18" style="font-weight:650">${l.title}</text><text class="muted" x="${xs[i] + 2}" y="33" style="font-size:10.5px">${l.sub}</text>`;
+  });
   edges.forEach(e => { const a = pos[e.source], b = pos[e.target]; if (!a || !b) return;
-    const fwd = a.x <= b.x, x1 = fwd ? a.x + bw : a.x, x2 = fwd ? b.x : b.x + bw, mx = (x1 + x2) / 2;
-    s += `<path d="M${x1},${a.y + bh / 2} C${mx},${a.y + bh / 2} ${mx},${b.y + bh / 2} ${x2},${b.y + bh / 2}" fill="none" stroke="var(--muted)" stroke-opacity=".35" stroke-width="1.1" stroke-dasharray="${dash[e.confidence] || ""}"/>`; });
+    let d;
+    if (Math.abs(a.x - b.x) < 1) { // same layer: loop out to the right
+      const x = a.x + bw, bulge = x + 26;
+      d = `M${x},${a.y + bh / 2} C${bulge},${a.y + bh / 2} ${bulge},${b.y + bh / 2} ${x},${b.y + bh / 2}`;
+    } else {
+      const fwd = a.x < b.x, x1 = fwd ? a.x + bw : a.x, x2 = fwd ? b.x : b.x + bw, mx = (x1 + x2) / 2;
+      d = `M${x1},${a.y + bh / 2} C${mx},${a.y + bh / 2} ${mx},${b.y + bh / 2} ${x2},${b.y + bh / 2}`;
+    }
+    s += `<path d="${d}" fill="none" stroke="var(--muted)" stroke-opacity=".35" stroke-width="1.1" stroke-dasharray="${dash[e.confidence] || ""}"/>`; });
   nodes.forEach(n => { const p = pos[n.id], c = `var(${COLOR[n.kind] || "--n-other"})`, sh = D.shared[n.id];
     s += `<g data-id="${n.id}" style="cursor:pointer"><title>${n.label}</title><rect x="${p.x}" y="${p.y}" width="${bw}" height="${bh}" rx="6" fill="var(--card)" stroke="${c}" stroke-width="${sh ? 3 : 1.3}"/>
-      <rect x="${p.x}" y="${p.y}" width="5" height="${bh}" rx="2" fill="${c}"/><text x="${p.x + 11}" y="${p.y + 17}">${n.label.length > 29 ? n.label.slice(0, 28) + "…" : n.label}</text></g>`; });
+      <rect x="${p.x}" y="${p.y}" width="5" height="${bh}" rx="2" fill="${c}"/><text x="${p.x + 11}" y="${p.y + 17}">${(l => l.length > 25 ? l.slice(0, 24) + "…" : l)(shortLabel(n))}</text></g>`; });
   $("graph").innerHTML = s;
   $("graph").querySelectorAll("g").forEach(g => g.onclick = () => showNode(g.dataset.id));
   const label = id => (nodes.find(n => n.id === id) || {}).label;
