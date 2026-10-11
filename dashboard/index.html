@@ -126,6 +126,8 @@ a { color: var(--ink); }
       <h3 style="margin-top:0">Live on the local chain: your book, right now</h3>
       <p class="lead" id="forklead"></p>
       <table id="booknow"></table>
+      <h3>With auto-exit: exiting in time vs waiting</h3>
+      <table id="autonow"></table>
       <details class="more"><summary>What the market is doing (oracle, borrowers, pool)</summary><table id="forktable"></table></details>
     </div>
 
@@ -550,6 +552,20 @@ function renderFork() {
     });
     if (ref) b += `<tr><td><b>Book</b></td><td></td><td><b>${usd(tot)}</b> of ${usd(ref)} in calm</td><td></td><td><b>${stuck ? num(stuck) + " PT" : "0"}</b></td><td></td></tr>`;
     $("booknow").innerHTML = b;
+    // counterfactual from forkwatch: what the auto-exit rule would have sold for, against what waiting gives now
+    let a = "<tr><th>Pocket</th><th style=\"text-align:left\">Auto-exit sells</th><th>Exit in time</th><th>Waiting (now)</th><th>Gained by exiting</th></tr>", gain = 0, shown = 0;
+    f.tokens.forEach(k => {
+      const x = k.auto;
+      if (!x || x.state === "idle") return;
+      shown++;
+      if (x.state === "armed") { a += `<tr><td>${k.name}</td><td class="sub" style="text-align:left">armed, ${x.why}</td><td>-</td><td>-</td><td>-</td></tr>`; return; }
+      gain += x.gain;
+      a += `<tr><td>${k.name}</td><td style="text-align:left">${x.why}</td><td><span class="g">${usd(x.value)}</span></td><td>${x.now ? usd(x.now) : '<span class="r">nothing</span>'}</td>` +
+        `<td>${x.gain > 1000 ? `<span class="g">+${usd(x.gain)}</span>` : x.gain < -1000 ? `<span class="r">${usd(x.gain)}</span>` : "≈ 0"}</td></tr>`;
+    });
+    if (!shown) a += `<tr><td colspan="5" class="sub">no incident yet: the rule sells sUSDe/sUSDS &lt; 2 h before the oracle switch, reUSD on the first fall</td></tr>`;
+    else if (gain) a += `<tr><td><b>Book</b></td><td></td><td></td><td></td><td><b>${gain > 0 ? "+" : ""}${usd(gain)}</b></td></tr>`;
+    $("autonow").innerHTML = a;
   }).catch(() => {});
 }
 

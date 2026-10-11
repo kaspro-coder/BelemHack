@@ -210,6 +210,58 @@ def _book(t, tok, reference):
             "status": status, "time_left": left, "incident": incident, "sy_paused": paused}
 
 
+def exit_rule(tok, book, margin=2.0, now_mode=False):
+    """The auto-exit rule (autoexit.py): why to sell now, or None."""
+    if book.get("sy_paused"):
+        return None  # nothing can be sold while Pendle's SY is paused
+    if not book.get("incident"):
+        return None
+    o = tok.get("oracle")
+    if not o:
+        return "share price fell: the oracle follows the pool within 15 min"
+    if o["active"] == "backup":
+        return "oracle already switched: last chance before liquidators dump"
+    if now_mode:
+        return "first signal (--now)"
+    off_peg = o["deviation"] > o["threshold"]
+    if o["challenged"] and off_peg and o["challenge_hours_left"] is not None and o["challenge_hours_left"] <= margin:
+        return f"still off peg, oracle switches in {o['challenge_hours_left']:.1f} h"
+    return None
+
+
+AUTO = {}  # per pocket, during an incident: what the auto-exit rule would have sold for
+
+
+def _auto(t, tok, book):
+    """Counterfactual: the fund's pocket with the auto-exit rule, against waiting (what it gets now)."""
+    name, m = t["name"], AUTO.setdefault(t["name"], {})
+    status = book.get("status")
+    if status in (None, "not set up"):
+        return {"state": "idle"}
+    if status == "normal":
+        AUTO.pop(name, None)  # calm (or reset): forget the last incident
+        return {"state": "idle"}
+    now = book.get("sell_now_usd") or 0.0
+    if status == "exited":  # the robot really sold
+        m.setdefault("fired", {"value": book["sell_now_usd"], "why": "sold by the robot"})
+    elif book.get("sellable_pt") == FUND_PT:
+        m["last_full"] = {"value": now, "block": None}
+        why = exit_rule(tok, book)
+        if why and "fired" not in m:
+            o = tok.get("oracle")
+            short = ("on the first fall" if not o else "at the oracle switch" if o["active"] == "backup"
+                     else f"{o['challenge_hours_left']:.1f} h before the switch")
+            m["fired"] = {"value": now, "why": short}
+    if "fired" in m:
+        v, why, state = m["fired"]["value"], m["fired"]["why"], "fired"
+    elif book.get("sellable_pt", FUND_PT) < FUND_PT and "last_full" in m:
+        # time jumped past the rule's moment: use the last moment the whole pocket was still sellable
+        v, why, state = m["last_full"]["value"], "last moment fully sellable", "fired"
+    else:
+        return {"state": "armed", "why": "waits for < 2 h before the switch" if tok.get("oracle") else "sells on the first fall"}
+    return {"state": state, "value": v, "why": why, "now": now, "gain": v - now}
+
+
 def _exits():
     """Sales made by the auto-exit robot (dashboard/autoexit.json), if it runs."""
     try:
@@ -238,6 +290,7 @@ def check():
             tok = _token(t, now)
             try:
                 tok["book"] = _book(t, tok, refs.get(t["name"]))
+                tok["auto"] = _auto(t, tok, tok["book"])
             except Exception as e:
                 tok["book"] = {"error": str(e)[:160]}
             status["tokens"].append(tok)

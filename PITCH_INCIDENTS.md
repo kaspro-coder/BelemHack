@@ -92,6 +92,10 @@ rouge, l'oracle « challenged » en rouge, puis l'emprunteur liquidable en rouge
 4. **1d-1e, liquidation et ventes** : *« Le liquidateur saisit 3,07 millions de PT et les revend. Le pool est plein. Notre
    poche : 900 000 PT bloqués. Le même ordre de vente, 16 heures plus tôt, passait. »*
 
+*« Et ce que ça coûte d'avoir attendu, la page le calcule toute seule. »* Montrer le tableau « With auto-exit:
+exiting in time vs waiting » sous le book : *« Sortir 1,5 heure avant la bascule : 981 000 dollars. Avoir attendu :
+98 000. Sortir à temps vaut 883 000 dollars sur cette seule poche. »*
+
 *(Optionnel, 30 s, si le temps le permet : rejouer avec le robot, README « Incident 1 again, with the auto-exit
 robot »)* *« Même incident, mais cette fois un robot surveille la poche. Il ne vend pas au premier signal : un creux
 court ne le fait pas bouger. Il vend quand il reste moins de 2 heures avant que l'oracle bascule. »* Fenêtre 5 :

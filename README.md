@@ -325,6 +325,15 @@ cast send $SELLER "sell(address,uint256)" $POOL_E 1000000000000000000000000 --fr
 **Reverts**: the position is unsellable. The same command at step 1a would have passed: that is the 16 h window.
 Then **reset**.
 
+### "With auto-exit" table: what exiting in time would have saved
+
+No extra window needed: during any incident, the live panel's **"With auto-exit: exiting in time vs waiting"** table
+shows, per pocket, what the auto-exit rule would have sold for (the moment it fires), what waiting gives now, and the
+difference. Incident 1 played as above, without the robot, ends with `at the oracle switch, $981k | waiting $98k |
++$883k`. Split 1c into two jumps (14.5 h, then 1.5 h, as in the robot section below) and it reads
+`1.5 h before the switch`, same $981k. Before the rule fires it shows
+`armed`. It resets itself when the market is back to normal. Restarting forkwatch mid-incident loses this memory.
+
 ### Incident 1 again, with the auto-exit robot (PT-sUSDe)
 
 Same incident, but the fund is protected by a robot that sells its PT for real when the exit window is about to

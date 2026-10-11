@@ -22,23 +22,7 @@ def _arg(name, default):
     return sys.argv[sys.argv.index(name) + 1] if name in sys.argv else default
 
 
-def _should_sell(tok, book, margin, now_mode):
-    """Why to sell now, or None."""
-    if book.get("sy_paused"):
-        return None  # nothing can be sold while Pendle's SY is paused
-    if not book.get("incident"):
-        return None
-    o = tok.get("oracle")
-    if not o:
-        return "share price fell: the oracle follows the pool within 15 min"
-    if o["active"] == "backup":
-        return "oracle already switched: last chance before liquidators dump"
-    if now_mode:
-        return "first signal (--now)"
-    off_peg = o["deviation"] > o["threshold"]
-    if o["challenged"] and off_peg and o["challenge_hours_left"] is not None and o["challenge_hours_left"] <= margin:
-        return f"still off peg, oracle switches in {o['challenge_hours_left']:.1f} h"
-    return None
+_should_sell = fw.exit_rule  # the rule lives in forkwatch, which also shows what it would have saved
 
 
 def _sell(t, pt_amount):
