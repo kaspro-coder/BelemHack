@@ -75,6 +75,7 @@ details.more > summary { cursor: pointer; color: var(--ink); font-size: 12.5px; 
 details.more[open] > summary { margin-bottom: 8px; }
 #incidents td, #incidents th { text-align: left; vertical-align: top; }
 a { color: var(--ink); }
+.r { color: var(--red); font-weight: 700; } .g { color: var(--green); font-weight: 700; } .a { color: var(--amber); font-weight: 700; }
 </style>
 </head>
 <body>
@@ -200,13 +201,13 @@ function incidentRows(p) {
   const driver = p.driver.split(" (")[0];
   const hit = p.events.find(e => e.severity === p.stuck_from);
   if (hit) rows.push([`${driver} ≥ ${sev(p.stuck_from)}${p.window_hours >= 1 ? ", > " + p.window : ""}`,
-    `${usd(hit.exit_in_window)} if sold in time, then <b>stuck</b> (${hit.liquidated} liquidated, ${num(hit.stuck_pt)} PT in pool)`,
+    `<span class="g">${usd(hit.exit_in_window)}</span> if sold in time, then <b>stuck</b> (${hit.liquidated} liquidated, ${num(hit.stuck_pt)} PT in pool)`,
     p.window, chance(d.p_stuck)]);
   if (p.name === "PT-sUSDe") {
     const dip = p.short_dip.filter(r => !r.switched).map(r => r.hours_depegged);
-    rows.push([`Short dip: USDe $0.96, ≤ ${Math.max(...dip)} h`, "nothing (oracle holds)", "-", '<span class="sub">frequent</span>']);
+    rows.push([`Short dip: USDe $0.96, ≤ ${Math.max(...dip)} h`, '<span class="g">nothing</span> (oracle holds)', "-", '<span class="sub">frequent</span>']);
     const x = D.exchange_hacks;
-    rows.push(["Perp exchange hacked (USDe hedge)", "harmless if dip < 16 h, else row 1", "16 h", `${pct(x.per_year, 1)} / venue / yr`]);
+    rows.push(["Perp exchange hacked (USDe hedge)", '<span class="g">harmless</span> if dip < 16 h, else row 1', "16 h", `${pct(x.per_year, 1)} / venue / yr`]);
     const ff = p.feed_failure.find(r => r.wrong_price === 80000000) || p.feed_failure[p.feed_failure.length - 1];
     rows.push([`Chainlink USDe feed wrong ($${(ff.wrong_price / 1e8).toFixed(2)}), 16 h`,
       `${ff.liquidated} liquidated, ${usd(ff.bad_debt_usdc / 1e6)} bad debt, <b>stuck</b>`, "16 h", '<span class="sub">not priced</span>']);
@@ -224,7 +225,7 @@ function incidentRows(p) {
   const k = D.book.contagion;
   if (p.name === "PT-sUSDS" && k)
     rows.push(["reUSD loss → Smokehouse USDT run",
-      `${usd(k.locked)} locked, rate ${pct(k.rate_before, 1)} → ${pct(k.rate_after, 1)}, forced PT sales`,
+      `<span class="r">${usd(k.locked)} locked</span>, rate ${pct(k.rate_before, 1)} → <span class="r">${pct(k.rate_after, 1)}</span>, forced PT sales`,
       "days", chance(k)]);
   rows.push(["Pendle pauses the SY", "<b>stuck</b> until unpaused", "instant", '<span class="sub">not priced</span>']);
   return rows;
@@ -242,13 +243,15 @@ function renderPosition() {
     n(pct(at.p.expected_loss, 2), `expected loss if we stay (${pct(at.lo.expected_loss, 2)}-${pct(at.hi.expected_loss, 2)})`) +
     n(pct(d.carry, 2), `yield given up (${pct(p.implied_apy, 1)} vs ${pct(d.risk_free, 1)} T-bill)`);
   const keep = d.exit_cost + d.carry;
-  const verdict = { STAY: "<b>Stay</b>, prepare the exit", EXIT: "<b>Exit</b>", UNCLEAR: "<b>Hold less</b>: data cannot tell" }[d.verdict];
+  const verdict = { STAY: '<span class="g">Stay</span>, prepare the exit', EXIT: '<span class="r">Exit</span>', UNCLEAR: '<span class="a">Hold less</span>: data cannot tell' }[d.verdict];
+  const cmp = v => v < keep ? "g" : "r"; // cheaper than exiting = green
   $("why").innerHTML = `<ul class="lim" style="color:var(--ink)"><li>Exiting: ${pct(d.exit_cost, 2)} + ${pct(d.carry, 2)} = <b>${pct(keep, 2)}</b></li>` +
-    `<li>Staying: <b>${pct(at.p.expected_loss, 2)}</b> (up to ${pct(at.hi.expected_loss, 2)})</li><li>→ ${verdict}</li></ul>`;
+    `<li>Staying: <span class="${cmp(at.p.expected_loss)}">${pct(at.p.expected_loss, 2)}</span> (up to <span class="${cmp(at.hi.expected_loss)}">${pct(at.hi.expected_loss, 2)}</span>)</li><li>→ ${verdict}</li></ul>`;
+  const fast = t => ["15 min", "immediate", "instant"].includes(t) ? `<span class="r">${t}</span>` : t;
   $("incidents").innerHTML = "<tr><th>Incident</th><th>Effect on 1M PT</th><th>Time to act</th><th>Chance</th></tr>" +
-    incidentRows(p).map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("");
-  $("trigger").textContent = `Watch ${p.trigger.split(":")[0].replace(/ \(.*\)$/, "")} → ${p.window} to exit` +
-    (p.window_hours < 1 ? " → automate it" : "");
+    incidentRows(p).map(r => `<tr><td>${r[0]}</td><td>${r[1].replace(/<b>(stuck|nothing)<\/b>/g, '<b class="r">$1</b>')}</td><td>${fast(r[2])}</td><td>${r[3]}</td></tr>`).join("");
+  $("trigger").innerHTML = `Watch ${p.trigger.split(":")[0].replace(/ \(.*\)$/, "")} → <span class="r">${p.window}</span> to exit` +
+    (p.window_hours < 1 ? ' → <span class="r">automate it</span>' : "");
   let r = "<tr><th>Probability estimate</th><th>Expected loss</th><th>Staying vs exiting</th></tr>";
   [["lo", "Low end of 90% range"], ["p", "Central"], ["hi", "High end"]].forEach(([k, l]) =>
     r += `<tr><td>${l}</td><td>${pct(at[k].expected_loss, 3)}</td><td><b style="color:var(--${at[k].verdict === "STAY" ? "stay" : "exit"})">${at[k].verdict.toLowerCase()}</b> (${at[k].edge > 0 ? "+" : ""}${pct(at[k].edge, 3)})</td></tr>`);
@@ -491,13 +494,13 @@ function setupCalc() {
 
 function renderBook() {
   const b = D.book, n = (v, l) => `<div class="num"><div class="v">${v}</div><div class="l">${l}</div></div>`, c = b.book;
-  $("booklead").innerHTML = `<ul class="lim" style="color:var(--ink)"><li>${num(b.fund_pt)} PT per pocket</li><li>Chance ≥ 1 pocket gets stuck before expiry: <b>${pct(c.p.any_stuck, 1)}</b> (${pct(c.lo.any_stuck, 1)}-${pct(c.hi.any_stuck, 1)})</li></ul>`;
+  $("booklead").innerHTML = `<ul class="lim" style="color:var(--ink)"><li>${num(b.fund_pt)} PT per pocket</li><li>Chance ≥ 1 pocket gets stuck before expiry: <b class="r">${pct(c.p.any_stuck, 1)}</b> (${pct(c.lo.any_stuck, 1)}-${pct(c.hi.any_stuck, 1)})</li></ul>`;
   let t = `<tr><th>Event</th><th>Chance before expiry</th><th>Exit window</th>${b.pockets.map(p => `<th>${p}</th>`).join("")}</tr>`;
   b.rows.forEach(r => t += `<tr><td>${r.event}</td><td>${pct(r.p, 2)} <span class="sub">(${pct(r.lo, 1)}-${pct(r.hi, 1)})</span></td><td>${r.window}</td>` +
     b.pockets.map(p => { const h = r.hits[p]; return `<td style="color:var(--${h === "-" ? "muted" : "exit"})">${h === "stuck if the vault run happens" ? "stuck*" : h}</td>`; }).join("") + "</tr>");
   $("booktable").innerHTML = t;
   const k = b.contagion;
-  $("booknote").innerHTML = k ? `* if Smokehouse USDT's depositors run: ${usd(k.locked)} locked, rate ${pct(k.rate_before, 1)} → ${pct(k.rate_after, 1)}. Pendle, Morpho, Ethereum: mapped, not priced.` : "";
+  $("booknote").innerHTML = k ? `* if Smokehouse USDT's depositors run: <span class="r">${usd(k.locked)} locked</span>, rate ${pct(k.rate_before, 1)} → <span class="r">${pct(k.rate_after, 1)}</span>. Pendle, Morpho, Ethereum: mapped, not priced.` : "";
 }
 
 function renderEco() {
@@ -552,12 +555,12 @@ function renderFork() {
 function renderSharedKey() {
   const items = [], c = D.contagion.paths[0];
   if (c) {
-    const legs = c.legs.map(l => `${pct(l.share_of_market_supply, 0)} of ${l.position.split(" ")[0]}`).join(", ");
-    items.push(`<b>One lender, two issuers:</b> ${c.vault} funds ${legs} lenders`);
+    const legs = c.legs.map(l => `<span class="r">${pct(l.share_of_market_supply, 0)}</span> of ${l.position.split(" ")[0]}`).join(", ");
+    items.push(`<b class="r">One lender, two issuers:</b> ${c.vault} funds ${legs} lenders`);
   }
-  items.push(`<b>One pause switch:</b> Pendle can pause all three SYs (same owner)`);
+  items.push(`<b class="r">One pause switch:</b> Pendle can pause <span class="r">all three</span> SYs (same owner)`);
   items.push(`<b>Same rails:</b> Ethereum, Pendle, Morpho, USDC`);
-  items.push(`<b>Three oracles:</b> sUSDe ignores the market · reUSD follows it (15 min) · sUSDS follows it above a floor`);
+  items.push(`<b class="r">Three oracles:</b> sUSDe <span class="g">ignores the market</span> · reUSD follows it (<span class="r">15 min</span>) · sUSDS follows it <span class="g">above a floor</span>`);
   $("sharedkey").innerHTML = items.map(x => `<li>${x}</li>`).join("");
 }
 
