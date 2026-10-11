@@ -404,7 +404,10 @@ function showNode(id) {
   const kv = Object.entries(d).filter(([k, v]) => v !== null && typeof v !== "object" || Array.isArray(v)).map(([k, v]) => `${k}: <b>${f(v)}</b>`);
   const out = D.graph.edges.filter(e => e.source === id).map(e => `${e.relation} → ${(D.graph.nodes.find(x => x.id === e.target) || {}).label} <span class="tag">${e.confidence}</span>`);
   const sh = D.shared[id] ? `<br><b>Shared by:</b> ${D.shared[id].map(p => D.graph.nodes.find(x => x.id === p).label).join(", ")}` : "";
-  $("detail").innerHTML = `<b>${n.label}</b> (${n.kind})${sh}<br>${kv.join(" · ")}${out.length ? "<br>" + out.join("<br>") : ""}`;
+  // a lending vault: where its money sits, and how much of each market's lenders it is
+  const alloc = n.kind === "vault" && d.allocations ? "<br>" + Object.values(d.allocations).map(a =>
+    `Lends <b>${usd(a.usd)}</b> to ${a.market}: <b>${pct(a.share_of_market_supply, 0)}</b> of that market's lenders (${pct(a.share_of_vault, 0)} of the vault)`).join("<br>") : "";
+  $("detail").innerHTML = `<b>${n.label}</b> (${n.kind})${sh}${alloc}<br>${kv.join(" · ")}${out.length ? "<br>" + out.join("<br>") : ""}`;
 }
 
 function renderContagion() {
