@@ -74,6 +74,21 @@ dashboard/index.html      the demo page
 cd src && python -m unittest -v      # 19 tests: base rates, Poisson intervals, expected loss, decision, graph walks, fork outputs
 ```
 
+## Stay or exit for your own quantities
+
+From `src`, give the PT you hold (PT-sUSDe, PT-reUSD, PT-sUSDS) and get one verdict per line:
+
+```powershell
+python -m defi_risk.decide sUSDe=2000000 reUSD=500000 sUSDS=1000000
+python -m defi_risk.decide sUSDe=2000000 --crowd 3000000
+```
+
+Same rule and same fork results as the dashboard's position-size calculator: execution cost interpolated
+from the sales measured on the pool, pool capacity, expected loss over the 90% probability range, yield given
+up. `--crowd` is the PT sold ahead of the fund in a crisis (default 1,000,000). REDUCE means part of the
+position would not get out. The expected loss is the one measured for a 1M PT position; it is not rescaled
+with size.
+
 ## Map any PT live
 
 The same discovery runs on a PT nobody prepared, in about 5 seconds, printed along the brief's five layers.
