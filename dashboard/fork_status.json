@@ -1,19 +1,19 @@
 {
- "block": 26164640,
- "timestamp": 1791738097,
- "hours_since_fork": 19.85388888888889,
- "read_at": "03:02:52",
+ "block": 26164635,
+ "timestamp": 1791666623,
+ "hours_since_fork": 0.0,
+ "read_at": "03:27:26",
  "tokens": [
   {
    "name": "PT-sUSDe",
    "markets": {
     "USDC": {
-     "oracle_price": 992554979071537291000000,
+     "oracle_price": 992418993531202436000000,
      "unhealthy": 0,
      "borrowers": 13,
      "debt_usd": 6992654.071532,
      "debt_at_risk_usd": 0.0,
-     "closest_distance": 0.010098574641856817,
+     "closest_distance": 0.009962934069806306,
      "utilization": 0.9014439061738645
     }
    },
@@ -38,7 +38,7 @@
    "name": "PT-reUSD",
    "markets": {
     "USDC": {
-     "oracle_price": 982073438746544333000000000000000000,
+     "oracle_price": 981825606874690731000000000000000000,
      "unhealthy": 0,
      "borrowers": 231,
      "debt_usd": 107372725.35202298,
@@ -47,12 +47,12 @@
      "utilization": 0.8909232428389381
     },
     "USDT": {
-     "oracle_price": 982073438746544333000000000000000000,
+     "oracle_price": 981825606874690731000000000000000000,
      "unhealthy": 0,
      "borrowers": 75,
      "debt_usd": 8385606.653267999,
      "debt_at_risk_usd": 0.0,
-     "closest_distance": 0.027307991895162642,
+     "closest_distance": 0.02706246552182734,
      "utilization": 0.7392452098444273
     }
    },
@@ -70,40 +70,40 @@
    "name": "PT-sUSDS",
    "markets": {
     "USDC": {
-     "oracle_price": 954353047682014206100000,
-     "unhealthy": 3,
+     "oracle_price": 983574485984271944000000,
+     "unhealthy": 0,
      "borrowers": 12,
-     "debt_usd": 12685802.969278,
-     "debt_at_risk_usd": 4809298.061546001,
-     "closest_distance": -0.019371650866578438,
-     "utilization": 0.8895232528285816
+     "debt_usd": 12681246.272212999,
+     "debt_at_risk_usd": 0.0,
+     "closest_distance": 0.011268577398435897,
+     "utilization": 0.8894879427109529
     },
     "USDT": {
-     "oracle_price": 954353047682014206100000,
+     "oracle_price": 983574485984271944000000,
      "unhealthy": 0,
      "borrowers": 9,
      "debt_usd": 4304186.966656,
      "debt_at_risk_usd": 0.0,
-     "closest_distance": 0.003424880754396731,
+     "closest_distance": 0.033032560473967854,
      "utilization": 0.8342414579054855
     },
     "USDS": {
-     "oracle_price": 987591631785895485000000000000000000,
+     "oracle_price": 987364989218670726000000000000000000,
      "unhealthy": 0,
      "borrowers": 21,
      "debt_usd": 3140955.5748670925,
      "debt_at_risk_usd": 0.0,
-     "closest_distance": 0.010303029306562128,
+     "closest_distance": 0.010075851449678597,
      "utilization": 0.8577494744543334
     }
    },
    "feed": {
     "label": "USDS/USD",
-    "value": 0.97
+    "value": 0.99987811
    },
    "oracle": {
-    "active": "backup",
-    "deviation": 0.030927835051546393,
+    "active": "primary",
+    "deviation": 0.000121904858983261,
     "threshold": 0.0075,
     "challenged": false,
     "challenge_hours_left": null
