@@ -5,78 +5,82 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>DeFi Risk Dependency</title>
 <style>
+/* Grayscale, square, plain: an open-source tool look. Severity is shown by weight and inversion, not colour. */
 :root {
-  --bg: #f6f7f9; --card: #ffffff; --ink: #14181f; --muted: #5d6675; --line: #e2e6ec;
-  --stay: #1a7f4b; --stay-bg: #e6f4ec; --exit: #b42318; --exit-bg: #fdeceb;
-  --warn: #b26a00; --warn-bg: #fff4e0; --accent: #2459d6; --accent-bg: #eaf0fd;
-  --n-pos: #2459d6; --n-amm: #0f8b8d; --n-asset: #6b5bd2; --n-issuer: #b26a00;
-  --n-lend: #b42318; --n-oracle: #8a4fb0; --n-venue: #3d7a2a; --n-vault: #c2410c; --n-other: #6b7280;
+  --bg: #ffffff; --card: #ffffff; --ink: #111111; --muted: #666666; --line: #cfcfcf;
+  --stay: #8c8c8c; --stay-bg: #ffffff; --exit: #111111; --exit-bg: #111111;
+  --warn: #333333; --warn-bg: #f2f2f2; --accent: #111111; --accent-bg: #f2f2f2;
+  --n-pos: #111111; --n-amm: #555555; --n-asset: #777777; --n-issuer: #333333;
+  --n-lend: #222222; --n-oracle: #555555; --n-venue: #888888; --n-vault: #333333; --n-other: #9a9a9a;
 }
 @media (prefers-color-scheme: dark) {
   :root {
-    --bg: #0f1218; --card: #171b23; --ink: #e8ebf0; --muted: #98a2b3; --line: #2a303b;
-    --stay: #4ac385; --stay-bg: #12301f; --exit: #f47067; --exit-bg: #3a1a18;
-    --warn: #f0a63a; --warn-bg: #33270f; --accent: #6c93f5; --accent-bg: #1b2440;
-    --n-pos: #6c93f5; --n-amm: #3fc1c3; --n-asset: #9b8cf0; --n-issuer: #f0a63a;
-    --n-lend: #f47067; --n-oracle: #c58ae6; --n-venue: #7fcf63; --n-vault: #fb923c; --n-other: #98a2b3;
+    --bg: #0d0d0d; --card: #0d0d0d; --ink: #e6e6e6; --muted: #9a9a9a; --line: #3a3a3a;
+    --stay: #8a8a8a; --stay-bg: #0d0d0d; --exit: #f0f0f0; --exit-bg: #f0f0f0;
+    --warn: #cfcfcf; --warn-bg: #1c1c1c; --accent: #e6e6e6; --accent-bg: #1c1c1c;
+    --n-pos: #f0f0f0; --n-amm: #b0b0b0; --n-asset: #9a9a9a; --n-issuer: #d0d0d0;
+    --n-lend: #e0e0e0; --n-oracle: #b0b0b0; --n-venue: #808080; --n-vault: #d0d0d0; --n-other: #6e6e6e;
   }
 }
-* { box-sizing: border-box; }
-body { margin: 0; background: var(--bg); color: var(--ink); font: 15px/1.5 system-ui, -apple-system, "Segoe UI", Roboto, sans-serif; }
+* { box-sizing: border-box; border-radius: 0 !important; }
+body { margin: 0; background: var(--bg); color: var(--ink); font: 13.5px/1.55 ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace; }
 .wrap { max-width: 1160px; margin: 0 auto; padding: 24px 16px 56px; }
-h1 { font-size: 22px; margin: 0; }
-h2 { font-size: 16px; margin: 0 0 4px; }
-h3 { font-size: 14px; margin: 14px 0 6px; }
-.sub, .lead { color: var(--muted); font-size: 13px; }
+h1 { font-size: 19px; margin: 0; font-weight: 700; }
+h2 { font-size: 15px; margin: 0 0 4px; }
+h3 { font-size: 13.5px; margin: 16px 0 6px; text-transform: uppercase; letter-spacing: .04em; }
+.sub, .lead { color: var(--muted); font-size: 12.5px; }
 .lead { margin: 0 0 14px; }
-.card { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 20px; margin-top: 16px; overflow-x: auto; }
-@media (max-width: 600px) { .card { padding: 14px; } h1 { font-size: 19px; } }
+.card { background: var(--card); border: 1px solid var(--ink); padding: 20px; margin-top: 18px; overflow-x: auto; }
+@media (max-width: 600px) { .card { padding: 14px; } h1 { font-size: 17px; } }
 .sliders { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin-top: 14px; }
-.sl label { display: flex; justify-content: space-between; gap: 8px; font-size: 13px; margin-bottom: 4px; }
+.sl label { display: flex; justify-content: space-between; gap: 8px; font-size: 12.5px; margin-bottom: 4px; }
 .sl label b { font-variant-numeric: tabular-nums; }
-.sl input[type=range] { width: 100%; accent-color: var(--accent); }
+.sl input[type=range] { width: 100%; accent-color: var(--ink); filter: grayscale(1); }
 .sl small { display: block; color: var(--muted); font-size: 11.5px; margin-top: 2px; }
+input, select { border: 1px solid var(--ink) !important; background: var(--card) !important; color: var(--ink) !important; font: inherit !important; }
 #livetable td, #livetable th, #forktable td, #forktable th, #booknow td, #booknow th { text-align: left; }
-.tabs { display: flex; gap: 8px; margin-top: 18px; flex-wrap: wrap; }
-.tab { border: 1px solid var(--line); background: var(--card); color: var(--ink); border-radius: 999px; padding: 7px 16px; font: inherit; cursor: pointer; }
-.tab.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+.tabs { display: flex; gap: 0; margin-top: 18px; flex-wrap: wrap; }
+.tab { border: 1px solid var(--ink); margin-right: -1px; background: var(--card); color: var(--ink); padding: 6px 14px; font: inherit; cursor: pointer; }
+.tab.on { background: var(--ink); color: var(--bg); }
 .grid { display: grid; grid-template-columns: minmax(200px, 250px) 1fr; gap: 22px; }
 .two { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
 @media (max-width: 860px) { .grid, .two { grid-template-columns: 1fr; } }
-.badge { border-radius: 10px; padding: 18px; text-align: center; }
-.badge .word { font-size: 38px; font-weight: 750; letter-spacing: .02em; }
-.badge .small { font-size: 12.5px; margin-top: 4px; }
-.stay { background: var(--stay-bg); color: var(--stay); }
-.exit { background: var(--exit-bg); color: var(--exit); }
-.unclear { background: var(--warn-bg); color: var(--warn); }
+.badge { padding: 18px; text-align: center; border: 1px solid var(--ink); }
+.badge .word { font-size: 34px; font-weight: 800; letter-spacing: .04em; }
+.badge .small { font-size: 12px; margin-top: 4px; }
+.badge.stay { background: var(--card); color: var(--ink); }
+.badge.exit { background: var(--ink); color: var(--bg); }
+.badge.unclear { background: var(--card); color: var(--ink); border: 2px dashed var(--ink); }
+.callout.exit, .callout.unclear { background: var(--card); color: var(--ink); border: 1px solid var(--ink); }
 .nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
-.num .v { font-size: 22px; font-weight: 650; font-variant-numeric: tabular-nums; }
-.num .l { font-size: 12px; color: var(--muted); }
-.callout { border-radius: 10px; padding: 12px 14px; margin-top: 14px; font-size: 13.5px; }
-.callout b.big { font-size: 26px; display: block; line-height: 1.2; }
-.action { display: grid; grid-template-columns: 130px 1fr; gap: 14px; align-items: center; background: var(--accent-bg); }
-table { width: 100%; border-collapse: collapse; font-size: 13px; font-variant-numeric: tabular-nums; }
+.num .v { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
+.num .l { font-size: 11.5px; color: var(--muted); }
+.callout { padding: 12px 14px; margin-top: 14px; font-size: 13px; }
+.callout b.big { font-size: 24px; display: block; line-height: 1.2; }
+.action { display: grid; grid-template-columns: 130px 1fr; gap: 14px; align-items: center; background: var(--warn-bg); border-left: 3px solid var(--ink); }
+table { width: 100%; border-collapse: collapse; font-size: 12.5px; font-variant-numeric: tabular-nums; }
 th, td { text-align: right; padding: 6px 8px; border-bottom: 1px solid var(--line); }
 th:first-child, td:first-child { text-align: left; }
-th { color: var(--muted); font-weight: 550; font-size: 12px; }
-tr.bad td { color: var(--exit); }
+th { color: var(--ink); font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: .03em; border-bottom: 1px solid var(--ink); }
+tr.bad td { color: var(--ink); font-weight: 700; }
 svg { width: 100%; height: auto; display: block; }
-svg text { fill: var(--ink); font-size: 11.5px; font-family: inherit; }
+svg text { fill: var(--ink); font-size: 10.5px; font-family: inherit; }
 svg .muted { fill: var(--muted); }
-.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 12px; color: var(--muted); margin-top: 8px; }
-.sw { display: inline-block; width: 12px; height: 12px; border-radius: 3px; vertical-align: -1px; margin-right: 5px; }
-.detail { margin-top: 10px; font-size: 13px; min-height: 44px; background: var(--bg); border-radius: 8px; padding: 10px 12px; }
-.tag { font-size: 11px; padding: 1px 6px; border-radius: 4px; background: var(--warn-bg); color: var(--warn); }
-ul.lim { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13px; }
+.legend { display: flex; flex-wrap: wrap; gap: 14px; font-size: 11.5px; color: var(--muted); margin-top: 8px; }
+.sw { display: inline-block; width: 12px; height: 12px; vertical-align: -1px; margin-right: 5px; border: 1px solid var(--ink); }
+.detail { margin-top: 10px; font-size: 12.5px; min-height: 44px; background: var(--warn-bg); padding: 10px 12px; border: 1px solid var(--line); }
+.tag { font-size: 11px; padding: 0 5px; border: 1px solid var(--muted); color: var(--muted); }
+ul.lim { margin: 0; padding-left: 18px; color: var(--muted); font-size: 12.5px; }
 ul.lim li { margin: 4px 0; }
-code { font-size: 12.5px; background: var(--bg); padding: 1px 5px; border-radius: 4px; }
-pre { background: var(--bg); border-radius: 8px; padding: 10px 12px; font-size: 12.5px; overflow-x: auto; margin: 6px 0 0; }
-.part h2 { font-size: 19px; margin-bottom: 6px; }
-.kicker { font-size: 12px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+code { font-size: 12px; background: var(--warn-bg); padding: 1px 5px; }
+pre { background: var(--warn-bg); border: 1px solid var(--line); padding: 10px 12px; font-size: 12px; overflow-x: auto; margin: 6px 0 0; }
+.part h2 { font-size: 17px; margin-bottom: 6px; }
+.kicker { font-size: 11.5px; font-weight: 700; letter-spacing: .08em; text-transform: uppercase; color: var(--muted); margin-bottom: 4px; }
 details.more { margin-top: 14px; }
-details.more > summary { cursor: pointer; color: var(--accent); font-size: 13.5px; font-weight: 550; }
+details.more > summary { cursor: pointer; color: var(--ink); font-size: 12.5px; text-decoration: underline; }
 details.more[open] > summary { margin-bottom: 8px; }
 #incidents td, #incidents th { text-align: left; vertical-align: top; }
+a { color: var(--ink); }
 </style>
 </head>
 <body>
@@ -118,7 +122,7 @@ details.more[open] > summary { margin-bottom: 8px; }
     <table id="incidents"></table>
     <div class="callout action" style="grid-template-columns:1fr"><div><b>Action.</b> <span id="trigger"></span></div></div>
 
-    <div id="forklive" style="display:none; margin-top:18px; border-left:4px solid var(--warn); padding-left:12px">
+    <div id="forklive" style="display:none; margin-top:18px; border-left:3px solid var(--ink); padding-left:12px">
       <h3 style="margin-top:0">Live on the local chain: your book, right now</h3>
       <p class="lead" id="forklead"></p>
       <table id="booknow"></table>
@@ -270,10 +274,10 @@ function bars(svgId, rows, series, yfmt) {
     const x0 = L + i * bw;
     if (stacked.length) {
       let base = 0;
-      stacked.forEach(sr => { const v = r[sr.key]; s += `<rect x="${x0 + bw * .2}" y="${y(base + v)}" width="${bw * .6}" height="${y(base) - y(base + v)}" fill="${sr.color}" rx="2"/>`; base += v; });
+      stacked.forEach(sr => { const v = r[sr.key]; s += `<rect x="${x0 + bw * .2}" y="${y(base + v)}" width="${bw * .6}" height="${y(base) - y(base + v)}" fill="${sr.color}" rx="0"/>`; base += v; });
     } else {
       const w = bw * .7 / grouped.length;
-      grouped.forEach((sr, j) => { const v = r[sr.key]; s += `<rect x="${x0 + bw * .15 + j * w}" y="${y(v)}" width="${w - 2}" height="${Math.max(0, y(0) - y(v))}" fill="${sr.color}" rx="2"/>`;
+      grouped.forEach((sr, j) => { const v = r[sr.key]; s += `<rect x="${x0 + bw * .15 + j * w}" y="${y(v)}" width="${w - 2}" height="${Math.max(0, y(0) - y(v))}" fill="${sr.color}" rx="0"/>`;
         if (v === 0) s += `<text x="${x0 + bw * .15 + j * w + w / 2 - 1}" y="${y(0) - 4}" text-anchor="middle" style="fill:${sr.color};font-size:10px">0</text>`; });
     }
     s += `<text x="${x0 + bw / 2}" y="${H - B + 16}" text-anchor="middle">${sev(r.severity)}</text>`;
@@ -330,9 +334,9 @@ function renderExtra(p) {
 // Layer 1 (chain and protocols) sits underneath everything: first column, on the far left.
 const LAYERS = [
   { key: "L1", title: "Layer 1 · Settlement", sub: "underneath everything" },
-  { key: "L2", title: "Layer 2 · Yield source & issuer", sub: "where a shock starts" },
-  { key: "L3", title: "Layer 3 · Oracle", sub: "passes it to the lending price" },
-  { key: "L5", title: "Layer 5 · Lending markets", sub: "liquidate, force-sell the PT" },
+  { key: "L2", title: "Layer 2 · Issuer", sub: "where a shock starts" },
+  { key: "L3", title: "Layer 3 · Oracle", sub: "passes it to lending" },
+  { key: "L5", title: "Layer 5 · Lending", sub: "liquidates, sells the PT" },
   { key: "L4", title: "Layer 4 · PT market", sub: "where the PT is sold" },
   { key: "pos", title: "Positions", sub: "the fund's PTs" },
 ];
@@ -374,7 +378,7 @@ function renderGraph() {
   const dash = { measured: "", documented: "6 4", unverified: "2 4" };
   let s = "";
   LAYERS.forEach((l, i) => {
-    s += `<rect x="${xs[i] - 3}" y="2" width="${bw + 6}" height="${colH - 4}" rx="8" fill="var(--bg)" opacity="${l.key === "pos" ? 0 : .55}"/>`;
+    s += `<rect x="${xs[i] - 3}" y="2" width="${bw + 6}" height="${colH - 4}" rx="0" fill="var(--bg)" opacity="${l.key === "pos" ? 0 : .55}"/>`;
     s += `<text x="${xs[i] + 2}" y="18" style="font-weight:650">${l.title}</text><text class="muted" x="${xs[i] + 2}" y="33" style="font-size:10.5px">${l.sub}</text>`;
     if (i > 0 && i < LAYERS.length - 1) s += `<text x="${xs[i] + bw + (step - bw) / 2}" y="26" text-anchor="middle" class="muted" style="font-size:16px">→</text>`;
   });
@@ -390,8 +394,8 @@ function renderGraph() {
     }
     s += `<path d="${d}" fill="none" stroke="var(--muted)" stroke-opacity=".35" stroke-width="1.1" stroke-dasharray="${dash[e.confidence] || ""}"/>`; });
   nodes.forEach(n => { const p = pos[n.id], c = `var(${COLOR[n.kind] || "--n-other"})`, sh = D.shared[n.id];
-    s += `<g data-id="${n.id}" style="cursor:pointer"><title>${n.label}</title><rect x="${p.x}" y="${p.y}" width="${bw}" height="${bh}" rx="6" fill="var(--card)" stroke="${c}" stroke-width="${sh ? 3 : 1.3}"/>
-      <rect x="${p.x}" y="${p.y}" width="5" height="${bh}" rx="2" fill="${c}"/><text x="${p.x + 11}" y="${p.y + 17}">${(l => l.length > 25 ? l.slice(0, 24) + "…" : l)(shortLabel(n))}</text></g>`; });
+    s += `<g data-id="${n.id}" style="cursor:pointer"><title>${n.label}</title><rect x="${p.x}" y="${p.y}" width="${bw}" height="${bh}" rx="0" fill="var(--card)" stroke="${c}" stroke-width="${sh ? 3 : 1.3}"/>
+      <rect x="${p.x}" y="${p.y}" width="5" height="${bh}" rx="0" fill="${c}"/><text x="${p.x + 11}" y="${p.y + 17}">${(l => l.length > 25 ? l.slice(0, 24) + "…" : l)(shortLabel(n))}</text></g>`; });
   $("graph").innerHTML = s;
   $("graph").querySelectorAll("g").forEach(g => g.onclick = () => showNode(g.dataset.id));
   const label = id => (nodes.find(n => n.id === id) || {}).label;
