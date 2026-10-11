@@ -71,147 +71,112 @@ ul.lim { margin: 0; padding-left: 18px; color: var(--muted); font-size: 13px; }
 ul.lim li { margin: 4px 0; }
 code { font-size: 12.5px; background: var(--bg); padding: 1px 5px; border-radius: 4px; }
 pre { background: var(--bg); border-radius: 8px; padding: 10px 12px; font-size: 12.5px; overflow-x: auto; margin: 6px 0 0; }
+.part h2 { font-size: 19px; margin-bottom: 6px; }
+.kicker { font-size: 12px; font-weight: 650; letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+details.more { margin-top: 14px; }
+details.more > summary { cursor: pointer; color: var(--accent); font-size: 13.5px; font-weight: 550; }
+details.more[open] > summary { margin-bottom: 8px; }
+#incidents td, #incidents th { text-align: left; vertical-align: top; }
 </style>
 </head>
 <body>
 <div class="wrap">
-  <h1>DeFi Risk Dependency: stay or exit, simulated on the real contracts</h1>
+  <h1>Stay or exit? DeFi positions, their dependencies, and what an incident does to the book</h1>
   <div class="sub" id="sub"></div>
 
-  <section class="card" style="border-left:4px solid var(--accent)">
-    <h2>What a portfolio manager should take away</h2>
-    <ol class="lim" id="summary" style="color:var(--ink); font-size:14px"></ol>
+  <!-- PART 1 · the brief's challenge: identify the dependencies of a position -->
+  <section class="card part">
+    <div class="kicker">1 · Identify the dependencies</div>
+    <h2>An on-chain position is a stack of dependencies</h2>
+    <p class="lead">A PT is one line in the book. Underneath it: the chain, the issuer behind its yield, the oracle that prices it, the pool where it is sold, and the lending markets that hold it as collateral. Mapped automatically for three PTs, along the brief's five layers. Click a node.</p>
+    <svg id="graph" role="img" aria-label="Dependency graph"></svg>
+    <div class="legend"><span><i class="sw" style="border:3px solid var(--muted);background:transparent"></i>shared by two or more positions</span><span>— measured</span><span>- - documented</span><span>··· unverified</span></div>
+    <div class="detail" id="detail">Select a node.</div>
+    <h3>What the three positions share</h3>
+    <ul class="lim" id="sharedkey" style="color:var(--ink)"></ul>
+    <details class="more"><summary>All shared dependencies</summary><table id="shared"></table></details>
+    <details class="more" id="eco" style="display:none"><summary id="ecosum">Same discovery on the whole Pendle × Morpho ecosystem</summary>
+      <p class="lead" id="ecolead"></p><div class="nums" id="econums"></div><table id="ecotable" style="margin-top:12px"></table></details>
   </section>
 
-  <section class="card" id="forklive" style="display:none; border-left:4px solid var(--warn)">
-    <h2>Local chain (Anvil fork): live during a demo</h2>
-    <p class="lead" id="forklead"></p>
-    <h3>Your book, right now</h3>
-    <table id="booknow"></table>
-    <h3>What the market is doing</h3>
-    <table id="forktable"></table>
-  </section>
+  <!-- PART 2 · the risk manager's question -->
+  <section class="card part">
+    <div class="kicker">2 · Estimate the impact, decide</div>
+    <h2>Should we stay, or is the expected loss high enough to justify exiting despite execution costs?</h2>
+    <p class="lead">For each position: what exiting costs now, what staying is expected to cost, and what each incident does to the fund's 1M PT, and how fast.</p>
+    <div class="tabs" id="tabs"></div>
 
-  <section class="card" id="live" style="display:none">
-    <h2>Live signals on mainnet</h2>
-    <p class="lead" id="livelead"></p>
-    <table id="livetable"></table>
-  </section>
-
-  <section class="card">
-    <h2>The book: which event hits which pocket</h2>
-    <p class="lead" id="booklead"></p>
-    <div class="nums" id="booknums"></div>
-    <table id="booktable" style="margin-top:12px"></table>
-    <p class="sub" id="booknote"></p>
-  </section>
-
-  <section class="card" id="calc">
-    <h2>Position calculator</h2>
-    <p class="lead">Pick a position and a size. Everything below is recomputed from what the fork measured: exit costs at each size, the pool's capacity, and the probability range.</p>
-    <div class="sliders" style="margin-top:0">
-      <div class="sl"><label>Position <b></b></label><select id="c-token" style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit"></select></div>
-      <div class="sl"><label>Position size (PT) <b id="c-size-usd"></b></label><input id="c-size" type="number" min="10000" step="100000" value="1000000" style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit"></div>
-      <div class="sl"><label>PT sold ahead of you in a crisis <b id="c-crowd-v"></b></label><input id="c-crowd" type="range" min="0" max="6000000" step="100000" value="1000000"><small>Other holders and liquidators who reach the pool first.</small></div>
-    </div>
-    <div class="grid" style="margin-top:14px">
-      <div class="badge" id="c-badge"><div class="word" id="c-word" style="font-size:30px"></div><div class="small" id="c-why"></div></div>
-      <div>
-        <div class="nums" id="c-nums"></div>
-        <table id="c-range" style="margin-top:12px"></table>
-        <p class="sub" id="c-note" style="margin-top:10px"></p>
-      </div>
-    </div>
-  </section>
-
-  <div class="tabs" id="tabs"></div>
-
-  <section class="card">
-    <div class="grid">
-      <div>
-        <div class="badge" id="badge"><div class="word" id="word"></div><div class="small" id="wsmall"></div></div>
-        <div class="callout action" style="margin-top:12px; grid-template-columns:1fr">
-          <div><span class="sub">Exit window once the signal fires</span><b class="big" id="window"></b></div>
-        </div>
-      </div>
+    <div class="grid" style="margin-top:16px">
+      <div class="badge" id="badge"><div class="word" id="word"></div><div class="small" id="wsmall"></div></div>
       <div>
         <div class="nums" id="nums"></div>
-        <table id="range" style="margin-top:12px"></table>
-        <div class="callout exit" id="liq"></div>
-        <div class="callout unclear" id="queue"></div>
-        <div class="callout action" style="grid-template-columns:1fr"><div><b>Action.</b> <span id="trigger"></span></div></div>
+        <p id="why" style="margin:12px 0 0"></p>
       </div>
     </div>
-  </section>
 
-  <div class="two">
-    <section class="card">
-      <h2 id="ctitle">Cascade</h2>
-      <p class="lead">Collateral seized on Morpho, and how much of it the Pendle pool could not absorb.</p>
-      <svg id="cascade" viewBox="0 0 520 290"></svg>
+    <h3>When an incident hits this position</h3>
+    <table id="incidents"></table>
+    <div class="callout action" style="grid-template-columns:1fr"><div><b>Action.</b> <span id="trigger"></span></div></div>
+
+    <div id="forklive" style="display:none; margin-top:18px; border-left:4px solid var(--warn); padding-left:12px">
+      <h3 style="margin-top:0">Live on the local chain: your book, right now</h3>
+      <p class="lead" id="forklead"></p>
+      <table id="booknow"></table>
+      <details class="more"><summary>What the market is doing (oracle, borrowers, pool)</summary><table id="forktable"></table></details>
+    </div>
+
+    <h3>What the fund gets for its 1M PT, by size of the shock</h3>
+    <svg id="exitchart" viewBox="0 0 520 260"></svg>
+    <div class="legend"><span><i class="sw" style="background:var(--stay)"></i>selling inside the exit window</span><span><i class="sw" style="background:var(--exit)"></i>selling after the cascade (0 = the pool refuses)</span></div>
+
+    <details class="more"><summary>And with a different position size?</summary>
+      <div class="sliders">
+        <div class="sl"><label>Position size (PT) <b id="c-size-usd"></b></label><input id="c-size" type="number" min="10000" step="100000" value="1000000" style="width:100%;padding:6px;border-radius:6px;border:1px solid var(--line);background:var(--card);color:var(--ink);font:inherit"></div>
+        <div class="sl"><label>PT sold ahead of you in a crisis <b id="c-crowd-v"></b></label><input id="c-crowd" type="range" min="0" max="6000000" step="100000" value="1000000"><small>Other holders and liquidators who reach the pool first.</small></div>
+      </div>
+      <div class="grid" style="margin-top:14px">
+        <div class="badge" id="c-badge"><div class="word" id="c-word" style="font-size:28px"></div><div class="small" id="c-why"></div></div>
+        <div class="nums" id="c-nums"></div>
+      </div>
+      <p class="sub" style="margin-top:10px">Size is limited by the pool, not by the yield: the fund exits fully only if the PT sold ahead of it plus its own size fit in the pool's capacity measured on the fork (this rule matches all 18 crowded-exit runs).</p>
+    </details>
+
+    <details class="more"><summary>All scenario results for this position</summary>
+      <h3 id="ctitle">Cascade</h3>
+      <svg id="cascade" viewBox="0 0 520 260"></svg>
       <div class="legend"><span><i class="sw" style="background:var(--accent)"></i>seized and sold</span><span><i class="sw" style="background:var(--exit)"></i>stuck (pool saturated)</span></div>
-    </section>
-    <section class="card">
-      <h2>What the fund gets for its 1M PT</h2>
-      <p class="lead">Selling inside the exit window vs after the cascade. Zero means the pool refuses the sale.</p>
-      <svg id="exitchart" viewBox="0 0 520 290"></svg>
-      <div class="legend"><span><i class="sw" style="background:var(--stay)"></i>exit inside the window</span><span><i class="sw" style="background:var(--exit)"></i>exit after the cascade</span></div>
-    </section>
-  </div>
-
-  <section class="card">
-    <h2>Scenario results</h2>
-    <p class="lead" id="slead"></p>
-    <table id="events"></table>
-    <h3>Same events with flash-loan liquidators</h3>
-    <p class="lead" style="margin-bottom:8px">They only liquidate what the pool can absorb in the same transaction, partially if needed. What they leave stays as unhealthy debt with the lenders.</p>
-    <table id="prudent"></table>
+      <h3>Probability range</h3><table id="range"></table>
+      <h3>Scenario table</h3><p class="lead" id="slead"></p><table id="events"></table>
+      <h3>Same events with flash-loan liquidators</h3><p class="lead">They only liquidate what the pool can absorb in the same transaction; what they leave stays as unhealthy debt with the lenders.</p><table id="prudent"></table>
+      <div id="extra"></div>
+    </details>
   </section>
 
-  <section class="card" id="extra"></section>
-
-  <section class="card">
-    <h2>Three tokens, mapped together: what they share</h2>
-    <p class="lead">Discovered automatically from Pendle, Morpho, DefiLlama and on-chain reads, and laid out along the brief's five layers. Left of the lending column is what each PT is made of; from it rightwards, what holds the PT and can force-sell it. Thick outlines are dependencies shared by two or more positions. Click a node.</p>
-    <svg id="graph" role="img" aria-label="Dependency graph"></svg>
-    <div class="detail" id="detail">Select a node.</div>
-    <h3>Shared dependencies</h3>
-    <table id="shared"></table>
+  <!-- PART 3 · the book -->
+  <section class="card part">
+    <div class="kicker">3 · The book</div>
+    <h2>Which incident hits which pocket</h2>
+    <p class="lead" id="booklead"></p>
+    <table id="booktable"></table>
+    <p class="sub" id="booknote"></p>
+    <details class="more"><summary>Contagion: how PT-reUSD can drag PT-sUSDS down</summary>
+      <p class="lead" id="clead"></p>
+      <div class="two"><div><ol class="lim" id="cpath" style="color:var(--ink)"></ol></div><div><table id="crun"></table></div></div>
+    </details>
   </section>
 
-  <section class="card" id="eco" style="display:none">
-    <h2>Ecosystem scan: every Pendle PT used as Morpho collateral</h2>
-    <p class="lead" id="ecolead"></p>
-    <div class="nums" id="econums"></div>
-    <table id="ecotable" style="margin-top:12px"></table>
-  </section>
-
+  <!-- folded background -->
   <section class="card">
-    <h2>Contagion between tokens that share nothing directly</h2>
-    <p class="lead" id="clead"></p>
-    <div class="two">
-      <div>
-        <h3>The path</h3>
-        <ol class="lim" id="cpath" style="color:var(--ink)"></ol>
-      </div>
-      <div>
-        <h3>Vault run replayed on the PT-sUSDS/USDT market</h3>
-        <table id="crun"></table>
-      </div>
-    </div>
-  </section>
-
-  <section class="card">
-    <h2>How this was produced</h2>
-    <p class="lead">An Anvil fork of Ethereum mainnet, pinned at one block. Each scenario starts from the real state, forces one event with Foundry cheatcodes (mocked feed, issuer write-down, whale dump, time warp), lets the real Morpho, Pendle and oracle contracts react, measures, then reverts.</p>
-    <pre>anvil --fork-url $ETH_RPC_URL --fork-block-number <span id="blk"></span>
+    <details class="more" style="margin-top:0"><summary>How probabilities are estimated</summary>
+      <p class="lead" id="probs"></p></details>
+    <details class="more"><summary>How this was produced</summary>
+      <p class="lead">An Anvil fork of Ethereum mainnet, pinned at one block. Each scenario starts from the real state, forces one event (mocked price feed, issuer write-down, whale dump, time warp), lets the real Morpho, Pendle and oracle contracts react, measures, then reverts.</p>
+      <pre>anvil --fork-url $ETH_RPC_URL --fork-block-number <span id="blk"></span>
 cd sim &amp;&amp; forge test --fork-url http://127.0.0.1:8545
-cd ../src &amp;&amp; python -m defi_risk.sim_report &amp;&amp; python -m defi_risk.dashboard</pre>
-  </section>
-
-  <section class="card">
-    <h2>Limits you should know about</h2>
-    <ul class="lim" id="limits"></ul>
+cd ../src &amp;&amp; python -m defi_risk.sim_report &amp;&amp; python -m defi_risk.dashboard</pre></details>
+    <details class="more"><summary>Limits</summary><ul class="lim" id="limits"></ul></details>
+    <details class="more" id="live" style="display:none"><summary>Monitoring the same signals on mainnet</summary>
+      <p class="lead" id="livelead"></p><table id="livetable"></table></details>
   </section>
 </div>
 
@@ -223,33 +188,75 @@ const sev = x => pct(x, Number.isInteger(+(x * 100).toFixed(4)) ? 0 : 2);
 const num = x => x >= 1e8 ? Math.round(x / 1e6) + "M" : x >= 1e6 ? (x / 1e6).toFixed(1) + "M" : x >= 1e3 ? Math.round(x / 1e3) + "k" : Math.round(x);
 let D, cur = 0;
 
+function chance(pr) {
+  return pr ? `${pct(pr.p, 2)} <span class="sub">(${pct(pr.lo, 1)}-${pct(pr.hi, 1)})</span>` : '<span class="sub">not priced</span>';
+}
+
+// One row per incident that hits this position: what it does to the fund's 1M PT, how fast, how likely.
+function incidentRows(p) {
+  const d = p.decision, rows = [], calm = p.calm_exit;
+  const driver = p.driver.split(" (")[0];
+  const hit = p.events.find(e => e.severity === p.stuck_from);
+  if (hit) rows.push([`${driver} of ${sev(p.stuck_from)} or more${p.window_hours >= 1 ? ", lasting more than " + p.window : ""}`,
+    `${usd(hit.exit_in_window)} if sold inside the window, then <b>unsellable</b>: ${hit.liquidated} borrower${hit.liquidated === 1 ? "" : "s"} liquidated, ${num(hit.stuck_pt)} PT stuck in the pool`,
+    p.window, chance(d.p_stuck)]);
+  if (p.name === "PT-sUSDe") {
+    const dip = p.short_dip.filter(r => !r.switched).map(r => r.hours_depegged);
+    rows.push([`Short dip: USDe at $0.96 for up to ${Math.max(...dip)} h (the Bybit-hack pattern)`,
+      "nothing: the oracle never switches, nobody is liquidated", "-", '<span class="sub">frequent, harmless</span>']);
+    const x = D.exchange_hacks;
+    rows.push(["A perp exchange behind USDe's hedge is hacked",
+      "USDe dipped below $0.96 for about a day after Bybit's hack: harmless if under 16 h, otherwise the row above",
+      "16 h", `${pct(x.per_year, 1)} per venue per year`]);
+    const ff = p.feed_failure.find(r => r.wrong_price === 80000000) || p.feed_failure[p.feed_failure.length - 1];
+    rows.push([`The Chainlink USDe/USD feed prints $${(ff.wrong_price / 1e8).toFixed(2)} for 16 h (USDe really at $1)`,
+      `${ff.liquidated} borrowers wrongly liquidated, ${usd(ff.bad_debt_usdc / 1e6)} bad debt, pool full: <b>unsellable</b>`, "16 h", '<span class="sub">not priced</span>']);
+    const pan = p.pt_panic.find(r => r.dump_pt / 1e18 >= 2e6) || p.pt_panic[p.pt_panic.length - 1];
+    rows.push([`Panic in the PT market: a whale dumps ${num(pan.dump_pt / 1e18)} PT`,
+      `nobody liquidated (the oracle ignores the market), but the pool fills: the fund gets ${pan.fund_exit_after ? usd(pan.fund_exit_after / 1e6) : "nothing"}`,
+      "immediate", '<span class="sub">not priced</span>']);
+  } else {
+    const pan = p.pt_panic.find(r => !r.fund_exit && r.liquidated) || p.pt_panic.find(r => !r.fund_exit) || p.pt_panic[p.pt_panic.length - 1];
+    const fall = Math.max(0, 1 - pan.oracle_low / pan.oracle_start);
+    rows.push([`Panic in the PT market: a whale dumps ${num(pan.dump_pt)} PT`,
+      `oracle ${fall > 0.001 ? "falls " + pct(fall, 1) : "barely moves (floor)"}, ${pan.liquidated} liquidated, pool full: the fund gets ${pan.fund_exit ? usd(pan.fund_exit) : "nothing"}`,
+      p.name === "PT-reUSD" ? "15 min" : "immediate", '<span class="sub">not priced</span>']);
+  }
+  const k = D.book.contagion;
+  if (p.name === "PT-sUSDS" && k)
+    rows.push(["Contagion: a reUSD write-down makes Smokehouse USDT's depositors run",
+      `the vault pulls out: ${usd(k.locked)} locked, borrow rate ${pct(k.rate_before, 1)} → ${pct(k.rate_after, 1)}, borrowers must sell PT-sUSDS`,
+      "days", chance(k)]);
+  rows.push(["Pendle's governance pauses the SY behind the PT (settlement layer)", "<b>unsellable at once</b>, until it is unpaused", "instant", '<span class="sub">not priced</span>']);
+  return rows;
+}
+
 function renderPosition() {
-  const p = D.positions[cur], d = p.decision;
+  const p = D.positions[cur], d = p.decision, at = d.at;
   document.querySelectorAll(".tab").forEach((t, i) => t.classList.toggle("on", i === cur));
   $("word").textContent = d.verdict;
   $("badge").className = "badge " + d.verdict.toLowerCase();
-  $("wsmall").textContent = d.verdict === "UNCLEAR" ? "the probability range does not agree" : "the whole probability range agrees";
-  $("window").textContent = p.window;
+  $("wsmall").textContent = { STAY: "stay: the whole probability range agrees", EXIT: "exit: the whole probability range agrees", UNCLEAR: "reduce: the probability range straddles break-even" }[d.verdict];
   const n = (v, l) => `<div class="num"><div class="v">${v}</div><div class="l">${l}</div></div>`;
-  $("nums").innerHTML = n(pct(d.exit_cost, 3), "cost of exiting now (pool only)") + n(pct(d.carry, 3), "carry given up by exiting") +
-    n(pct(d.at.p.expected_loss, 3), "expected permanent loss if we stay") + n(pct(p.implied_apy, 2), "implied APY, " + Math.round(p.days) + " days left");
-  let r = "<tr><th>Probability estimate (cohort)</th><th>Expected loss</th><th>Verdict</th></tr>";
-  [["lo", "Low end of 90% range"], ["p", "Central"], ["hi", "High end"]].forEach(([k, l]) => {
-    const a = d.at[k];
-    r += `<tr><td>${l}</td><td>${pct(a.expected_loss, 3)}</td><td><b style="color:var(--${a.verdict === "STAY" ? "stay" : "exit"})">${a.verdict}</b> (${a.edge > 0 ? "+" : ""}${pct(a.edge, 3)})</td></tr>`;
-  });
+  $("nums").innerHTML =
+    n(pct(d.exit_cost, 2), "execution cost of exiting now (1M PT, measured on the pool)") +
+    n(pct(at.p.expected_loss, 2), `expected loss if we stay (range ${pct(at.lo.expected_loss, 2)}-${pct(at.hi.expected_loss, 2)})`) +
+    n(pct(d.carry, 2), `yield given up by exiting (${pct(p.implied_apy, 1)} vs ${pct(d.risk_free, 1)} T-bill, ${Math.round(p.days)} days)`);
+  const keep = d.exit_cost + d.carry;
+  $("why").innerHTML = d.verdict === "STAY"
+    ? `Exiting costs ${pct(d.exit_cost, 2)} plus ${pct(d.carry, 2)} of yield given up (${pct(keep, 2)}); the expected loss stays below that even at the high end (${pct(at.hi.expected_loss, 2)}). <b>Stay</b>, and prepare the exit for the incidents below.`
+    : d.verdict === "EXIT"
+    ? `The expected loss exceeds the ${pct(keep, 2)} that exiting costs, across the whole range. <b>Exit</b>.`
+    : `Exiting costs ${pct(d.exit_cost, 2)} plus ${pct(d.carry, 2)} of yield given up (${pct(keep, 2)}). The expected loss is lower at the centre (${pct(at.p.expected_loss, 2)}) but higher at the high end (${pct(at.hi.expected_loss, 2)}): the data cannot tell. <b>Hold less</b> rather than all-or-nothing.`;
+  $("incidents").innerHTML = "<tr><th>Incident</th><th>What it does to the fund's 1M PT</th><th>Time to act</th><th>Chance before expiry</th></tr>" +
+    incidentRows(p).map(r => `<tr><td>${r[0]}</td><td>${r[1]}</td><td>${r[2]}</td><td>${r[3]}</td></tr>`).join("");
+  $("trigger").textContent = `Watch ${p.trigger}. Once it fires, the fund has ${p.window} to exit before liquidations fill the pool.` +
+    (p.window_hours < 1 ? " Too short for a human: the exit has to be automated." : "");
+  let r = "<tr><th>Probability estimate</th><th>Expected loss</th><th>Staying vs exiting</th></tr>";
+  [["lo", "Low end of 90% range"], ["p", "Central"], ["hi", "High end"]].forEach(([k, l]) =>
+    r += `<tr><td>${l}</td><td>${pct(at[k].expected_loss, 3)}</td><td><b style="color:var(--${at[k].verdict === "STAY" ? "stay" : "exit"})">${at[k].verdict.toLowerCase()}</b> (${at[k].edge > 0 ? "+" : ""}${pct(at[k].edge, 3)})</td></tr>`);
   $("range").innerHTML = r;
-  $("liq").innerHTML = p.stuck_from != null && d.p_stuck
-    ? `<b>Liquidity risk.</b> From a ${pct(p.stuck_from, 0)} move in the ${p.driver.split(" (")[0]}, the cascade saturates the pool and the fund's PT becomes unsellable before maturity. Chance before expiry: <b>${pct(d.p_stuck.p, 2)}</b> (range ${pct(d.p_stuck.lo, 2)} to ${pct(d.p_stuck.hi, 2)}).`
-    : "No severity tested made the position unsellable.";
-  if (d.p_stuck_prudent) $("liq").innerHTML += ` If liquidators only take what they can sell at once (flash loans), it takes a ${pct(p.stuck_from_prudent, 0)} move: chance ${pct(d.p_stuck_prudent.p, 2)}.`;
-  const c = p.crowd;
-  $("queue").innerHTML = c ? `<b>The exit is a queue.</b> After a ${sev(c.severity)} move, the fund still gets ~fair value with up to <b>${num(c.room_pt)} PT</b> sold ahead of it; from ${num(c.blocked_from_pt)} PT ahead, part of it is stuck. ` +
-    c.rows.map(r => `${num(r.crowd_pt)} ahead: ${r.fund_unsold > 0 ? usd(r.fund_exit) + " (" + num(r.fund_unsold) + " PT stuck)" : usd(r.fund_exit)}`).join(" · ") +
-    `. Keep the position small against that room, and be early.` : "";
-  $("trigger").textContent = `Watch ${p.trigger}. Once it fires, the fund has ${p.window} to exit before liquidations reach the pool.` +
-    (p.window_hours < 1 ? " That is too short for a human: the exit has to be automated." : "");
-  renderCascade(p); renderExit(p); renderEvents(p); renderExtra(p);
+  renderCascade(p); renderExit(p); renderEvents(p); renderExtra(p); renderCalc();
 }
 
 function bars(svgId, rows, series, yfmt) {
@@ -430,21 +437,6 @@ function renderLive() {
   }).catch(() => {});
 }
 
-function renderSummary() {
-  const P = Object.fromEntries(D.positions.map(p => [p.name, p])), b = D.book.book.p, k = D.book.contagion;
-  const fmtWin = p => `${p.name}: ${p.window}`;
-  const items = [
-    `<b>Same product, opposite risks.</b> Three PTs that look alike react differently because of their lending oracle. ` +
-      D.positions.map(p => `${p.name} becomes unsellable from a <b>${pct(p.stuck_from, 0)}</b> ${p.driver.split(" (")[0]}`).join("; ") + ".",
-    `<b>The exit window is set by the oracle, not by the market.</b> ${D.positions.map(fmtWin).join(", ")}. Inside it the exit is a queue: the first ~${num(Math.min(...D.positions.map(p => p.crowd.room_pt)))} PT out get fair value, the rest get nothing.` +
-      (D.positions.some(p => p.window_hours < 1) ? " A 15-minute window cannot be met by a human: the exit must be automated." : ""),
-    `<b>The book is more correlated than its issuers.</b> With 1M PT in each pocket, there is a <b>${pct(b.any_stuck, 1)}</b> chance that at least one becomes unsellable before expiry` +
-      (k ? `, and a shared lender (Smokehouse USDT) can drag PT-sUSDS down with PT-reUSD although they share no issuer.` : "."),
-    `<b>Verdicts:</b> ${D.positions.map(p => `${p.name} ${p.decision.verdict}`).join(", ")}. UNCLEAR means the measured probability range straddles the break-even: reduce size rather than choose all-or-nothing.`,
-  ];
-  $("summary").innerHTML = items.map(x => `<li>${x}</li>`).join("");
-}
-
 // ---------- position calculator ----------
 function calcModel(p) {
   // pool capacity: the most PT a single sale got through on the fork, calm market
@@ -461,7 +453,7 @@ function calcModel(p) {
   return { capacity, priceAt };
 }
 function renderCalc() {
-  const p = D.positions[+$("c-token").value], d = p.decision, m = calcModel(p);
+  const p = D.positions[cur], d = p.decision, m = calcModel(p);
   const size = Math.max(0, +$("c-size").value || 0), crowd = +$("c-crowd").value;
   $("c-size-usd").textContent = "≈ " + usd(size * p.mark);
   $("c-crowd-v").textContent = num(crowd) + " PT";
@@ -483,25 +475,14 @@ function renderCalc() {
     n(num(m.capacity) + " PT", "pool capacity: the largest single sale it accepted on the fork") +
     n(crisisStuck ? num(crisisStuck) + " PT" : "0", "stuck if you exit in a crisis behind that crowd") +
     n(num(room) + " PT", `largest position that still exits fully with ${num(crowd)} ahead (≈ ${usd(room * p.mark)})`);
-  let t = "<tr><th>Probability estimate</th><th>Carry given up</th><th>Expected loss</th><th>Exit cost</th><th>Staying vs exiting</th></tr>";
-  [["lo", "Low end"], ["p", "Central"], ["hi", "High end"]].forEach(([k, l]) => t +=
-    `<tr><td>${l}</td><td>${pct(d.carry, 3)}</td><td>${pct(d.at[k].expected_loss, 3)}</td><td>${pct(exitCost, 3)}</td><td><b style="color:var(--${at[k] > 0 ? "stay" : "exit"})">${at[k] > 0 ? "stay" : "exit"}</b> (${at[k] > 0 ? "+" : ""}${pct(at[k], 3)})</td></tr>`);
-  $("c-range").innerHTML = t;
-  $("c-note").textContent = `${p.name}: implied APY ${pct(p.implied_apy, 2)}, ${Math.round(p.days)} days to expiry, exit window ${p.window} once ${p.driver.split(" (")[0].toLowerCase()} starts. ` +
-    `A bigger position costs more to exit, which makes staying look better on paper, but it also needs more room in the queue: size is limited by the pool, not by the yield. ` +
-    `Capacity is the largest single sale the pool accepted on the fork; the crisis rule (fund exits fully if crowd + size ≤ capacity) matches all 18 crowded-exit runs.`;
 }
 function setupCalc() {
-  $("c-token").innerHTML = D.positions.map((p, i) => `<option value="${i}">${p.name}</option>`).join("");
-  ["c-token", "c-size", "c-crowd"].forEach(id => $(id).addEventListener("input", renderCalc));
-  renderCalc();
+  ["c-size", "c-crowd"].forEach(id => $(id).addEventListener("input", renderCalc));
 }
 
 function renderBook() {
   const b = D.book, n = (v, l) => `<div class="num"><div class="v">${v}</div><div class="l">${l}</div></div>`, c = b.book;
-  $("booklead").textContent = `${b.fund_pt.toLocaleString("en")} PT in each of ${b.pockets.join(", ")}. Each row is an event replayed on the fork; probabilities come from the stablecoin cohort.`;
-  $("booknums").innerHTML = n(pct(c.p.any_stuck, 1), `chance at least one pocket becomes unsellable before expiry (range ${pct(c.lo.any_stuck, 1)} to ${pct(c.hi.any_stuck, 1)})`) +
-    n(c.p.expected_stuck_pockets_with_contagion.toFixed(3), `expected pockets stuck, ${c.p.expected_stuck_pockets.toFixed(3)} without contagion`);
+  $("booklead").innerHTML = `${b.fund_pt.toLocaleString("en")} PT in each pocket. Chance that at least one pocket becomes unsellable before expiry: <b>${pct(c.p.any_stuck, 1)}</b> (range ${pct(c.lo.any_stuck, 1)} to ${pct(c.hi.any_stuck, 1)}).`;
   let t = `<tr><th>Event</th><th>Chance before expiry</th><th>Exit window</th>${b.pockets.map(p => `<th>${p}</th>`).join("")}</tr>`;
   b.rows.forEach(r => t += `<tr><td>${r.event}</td><td>${pct(r.p, 2)} <span class="sub">(${pct(r.lo, 1)}-${pct(r.hi, 1)})</span></td><td>${r.window}</td>` +
     b.pockets.map(p => { const h = r.hits[p]; return `<td style="color:var(--${h === "-" ? "muted" : "exit"})">${h === "stuck if the vault run happens" ? "stuck*" : h}</td>`; }).join("") + "</tr>");
@@ -528,7 +509,7 @@ function renderFork() {
   fetch("fork_status.json", { cache: "no-store" }).then(r => r.ok ? r.json() : null).then(f => {
     if (!f) return;
     $("forklive").style.display = "";
-    $("forklead").textContent = `What an incident does to the book, and how fast. Each pocket is priced by asking the real Pendle pool what it would pay for the fund's PT right now (simulated, nothing is executed). What the local fork looks like right now, refreshed every 3 s by python -m defi_risk.forkwatch --loop 3. Block ${f.block}, chain clock ${f.hours_since_fork >= 0 ? "+" : ""}${f.hours_since_fork.toFixed(1)} h after the pinned block. Read at ${f.read_at}.`;
+    $("forklead").textContent = `Each pocket priced every 3 s by asking the real Pendle pool what it would pay for the fund's PT (simulated, nothing executed). Block ${f.block}, chain clock ${f.hours_since_fork >= 0 ? "+" : ""}${f.hours_since_fork.toFixed(1)} h, read at ${f.read_at}.`;
     let t = "<tr><th>Position</th><th>Price input</th><th>Oracle</th><th>Lending markets: unhealthy / borrowers, debt at risk</th><th>Pool implied APY</th></tr>";
     f.tokens.forEach(k => {
       if (k.error) { t += `<tr><td>${k.name}</td><td colspan="4">read failed: ${k.error}</td></tr>`; return; }
@@ -555,6 +536,27 @@ function renderFork() {
   }).catch(() => {});
 }
 
+// Part 1: what the dependency map shows across the three positions, in plain words.
+function renderSharedKey() {
+  const items = [], c = D.contagion.paths[0];
+  if (c) {
+    const legs = c.legs.map(l => `${l.position.split(" ")[0]} (${pct(l.share_of_market_supply, 0)} of its market's lenders)`).join(" and ");
+    items.push(`<b>One lender behind two issuers.</b> ${c.vault} lends to ${legs}: a loss on one can drain the other, although they share no issuer.`);
+  }
+  items.push(`<b>One switch behind all three.</b> The SY contract under each PT can be paused by Pendle's governance, and the three have the same owner (read on-chain).`);
+  items.push(`<b>Same infrastructure.</b> All three run on Pendle and Morpho Blue on Ethereum, borrow USDC, and get part of their exit liquidity from off-chain limit orders that market makers can pull.`);
+  items.push(`<b>Same layer, three different oracles.</b> sUSDe's lending oracle ignores the market (linear discount), reUSD's follows the pool's 15-minute average, sUSDS's follows it above a floor. This is what makes the same incident hit them differently below.`);
+  $("sharedkey").innerHTML = items.map(x => `<li>${x}</li>`).join("");
+}
+
+function renderProbs() {
+  const x = D.exchange_hacks;
+  $("probs").innerHTML = `Never typed in by hand. For a move of size d: count the persistent episodes (two weekly prices in a row at or below 1 − d) ` +
+    `in the price history of 17 non-fiat USD stablecoins above $100M (about 3 years), divide by the number of holding windows observed, and give a 90% Poisson range. ` +
+    `For PT-reUSD the same cohort is a proxy for an issuer write-down. Exchange hacks: ${x.incidents} hacks of $10M+ over ${Math.round(x.exchange_years)} exchange-years ` +
+    `on the 25 largest perp venues. The expected loss sums, over move sizes, probability × size of the permanent loss.`;
+}
+
 function renderLimits() {
   $("limits").innerHTML = [
     "Liquidator behaviour is bracketed by two runs: liquidators who seize everything and dump it, and flash-loan liquidators who stop when the pool is full. Real behaviour sits in between.",
@@ -573,7 +575,7 @@ fetch("data.json").then(r => r.json()).then(d => {
   $("blk").textContent = d.fork_block;
   $("tabs").innerHTML = d.positions.map((p, i) => `<button class="tab" data-i="${i}">${p.name}</button>`).join("");
   document.querySelectorAll(".tab").forEach(t => t.onclick = () => { cur = +t.dataset.i; renderPosition(); });
-  renderSummary(); renderBook(); setupCalc(); renderPosition(); renderGraph(); renderContagion(); renderLimits(); renderLive(); renderEco(); renderFork(); setInterval(renderFork, 3000); setInterval(renderLive, 60000);
+  renderSharedKey(); renderProbs(); renderBook(); setupCalc(); renderPosition(); renderGraph(); renderContagion(); renderLimits(); renderLive(); renderEco(); renderFork(); setInterval(renderFork, 3000); setInterval(renderLive, 60000);
 }).catch(e => { document.body.insertAdjacentHTML("afterbegin", "<p style='padding:16px'>Could not load data.json. Run python -m defi_risk.dashboard, then serve this folder.</p>"); console.error(e); });
 </script>
 </body>
