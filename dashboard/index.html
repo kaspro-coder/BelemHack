@@ -88,7 +88,7 @@ details.more[open] > summary { margin-bottom: 8px; }
   <section class="card part">
     <div class="kicker">1 · Identify the dependencies</div>
     <h2>An on-chain position is a stack of dependencies</h2>
-    <p class="lead">A PT is one line in the book. Underneath it: the chain, the issuer behind its yield, the oracle that prices it, the pool where it is sold, and the lending markets that hold it as collateral. Mapped automatically for three PTs, along the brief's five layers, in the order an incident travels: read left to right, a shock at the issuer reaches the oracle, the lending markets liquidate, their PT floods the pool, and the fund's position is stuck. Click a node.</p>
+    <p class="lead">A PT is one line in the book. Underneath it: the chain, the issuer behind its yield, the oracle that prices it, the pool where it is sold, and the lending markets that hold it as collateral. Mapped automatically for three PTs along the brief's five layers. On the far left, the settlement layer everything runs on; then, left to right, the order an incident travels: a shock at the issuer reaches the oracle, the lending markets liquidate, their PT floods the pool, and the fund's position is stuck. Click a node.</p>
     <svg id="graph" role="img" aria-label="Dependency graph"></svg>
     <div class="legend"><span><i class="sw" style="border:3px solid var(--muted);background:transparent"></i>shared by two or more positions</span><span>— measured</span><span>- - documented</span><span>··· unverified</span></div>
     <div class="detail" id="detail">Select a node.</div>
@@ -327,15 +327,15 @@ function renderExtra(p) {
 
 // Columns follow the way an incident travels to the fund: the issuer is hit (L2), the oracle passes it
 // on (L3), lending markets liquidate (L5), their PT floods the pool (L4), the fund's position is stuck.
-// Layer 1 (chain and protocols) sits underneath everything, drawn as a band at the bottom.
+// Layer 1 (chain and protocols) sits underneath everything: first column, on the far left.
 const LAYERS = [
+  { key: "L1", title: "Layer 1 · Settlement", sub: "underneath everything" },
   { key: "L2", title: "Layer 2 · Yield source & issuer", sub: "where a shock starts" },
   { key: "L3", title: "Layer 3 · Oracle", sub: "passes it to the lending price" },
   { key: "L5", title: "Layer 5 · Lending markets", sub: "liquidate, force-sell the PT" },
   { key: "L4", title: "Layer 4 · PT market", sub: "where the PT is sold" },
   { key: "pos", title: "Positions", sub: "the fund's PTs" },
 ];
-const BAND = { key: "L1", title: "Layer 1 · Settlement", sub: "underneath everything: chain and protocols" };
 function layerOf(n, fromIssuer) {
   if (n.kind === "position") return "pos";
   if (["chain", "protocol"].includes(n.kind)) return "L1";
@@ -362,32 +362,26 @@ function renderGraph() {
   const nodes = D.graph.nodes, edges = D.graph.edges;
   const issuers = new Set(nodes.filter(n => n.kind === "issuer").map(n => n.id));
   const fromIssuer = new Set(edges.filter(e => issuers.has(e.source)).map(e => e.target));
-  const cols = LAYERS.map(() => []), band = [];
-  nodes.forEach(n => { const k = layerOf(n, fromIssuer); if (k === "L1") band.push(n); else cols[LAYERS.findIndex(l => l.key === k)].push(n); });
+  const cols = LAYERS.map(() => []);
+  nodes.forEach(n => cols[LAYERS.findIndex(l => l.key === layerOf(n, fromIssuer))].push(n));
   cols.forEach(c => c.sort((a, b) => ORDER.indexOf(a.kind) - ORDER.indexOf(b.kind) || a.label.localeCompare(b.label)));
-  const bw = 180, bh = 26, gap = 31, W = 1140, top = 46, step = (W - bw - 8) / (LAYERS.length - 1);
+  const bw = 166, bh = 26, gap = 31, W = 1140, top = 46, step = (W - bw - 8) / (LAYERS.length - 1);
   const xs = LAYERS.map((_, i) => 4 + i * step);
-  const colH = top + Math.max(...cols.map(c => c.length)) * gap + 10, bandTop = colH + 18, H = bandTop + 74;
+  const colH = top + Math.max(...cols.map(c => c.length)) * gap + 10, H = colH;
   $("graph").setAttribute("viewBox", `0 0 ${W} ${H}`);
   const pos = {};
   cols.forEach((c, ci) => { const off = top + (colH - top - c.length * gap) / 2; c.forEach((n, i) => pos[n.id] = { x: xs[ci], y: off + i * gap }); });
-  const bstep = (W - 40) / Math.max(1, band.length);
-  band.forEach((n, i) => pos[n.id] = { x: 20 + i * bstep + (bstep - bw) / 2, y: bandTop + 38, band: true });
   const dash = { measured: "", documented: "6 4", unverified: "2 4" };
   let s = "";
   LAYERS.forEach((l, i) => {
     s += `<rect x="${xs[i] - 3}" y="2" width="${bw + 6}" height="${colH - 4}" rx="8" fill="var(--bg)" opacity="${l.key === "pos" ? 0 : .55}"/>`;
     s += `<text x="${xs[i] + 2}" y="18" style="font-weight:650">${l.title}</text><text class="muted" x="${xs[i] + 2}" y="33" style="font-size:10.5px">${l.sub}</text>`;
-    if (i < LAYERS.length - 1) s += `<text x="${xs[i] + bw + (step - bw) / 2}" y="26" text-anchor="middle" class="muted" style="font-size:16px">→</text>`;
+    if (i > 0 && i < LAYERS.length - 1) s += `<text x="${xs[i] + bw + (step - bw) / 2}" y="26" text-anchor="middle" class="muted" style="font-size:16px">→</text>`;
   });
-  s += `<rect x="4" y="${bandTop}" width="${W - 8}" height="${H - bandTop - 4}" rx="8" fill="var(--bg)" opacity=".55"/>`;
-  s += `<text x="12" y="${bandTop + 17}" style="font-weight:650">${BAND.title}</text><text class="muted" x="160" y="${bandTop + 17}" style="font-size:10.5px">${BAND.sub}</text>`;
+
   edges.forEach(e => { const a = pos[e.source], b = pos[e.target]; if (!a || !b) return;
     let d;
-    if (a.band || b.band) { // to or from the settlement band: a soft vertical curve
-      const [u, v] = a.band ? [b, a] : [a, b], x1 = u.x + bw / 2, y1 = u.y + bh, x2 = v.x + bw / 2, y2 = v.y;
-      d = `M${x1},${y1} C${x1},${(y1 + y2) / 2} ${x2},${(y1 + y2) / 2} ${x2},${y2}`;
-    } else if (Math.abs(a.x - b.x) < 1) { // same layer: loop out to the right
+    if (Math.abs(a.x - b.x) < 1) { // same layer: loop out to the right
       const x = a.x + bw, bulge = x + 26;
       d = `M${x},${a.y + bh / 2} C${bulge},${a.y + bh / 2} ${bulge},${b.y + bh / 2} ${x},${b.y + bh / 2}`;
     } else {
