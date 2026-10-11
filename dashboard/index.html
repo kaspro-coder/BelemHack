@@ -8,7 +8,7 @@
 /* Grayscale, square, plain: an open-source tool look. Severity is shown by weight and inversion, not colour. */
 :root {
   --bg: #ffffff; --card: #ffffff; --ink: #000000; --muted: #555555; --line: #cfcfcf;
-  --stay: #8c8c8c; --stay-bg: #ffffff; --exit: #111111; --exit-bg: #111111;
+  --stay: #15803d; --stay-bg: #ffffff; --exit: #dc2626; --exit-bg: #dc2626;
   --warn: #333333; --warn-bg: #f2f2f2; --accent: #111111; --accent-bg: #f2f2f2;
   /* colour only where it carries meaning: the dependency kinds, and the live state on the local chain */
   --n-pos: #000000; --n-amm: #2563eb; --n-asset: #7c3aed; --n-issuer: #7c3aed;
@@ -42,9 +42,9 @@ input, select { border: 1px solid var(--ink) !important; background: var(--card)
 .badge { padding: 18px; text-align: center; border: 1px solid var(--ink); }
 .badge .word { font-size: 34px; font-weight: 800; letter-spacing: .04em; }
 .badge .small { font-size: 12px; margin-top: 4px; }
-.badge.stay { background: var(--card); color: var(--ink); }
-.badge.exit { background: var(--ink); color: var(--bg); }
-.badge.unclear { background: var(--card); color: var(--ink); border: 2px dashed var(--ink); }
+.badge.stay { background: var(--green); color: #fff; border-color: var(--green); }
+.badge.exit { background: var(--red); color: #fff; border-color: var(--red); }
+.badge.unclear { background: var(--amber); color: #fff; border: 2px dashed var(--ink); }
 .callout.exit, .callout.unclear { background: var(--card); color: var(--ink); border: 1px solid var(--ink); }
 .nums { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; }
 .num .v { font-size: 20px; font-weight: 700; font-variant-numeric: tabular-nums; }
