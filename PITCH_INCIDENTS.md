@@ -8,9 +8,9 @@ clics et l'attente des commandes). « À l'écran » dit quoi montrer.
 |---|---|---|
 | 0 · Accroche | 25 s | 0:25 |
 | 1 · Dépendances | 1 min | 1:25 |
-| 2 · Rester ou sortir | 40 s | 2:05 |
-| 3 · L'incident en direct | 1 min 45 | 3:50 |
-| 4 · Les deux autres positions et le book | 50 s | 4:40 |
+| 2 · Rester ou sortir | 35 s | 2:00 |
+| 3 · Les incidents, dont un en direct | 2 min | 4:00 |
+| 4 · Les deux autres positions et le book | 40 s | 4:40 |
 | 5 · Clôture | 20 s | 5:00 |
 
 ## Avant de monter sur scène
@@ -48,16 +48,20 @@ même couche cache trois oracles différents : c'est ce qui décide de tout le r
 *« Toute cette carte se résume en un chiffre : ce que rester rapporte de plus que sortir. Pour sUSDe, plus 0,18 %. Il
 vient de trois mesures : sortir coûte 0,22 %, mesuré en vendant vraiment un million de PT dans le pool, plus 0,12 % de
 rendement abandonné ; rester coûte en moyenne 0,16 %. Mais la fourchette va de moins 0,09 à plus 0,27 % : elle passe par
-zéro, donc on réduit la position. Les probabilités viennent de l'historique de 17 stablecoins comparables. »*
+zéro, donc on réduit la position. »*
 
 **À l'écran** : le badge UNCLEAR orange avec « +0.18% · +$1.8k » en grand et sa fourchette ; les 3 puces en dessous.
 
-## 3 · L'incident en direct (1 min 45) [Impact, 30 % · Démo, 15 %]
+## 3 · Les incidents, dont un en direct (2 min) [Impact, 30 % · Démo, 15 %]
 
 *« Le brief le dit : remarquer l'incident n'est pas le difficile. Le difficile, c'est ce qu'il fait au book, et en
-combien de temps. Je le joue sur une copie d'Ethereum, avec les vrais contrats et les vrais emprunteurs. »*
+combien de temps. On a codé quatorze scénarios sur les trois positions, au moins un par couche : décrochage ou
+dépréciation chez l'émetteur, panne du flux de prix, panique sur le pool, foule de vendeurs, contagion par le prêteur
+commun, pause de Pendle. Ce tableau donne pour chacun l'effet sur nos PT, le temps pour agir et la probabilité. J'en
+joue un en direct, sur une copie d'Ethereum avec les vrais contrats. »*
 
-**À l'écran** : le panneau « Live on the local chain ». Un collage par étape dans la fenêtre 4.
+**À l'écran** : d'abord le tableau « When an incident hits this position » (5 secondes, le temps de la phrase), puis le
+panneau « Live on the local chain ». Un collage par étape dans la fenêtre 4.
 
 1. **1a + 1b collés ensemble** : *« USDe perd 1 %. Notre poche vaut encore 981 000 dollars et reste vendable : l'oracle
    ignore USDe tant qu'il n'a pas été contesté 16 heures. Quelqu'un lance la contestation : on a 16 heures. »*
@@ -76,8 +80,7 @@ sur une seule poche. »*
 *« Même question, autres réponses. reUSD : on reste, 11,8 % de rendement couvrent le risque, mais son oracle suit le
 marché en 15 minutes : aucun humain ne tient cette fenêtre, la sortie doit être automatique. sUSDS : on réduit. »*
 
-*« Sur le book : 8,5 % de chances qu'au moins une poche soit bloquée avant l'échéance. Et la vraie limite de taille, c'est
-la place dans le pool en cas de crise, pas le rendement. »*
+*« Sur le book : 8,5 % de chances qu'au moins une poche soit bloquée avant l'échéance. »*
 
 **À l'écran** : onglet PT-reUSD (STAY vert, « 15 min to exit → automate it ») ; onglet PT-sUSDS ; descendre sur
 « Which incident hits which pocket ».
@@ -117,6 +120,11 @@ Tout est déjà sur la page : le tableau des incidents et le graphique « USDe d
 montrent les mêmes chiffres (barre verte à 981k à 1 %, barre rouge à 0). Continue dessus sans t'arrêter.
 
 ## Questions probables, réponses courtes
+- **« Quels scénarios exactement ? »** 14 sur le fork, chacun à plusieurs intensités. sUSDe : décrochage d'USDe (avec
+  deux comportements de liquidateurs), creux court, panne du flux Chainlink, panique sur le pool, foule de vendeurs.
+  reUSD : dépréciation par l'émetteur (deux comportements), cascade par l'oracle TWAP, foule de vendeurs. sUSDS :
+  décrochage d'USDS, panique, foule de vendeurs. Contagion : fuite des déposants de Smokehouse USDT. Plus la pause du SY
+  par Pendle, jouée à la main. Couches : émetteur (L2), oracle (L3), pool (L4), prêt (L5), règlement (L1).
 - **« Votre chiffre inclut quoi ? »** La perte de parité du stablecoin (ou la dépréciation de reUSD), probabilisée sur
   l'historique. La panne d'oracle, la panique sur le pool et la pause Pendle sont simulées mais pas probabilisées : la
   page le dit sous le chiffre. La contagion Smokehouse est laissée dehors exprès : elle bloque la sortie, mais le PT
