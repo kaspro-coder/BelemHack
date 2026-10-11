@@ -116,7 +116,13 @@ reset puts the real code back.
 
 Four PowerShell windows.
 
-**Window 1, the local chain** (skip if Anvil is already running):
+**Window 1, the local chain.** First check whether one already runs:
+```powershell
+cast block-number --rpc-url http://127.0.0.1:8545
+```
+If it answers with the block number, Anvil is running. If `anvil` below fails with `os error 10048`, the port is
+taken by an Anvil that is already running. For a demo, run it in your own window so it does not depend on another
+session: stop the old one with `Stop-Process -Name anvil -Force`, then start it here:
 ```powershell
 cd C:\Users\Abdel\defi-risk
 $env:Path += ";C:\Users\Abdel\.foundry\bin"
