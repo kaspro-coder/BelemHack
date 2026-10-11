@@ -10,3 +10,4 @@ sim/cache/
 data/anvil.log
 data/src_oracle/
 data/fork_block.txt
+dashboard/fork_status.json
