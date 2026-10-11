@@ -1,17 +1,17 @@
 # Pitch (5 minutes), dans l'ordre de la page
 
 D'abord le graphe des dépendances, ensuite la question du risk manager avec l'incident en direct.
-Le texte en italique est à dire (environ 470 mots, soit 3 min 30 de parole à un rythme calme ; le reste, ce sont les
+Le texte en italique est à dire (environ 570 mots, soit 4 min de parole à un rythme calme ; le reste, ce sont les
 clics et l'attente des commandes). « À l'écran » dit quoi montrer.
 
 | Partie | Durée | Cumul |
 |---|---|---|
-| 0 · Accroche | 15 s | 0:15 |
-| 1 · Dépendances | 1 min | 1:15 |
-| 2 · Rester ou sortir | 40 s | 1:55 |
-| 3 · L'incident en direct | 1 min 45 | 3:40 |
-| 4 · Les deux autres positions et le book | 50 s | 4:30 |
-| 5 · Clôture | 20 s | 4:50 |
+| 0 · Accroche | 25 s | 0:25 |
+| 1 · Dépendances | 1 min | 1:25 |
+| 2 · Rester ou sortir | 40 s | 2:05 |
+| 3 · L'incident en direct | 1 min 45 | 3:50 |
+| 4 · Les deux autres positions et le book | 50 s | 4:40 |
+| 5 · Clôture | 20 s | 5:00 |
 
 ## Avant de monter sur scène
 - Anvil lancé, étape 0 faite, snapshot pris, fenêtre 3 (`forkwatch`) relancée **avant** l'incident.
@@ -21,10 +21,13 @@ clics et l'attente des commandes). « À l'écran » dit quoi montrer.
 
 ---
 
-## 0 · Accroche (15 s)
+## 0 · Accroche (25 s)
 
-*« Un PT Pendle, c'est une ligne dans un portefeuille. Deux questions : de quoi dépend cette ligne, et quand un incident
-arrive, est-ce qu'on reste ou est-ce qu'on sort ? »*
+*« Une position on-chain, c'est une ligne dans un book. Mais derrière cette ligne, il y a une chaîne, un émetteur, un
+oracle, un marché, des prêteurs, et on ne voit presque rien de tout ça depuis la position. Belem nous a donné un
+exemple, le PT Pendle. On l'a pris sur trois actifs qui couvrent leurs autres cas : un coffre qui couvre ses positions
+sur des plateformes de perp, des actifs dont le prix vient d'un seul flux, et un émetteur unique. Deux questions : de
+quoi dépend la ligne, et quand un incident arrive, on reste ou on sort ? »*
 
 **À l'écran** : le haut de la page.
 
