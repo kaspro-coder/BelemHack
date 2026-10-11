@@ -231,7 +231,12 @@ def main():
     if "--seller" in sys.argv:
         SELLER = sys.argv[sys.argv.index("--seller") + 1]
     while True:
-        s = check()
+        try:
+            s = check()
+        except Exception as e:  # Anvil down or restarting: keep waiting instead of crashing
+            print(f"local chain not reachable ({str(e)[:80]}), retrying...", flush=True)
+            time.sleep(loop or 3)
+            continue
         line = [f"block {s['block']} +{s['hours_since_fork']:.1f}h"]
         for t in s["tokens"]:
             if "error" in t:
