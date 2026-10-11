@@ -7,21 +7,13 @@
 <style>
 /* Grayscale, square, plain: an open-source tool look. Severity is shown by weight and inversion, not colour. */
 :root {
-  --bg: #ffffff; --card: #ffffff; --ink: #111111; --muted: #666666; --line: #cfcfcf;
+  --bg: #ffffff; --card: #ffffff; --ink: #000000; --muted: #555555; --line: #cfcfcf;
   --stay: #8c8c8c; --stay-bg: #ffffff; --exit: #111111; --exit-bg: #111111;
   --warn: #333333; --warn-bg: #f2f2f2; --accent: #111111; --accent-bg: #f2f2f2;
   --n-pos: #111111; --n-amm: #555555; --n-asset: #777777; --n-issuer: #333333;
   --n-lend: #222222; --n-oracle: #555555; --n-venue: #888888; --n-vault: #333333; --n-other: #9a9a9a;
 }
-@media (prefers-color-scheme: dark) {
-  :root {
-    --bg: #0d0d0d; --card: #0d0d0d; --ink: #e6e6e6; --muted: #9a9a9a; --line: #3a3a3a;
-    --stay: #8a8a8a; --stay-bg: #0d0d0d; --exit: #f0f0f0; --exit-bg: #f0f0f0;
-    --warn: #cfcfcf; --warn-bg: #1c1c1c; --accent: #e6e6e6; --accent-bg: #1c1c1c;
-    --n-pos: #f0f0f0; --n-amm: #b0b0b0; --n-asset: #9a9a9a; --n-issuer: #d0d0d0;
-    --n-lend: #e0e0e0; --n-oracle: #b0b0b0; --n-venue: #808080; --n-vault: #d0d0d0; --n-other: #6e6e6e;
-  }
-}
+html { color-scheme: light; }
 * { box-sizing: border-box; border-radius: 0 !important; }
 body { margin: 0; background: var(--bg); color: var(--ink); font: 13.5px/1.55 ui-monospace, "SFMono-Regular", Menlo, Consolas, "Liberation Mono", monospace; }
 .wrap { max-width: 1160px; margin: 0 auto; padding: 24px 16px 56px; }
