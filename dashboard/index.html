@@ -178,6 +178,7 @@ a { color: var(--ink); }
   <section class="card">
     <details class="more" style="margin-top:0"><summary>How probabilities are estimated</summary>
       <p class="lead" id="probs"></p></details>
+    <details class="more"><summary id="mathsum">How the number is computed</summary><div id="math"></div></details>
     <details class="more"><summary>How this was produced</summary>
       <p class="lead">An Anvil fork of Ethereum mainnet, pinned at one block. Each scenario starts from the real state, forces one event (mocked price feed, issuer write-down, whale dump, time warp), lets the real Morpho, Pendle and oracle contracts react, measures, then reverts.</p>
       <pre>anvil --fork-url $ETH_RPC_URL --fork-block-number <span id="blk"></span>
@@ -270,8 +271,45 @@ function renderPosition() {
   [["lo", "Low end of 90% range"], ["p", "Central"], ["hi", "High end"]].forEach(([k, l]) =>
     r += `<tr><td>${l}</td><td>${pct(at[k].expected_loss, 3)}</td><td><b style="color:var(--${at[k].verdict === "STAY" ? "stay" : "exit"})">${at[k].verdict.toLowerCase()}</b> (${at[k].edge > 0 ? "+" : ""}${pct(at[k].edge, 3)})</td></tr>`);
   $("range").innerHTML = r;
-  renderCascade(p); renderExit(p); renderEvents(p); renderExtra(p); renderCalc();
+  renderCascade(p); renderExit(p); renderEvents(p); renderExtra(p); renderCalc(); renderMath(p);
 }
+
+// Every step behind the headline number, for the selected position (same formulas as simulation.py).
+function renderMath(p) {
+  const d = p.decision, at = d.at, f = (x, n = 3) => pct(x, n), sg = x => (x >= 0 ? "+" : "") + pct(x, 3);
+  const sev = Object.keys(p.probabilities).map(Number).sort((a, b) => a - b);
+  const P = s => p.probabilities[String(s)] || p.probabilities[s];
+  const windows = P(sev[0]).episodes / P(sev[0]).p;
+  const dvr = p.driver.split(" (")[0];
+  $("mathsum").textContent = `How the number is computed (${p.name})`;
+  let h = `<h3>1 · The number</h3><p>staying vs exiting = yield given up by exiting + execution cost of exiting − expected loss if we stay</p>
+    <table><tr><th>Probability estimate</th><th>Yield given up</th><th>+ Exit cost</th><th>− Expected loss</th><th>= Staying vs exiting</th><th>Verdict</th></tr>` +
+    [["lo", "low end"], ["p", "central"], ["hi", "high end"]].map(([k, l]) =>
+      `<tr><td>${l}</td><td>${f(d.carry)}</td><td>${f(d.exit_cost)}</td><td>${f(at[k].expected_loss)}</td><td><b>${sg(at[k].edge)}</b></td><td><span class="${at[k].edge > 0 ? "g" : "r"}">${at[k].edge > 0 ? "stay" : "exit"}</span></td></tr>`).join("") +
+    `</table><p class="sub">The three agree → that verdict. They disagree → UNCLEAR (reduce). The low end of the probabilities gives the high end of the number.</p>`;
+  h += `<h3>2 · Yield given up by exiting</h3><p>(PT implied APY − 3-month T-bill) × days to expiry / 365 = (${f(p.implied_apy, 2)} − ${f(d.risk_free, 2)}) × ${p.days.toFixed(1)} / 365 = <b>${f(d.carry)}</b></p>
+    <p class="sub">Exiting means holding T-bills instead of the PT until its expiry (${p.expiry}). APY read from the Pendle pool on the fork; T-bill from FRED (DTB3).</p>`;
+  h += `<h3>3 · Execution cost of exiting now</h3><p>1 − (dollars received selling 1M PT on the fork) / (1M × mark price) = 1 − ${usd(p.calm_exit)} / ${usd(1e6 * p.mark)} = <b>${f(d.exit_cost)}</b></p>
+    <p class="sub">A real swap through the Pendle pool on the fork: slippage and fees included, no off-chain limit orders.</p>`;
+  h += `<h3>4 · Probability of a persistent ${dvr} of size d before expiry</h3>
+    <table><tr><th>d</th><th>Episodes observed</th><th>P(move ≥ d)</th><th>90% range</th></tr>` +
+    sev.map(s => `<tr><td>${sev_(s)}</td><td>${P(s).episodes}</td><td>${f(P(s).p)}</td><td>${f(P(s).lo)} - ${f(P(s).hi)}</td></tr>`).join("") +
+    `</table><p class="sub">Cohort: ${P(sev[0]).coins} non-fiat USD stablecoins above $100M, weekly prices over about 3 years. An episode = two weekly prices in a row at or below 1 − d. P = episodes / ${Math.round(windows)} holding windows of ${Math.round(p.days)} days observed. 90% range: exact Poisson interval on the episode count.${p.name === "PT-reUSD" ? " For reUSD the same cohort stands in for an issuer write-down." : ""}</p>`;
+  const rows = sev.map((s, i) => {
+    const nxt = i + 1 < sev.length ? sev[i + 1] : null;
+    const b = k => Math.max(0, P(s)[k] - (nxt !== null ? P(nxt)[k] : 0));
+    return { s, nxt, b };
+  });
+  h += `<h3>5 · Expected loss if we stay</h3><p>Σ over size buckets of P(move in the bucket) × d. A persistent move of d costs d at expiry: the PT repays in an asset worth 1 − d.</p>
+    <table><tr><th>Bucket</th><th>P(in bucket), central</th><th>× loss d</th><th>= contribution</th><th>low end</th><th>high end</th></tr>` +
+    rows.map(r => `<tr><td>${sev_(r.s)}${r.nxt !== null ? " to " + sev_(r.nxt) : " and more"}</td><td>${f(r.b("p"))}</td><td>${sev_(r.s)}</td><td>${f(r.b("p") * r.s, 4)}</td><td>${f(r.b("lo") * r.s, 4)}</td><td>${f(r.b("hi") * r.s, 4)}</td></tr>`).join("") +
+    `<tr><td><b>Expected loss</b></td><td></td><td></td><td><b>${f(at.p.expected_loss)}</b></td><td><b>${f(at.lo.expected_loss)}</b></td><td><b>${f(at.hi.expected_loss)}</b></td></tr></table>
+    <p class="sub">Each bucket is charged its smallest move, so within a bucket the loss is a lower bound; the last bucket is charged ${sev_(sev[sev.length - 1])}. ` +
+    `The one episode of ${sev_(sev[sev.length - 1])} or more weighs ${pct(rows[rows.length - 1].b("hi") * sev[sev.length - 1] / at.hi.expected_loss, 0)} of the high end: the range is wide because big depegs are rare. ` +
+    `Losses from incidents without a probability (oracle failure, PT panic, Pendle pause) are not in this sum.</p>`;
+  $("math").innerHTML = h;
+}
+const sev_ = s => pct(s, Number.isInteger(+(s * 100).toFixed(4)) ? 0 : 1);
 
 function bars(svgId, rows, series, yfmt) {
   const W = 520, H = 290, L = 66, B = 34, T = 12, R = 8;
