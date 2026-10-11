@@ -137,7 +137,8 @@ Four PowerShell windows.
 ```powershell
 cast block-number --rpc-url http://127.0.0.1:8545
 ```
-If it answers with the block number, Anvil is running. If `anvil` below fails with `os error 10048`, the port is
+If it answers with the block number, Anvil is running. If it fails with `os error 10061` (connection refused), no
+Anvil is running: start it below. If `anvil` below fails with `os error 10048`, the port is
 taken by an Anvil that is already running. For a demo, run it in your own window so it does not depend on another
 session: stop the old one with `Stop-Process -Name anvil -Force`, then start it here:
 ```powershell
@@ -353,7 +354,8 @@ Not replayed: an Ethereum outage or a bug inside Morpho or Pendle themselves.
 - `MODT: ...` messages come from the oracle's challenge rules (deviation not met, timelock not passed, resolved).
 - A command fails with "insufficient funds": the sender has no ETH for gas, rerun the `anvil_setBalance` line.
 - The panel does not move: check window 3 (forkwatch) is running and that you opened http://localhost:8765.
-- Anvil was restarted: the snapshot and `$SELLER` are gone, redo step 0.
+- `os error 10061` on any command: Anvil is not running (window 1 closed or stopped). Start it again, then redo step 0:
+  a new Anvil has no snapshot, no seller and no fund positions. Window 3 can keep running, it reconnects by itself.
 
 ## Method
 
