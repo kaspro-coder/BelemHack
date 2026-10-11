@@ -60,6 +60,7 @@ src/defi_risk/
   cohort.py, venues.py    measured base rates (stablecoin depegs, exchange hacks)
   simulation.py           decision layer fed by the fork results
   sim_report.py           text report;  dashboard.py: exports dashboard/data.json
+  map.py                  map any Pendle PT live, layer by layer (python -m defi_risk.map USD3 2026-12-17, ~5 s)
   ecosystem.py            scan of every Pendle PT used as Morpho collateral, shared dependencies ranked
   portfolio.py            book view: which event hits which pocket, with contagion
   forkwatch.py            live state of the local fork during a manual demo -> dashboard/fork_status.json
@@ -102,6 +103,7 @@ before being written here. Commands are for **Windows PowerShell**.
 ### The demo, in order (about 5 minutes)
 
 1. **The question** (top of the page, summary): three PTs that look alike react in opposite ways.
+   Optional: map a PT nobody prepared, live, in a terminal: `cd src; python -m defi_risk.map USD3 2026-12-17` (about 5 s).
 2. **The book before** (orange panel, "Your book, right now"): three pockets `normal`, about $2.96M in total.
 3. **Incident 1, live**, from window 4, one step at a time, pointing at the book table after each:
    - 1a USDe at $0.99: `exit still possible`, about $981k, **16 h left**. "Noticing is easy; what matters is the 16 hours."
